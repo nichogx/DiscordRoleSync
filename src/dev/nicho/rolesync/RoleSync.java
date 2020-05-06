@@ -1,5 +1,6 @@
 package dev.nicho.rolesync;
 
+import dev.nicho.rolesync.db.SQLiteHandler;
 import net.dv8tion.jda.api.AccountType;
 import net.dv8tion.jda.api.JDABuilder;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -9,8 +10,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 import javax.security.auth.login.LoginException;
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 
 public class RoleSync extends JavaPlugin {
+
+    private YamlConfiguration language = null;
 
     @Override
     public void onLoad() {
@@ -23,7 +27,7 @@ public class RoleSync extends JavaPlugin {
         File langFile = loadLangFile(getConfig().getString("language"));
         getLogger().info("Loaded " + langFile.getName());
 
-        YamlConfiguration language = new YamlConfiguration();
+        language = new YamlConfiguration();
         try {
             language.load(langFile);
         } catch (IOException | InvalidConfigurationException e) {
@@ -38,9 +42,15 @@ public class RoleSync extends JavaPlugin {
         getLogger().info("Initializing bot");
         JDABuilder builder = new JDABuilder(AccountType.BOT);
         builder.setToken(getConfig().getString("botInfo.token"));
-        builder.addEventListeners(new SyncBot(this));
         try {
+            builder.addEventListeners(new SyncBot(this, language));
             builder.build();
+        } catch (IOException | SQLException e) {
+            getLogger().severe("Error setting up database");
+            e.printStackTrace();
+            this.setEnabled(false);
+
+            return;
         } catch (LoginException e) {
             getLogger().severe("Error logging in. Did you set your token in config.yml?");
             this.setEnabled(false);

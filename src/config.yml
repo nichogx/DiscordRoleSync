@@ -15,17 +15,21 @@ botInfo:
   channelsToListen:
     - "000000000000000000" # general
 
-# which database to use. Options are sqlite (file) or mysql
-# for mysql you need to set the mysql configs below
-databaseType: "mysql"
-
-# info for connecting to the MySQL database
-mysql:
-  dbhost: ""
-  dbport: 3306
-  dbname: ""
-  dbuser: ""
-  dbpass: ""
+database:
+  # which database to use. Options are sqlite (file) or mysql
+  # for mysql you need to set the mysql configs below
+  type: "sqlite"
+  # prefix for the tables that will be created in the databases
+  # (do not include the _)
+  tablePrefix: "syncbot"
+  # info for connecting to the MySQL database, ignored unless
+  # database.type is "mysql"
+  mysql:
+    dbhost: ""
+    dbport: 3306
+    dbname: ""
+    dbuser: ""
+    dbpass: ""
 
 # whether or not to delete the user commands after
 # reacting and a few seconds pass
