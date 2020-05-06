@@ -1,0 +1,72 @@
+# the language the plugin and bot should run in
+# check the Spigot page for supported languages.
+#   you can add your own language files inside the language
+#   folder and put the name of the file (without the .yml part) here.
+language: "en_US"
+
+botInfo:
+  # the prefix the bot should listen to (can be any length)
+  prefix: "-"
+  # token - you should keep this a secret
+  # get one from the Discord developer portal
+  token: ""
+  # the bot will listen for commands from regular users on these chats
+  # it will always reply to commands from who has the roles in adminCommandRoles
+  channelsToListen:
+    - "000000000000000000" # general
+
+# which database to use. Options are sqlite (file) or mysql
+# for mysql you need to set the mysql configs below
+databaseType: "mysql"
+
+# info for connecting to the MySQL database
+mysql:
+  dbhost: ""
+  dbport: 3306
+  dbname: ""
+  dbuser: ""
+  dbpass: ""
+
+# whether or not to delete the user commands after
+# reacting and a few seconds pass
+deleteCommands: false
+
+# time, in seconds, to wait before deleting a command
+# this is ignored if deleteCommands is false, but is necessary
+deleteAfter: 10
+
+# should the bot manage the whitelist.json file?
+manageWhitelist: true
+
+# IDs of the roles that should have their members in the whitelist.json file
+whitelistRoles:
+  - "000000000000000000" # whitelisted
+
+# IDs of the roles that should be allowed to use admin commands such as unlink and info
+adminCommandRoles:
+  - "000000000000000000" # administrator
+  - "000000000000000000" # moderator
+
+# the permission plugin you are using
+# check the Spigot page for supported plugins
+permissionPlugin: "luckperms"
+
+# permissions to add to users with one of the roles in the list
+# follow the example and add more as needed
+permissions:
+  - group.admin:
+      - "000000000000000000" # administrator
+  - group.mod:
+      - "000000000000000000" # moderator
+  - group.vip:
+      - "000000000000000000" # twitch subs
+      - "000000000000000000" # irl friends or something
+
+# emojis to use for reaction
+# to use a custom emoji, you can put its ID instead of the actual
+# unicode emoji
+react:
+  onSuccess: "✅"
+  onUserError: "❌"
+  onBotError: "⚠"
+  onPermissionError: "🛑"
