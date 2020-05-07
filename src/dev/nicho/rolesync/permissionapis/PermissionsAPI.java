@@ -1,8 +1,11 @@
 package dev.nicho.rolesync.permissionapis;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public abstract class PermissionsAPI {
 
-    public abstract void setPermissions(String uuid, List<String> permissions, List<String> managed);
+    protected List<String> managedPerms = null;
+
+    public abstract void setPermissions(String uuid, @Nullable List<String> permissions);
 }

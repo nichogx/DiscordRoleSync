@@ -7,6 +7,7 @@ import net.luckperms.api.node.Node;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
@@ -16,7 +17,7 @@ public class LuckPermsAPI extends PermissionsAPI {
 
     private LuckPerms lp = null;
 
-    public LuckPermsAPI() throws PermPluginNotFoundException {
+    public LuckPermsAPI(List<String> managedPerms) throws PermPluginNotFoundException {
         RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
 
         if (provider == null) {
@@ -24,21 +25,22 @@ public class LuckPermsAPI extends PermissionsAPI {
         } else {
             lp = provider.getProvider();
         }
+
+        this.managedPerms = managedPerms;
     }
 
     @Override
-    public void setPermissions(String uuid, List<String> permissions, List<String> managed) {
+    public void setPermissions(String uuid, @Nullable List<String> permissions) {
         CompletableFuture<User> userFuture = lp.getUserManager().loadUser(UUID.fromString(uuid));
         userFuture.thenAcceptAsync(user -> {
             user.getNodes().forEach(node -> {
-                if (managed.contains(node.getKey())) {
+                if (managedPerms.contains(node.getKey())) {
                     user.data().remove(node);
                 }
             });
 
-            permissions.forEach(perm -> {
+            if (permissions != null) permissions.forEach(perm -> {
                 Node node = Node.builder(perm).value(true).build();
-                System.out.println("node for " + perm + " being added"); // TODO remove
                 user.data().add(node);
             });
 
