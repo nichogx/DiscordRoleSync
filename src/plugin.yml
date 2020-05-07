@@ -6,3 +6,8 @@ main: dev.nicho.rolesync.RoleSync
 loadbefore:
   - LuckPerms
   - someplugin
+commands:
+  discordrolesync:
+    description: Commands to manage the DiscordRoleSync plugin.
+    aliases:
+      - drs

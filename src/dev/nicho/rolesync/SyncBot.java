@@ -42,22 +42,12 @@ public class SyncBot extends ListenerAdapter {
     private PermissionsAPI permPlugin = null;
     private JDA bot = null;
 
-    public SyncBot(@Nonnull JavaPlugin plugin, YamlConfiguration language) throws IOException, SQLException, PermPluginNotFoundException {
+    public SyncBot(@Nonnull JavaPlugin plugin, YamlConfiguration language, DatabaseHandler db) throws IOException, SQLException, PermPluginNotFoundException {
         super();
         this.plugin = plugin;
         this.lang = language;
+        this.db = db;
         plugin.getLogger().info("Finished initializing bot.");
-
-        if (plugin.getConfig().getString("database.type").equalsIgnoreCase("mysql")) {
-            this.db = new MySQLHandler(plugin,
-                    plugin.getConfig().getString("database.mysql.dbhost"),
-                    plugin.getConfig().getInt("database.mysql.dbport"),
-                    plugin.getConfig().getString("database.mysql.dbname"),
-                    plugin.getConfig().getString("database.mysql.dbuser"),
-                    plugin.getConfig().getString("database.mysql.dbpass"));
-        } else {
-            this.db = new SQLiteHandler(plugin, new File(plugin.getDataFolder(), "database.db"));
-        }
 
         ConfigurationSection perms = plugin.getConfig().getConfigurationSection("permissions");
         List<String> managedPerms = new ArrayList<String>();

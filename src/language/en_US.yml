@@ -2,3 +2,19 @@ linkedTo: "Linked to"
 unknownUser: "unknown user"
 discordAlreadyLinked: "Your Discord account is already linked with a Minecraft account"
 minecraftAlreadyLinked: "Your Minecraft account is already linked with a Discord account"
+
+whitelistResetComplete: "Whitelist reset complete"
+whitelistEnabled: "Whitelist management has been enabled. Please enable whitelist using /whitelist on"
+whitelistDisabled: "Whitelist management has been disabled. Please disable whitelist using /whitelist off if wanted"
+whitelistNotEnabled: "Whitelist management is not enabled in this server."
+
+noPermissionError: "You do not have permission to run this command."
+commandError: "Error while performing command. Please check console."
+
+usage: "Usage:"
+drsWhitelistDescription: "Manage whitelist"
+drsReloadDescription: "Reload config and language files"
+
+drsWhitelistResetDescription: "Resets the whitelist with only the players that have the role(s)."
+drsWhitelistEnableDescription: "Enables whitelist management."
+drsWhitelistDisableDescription: "Disables whitelist management."

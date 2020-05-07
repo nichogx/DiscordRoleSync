@@ -124,4 +124,12 @@ public abstract class DatabaseHandler {
 
         return ps.executeQuery();
     }
+
+    public ResultSet getWhitelist() throws SQLException {
+        Connection c = this.getConnection();
+        PreparedStatement ps = c.prepareStatement("SELECT * FROM "
+                + plugin.getConfig().getString("database.tablePrefix") + "_whitelist");
+
+        return ps.executeQuery();
+    }
 }
