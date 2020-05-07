@@ -116,4 +116,12 @@ public abstract class DatabaseHandler {
 
         removeFromWhitelist(uuid);
     }
+
+    public ResultSet getAllLinkedUsers() throws SQLException {
+        Connection c = this.getConnection();
+        PreparedStatement ps = c.prepareStatement("SELECT * FROM "
+                + plugin.getConfig().getString("database.tablePrefix") + "_discordmcusers");
+
+        return ps.executeQuery();
+    }
 }

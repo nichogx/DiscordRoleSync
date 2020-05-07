@@ -26,6 +26,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.IOException;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -76,6 +77,25 @@ public class SyncBot extends ListenerAdapter {
         this.ch = new CommandHandler();
 
         plugin.getLogger().info("Logged in: " + event.getJDA().getSelfUser().getName());
+
+        try {
+            ResultSet linkedUsers = db.getAllLinkedUsers();
+
+            while (linkedUsers.next()) {
+                String discordID = linkedUsers.getString(1);
+                String uuid = linkedUsers.getString(2);
+
+                bot.retrieveUserById(discordID).queue(user -> {
+                    if (user != null) {
+                        checkRoles(user, uuid);
+                    }
+                });
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().severe("An error occured while checking all users. " +
+                    "Please check the stack trace below and contact the developer.");
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -95,20 +115,14 @@ public class SyncBot extends ListenerAdapter {
         String[] argv = message.split(" ");
         argv[0] = argv[0].substring(prefix.length()); // remove prefix
 
-        try {
-            if (argv[0].equalsIgnoreCase("info")) {
-                ch.info(argv, event);
-            } else if (argv[0].equalsIgnoreCase("link")) {
-                ch.link(argv, event);
-                User user = event.getAuthor();
-                checkRoles(user, db.findUUIDByDiscordID(user.getId()));
-            } else if (argv[0].equalsIgnoreCase("unlink")) {
-                ch.unlink(argv, event);
-            }
-        } catch (SQLException e) {
-            plugin.getLogger().severe("An error occured while processing a command. " +
-                    "Please check the stack trace below and contact the developer.");
-            e.printStackTrace();
+        if (argv[0].equalsIgnoreCase("info")) {
+            ch.info(argv, event);
+        } else if (argv[0].equalsIgnoreCase("link")) {
+            ch.link(argv, event);
+            User user = event.getAuthor();
+            checkRoles(user);
+        } else if (argv[0].equalsIgnoreCase("unlink")) {
+            ch.unlink(argv, event);
         }
 
     }
@@ -116,25 +130,25 @@ public class SyncBot extends ListenerAdapter {
 
     @Override
     public void onGuildMemberRoleAdd(@Nonnull GuildMemberRoleAddEvent event) {
-        userUpdated(event.getUser());
+        checkRoles(event.getUser());
     }
 
     @Override
     public void onGuildMemberRoleRemove(@Nonnull GuildMemberRoleRemoveEvent event) {
-        userUpdated(event.getUser());
+        checkRoles(event.getUser());
     }
 
     @Override
     public void onGuildMemberRemove(@Nonnull GuildMemberRemoveEvent event) {
-        userUpdated(event.getUser());
+        checkRoles(event.getUser());
     }
 
     @Override
     public void onGuildBan(@Nonnull GuildBanEvent event) {
-        userUpdated(event.getUser());
+        checkRoles(event.getUser());
     }
 
-    void userUpdated(User user) {
+    void checkRoles(User user) {
         try {
             checkRoles(user, db.findUUIDByDiscordID(user.getId()));
         } catch (SQLException e) {
@@ -143,26 +157,6 @@ public class SyncBot extends ListenerAdapter {
             e.printStackTrace();
         }
     }
-
-//    void userLeft(User user) {
-//        // remove whitelist and roles
-//        try {
-//            String uuid = db.findUUIDByDiscordID(user.getId());
-//
-//            // remove all managed permissions
-//            permPlugin.setPermissions(uuid, null);
-//
-//            // remove whitelist
-//            db.removeFromWhitelist(uuid);
-//            if (plugin.getConfig().getBoolean("manageWhitelist"))
-//                Bukkit.getOfflinePlayer(UUID.fromString(uuid)).setWhitelisted(false);
-//
-//        } catch (SQLException e) {
-//            plugin.getLogger().severe("An error occured while looking for the UUID of a user. " +
-//                    "Please check the stack trace below and contact the developer.");
-//            e.printStackTrace();
-//        }
-//    }
 
     void checkRoles(User user, String uuid) {
         try {
