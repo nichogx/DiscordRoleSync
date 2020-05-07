@@ -37,7 +37,7 @@ public abstract class DatabaseHandler {
     public String findUUIDByDiscordID(String id) throws SQLException {
         Connection c = this.getConnection();
         PreparedStatement ps = c.prepareStatement(
-                "SELECT minecraft_uuid FROM " + plugin.getConfig().getString("database.tablePrefix") + "_discordmcusers" +
+                "SELECT minecraft_uuid FROM " + plugin.getConfig().getString("database.tablePrefix") + "_discordmcusers " +
                         "WHERE discord_id = ?"
         );
 
@@ -45,7 +45,7 @@ public abstract class DatabaseHandler {
 
         ResultSet res = ps.executeQuery();
 
-        if (res.first()) return res.getString(1);
+        if (res.next()) return res.getString(1);
 
         return null;
     }
@@ -53,7 +53,7 @@ public abstract class DatabaseHandler {
     public String findDiscordIDbyUUID(String uuid) throws SQLException {
         Connection c = this.getConnection();
         PreparedStatement ps = c.prepareStatement(
-                "SELECT discord_id FROM " + plugin.getConfig().getString("database.tablePrefix") + "_discordmcusers" +
+                "SELECT discord_id FROM " + plugin.getConfig().getString("database.tablePrefix") + "_discordmcusers " +
                         "WHERE minecraft_uuid = ?"
         );
 
@@ -61,12 +61,47 @@ public abstract class DatabaseHandler {
 
         ResultSet res = ps.executeQuery();
 
-        if (res.first()) return res.getString(1);
+        if (res.next()) return res.getString(1);
 
         return null;
     }
 
-    public void linkUser() throws SQLException {
+    public void linkUser(String discordID, String minecraftUUID) throws SQLException {
+        Connection c = this.getConnection();
+        PreparedStatement ps = c.prepareStatement(
+                "INSERT INTO " + plugin.getConfig().getString("database.tablePrefix") +
+                        "_discordmcusers (discord_id, minecraft_uuid) SELECT ?, ? FROM (SELECT 1) " +
+                        "as A WHERE NOT EXISTS(SELECT * FROM " + plugin.getConfig().getString("database.tablePrefix") +
+                        "_discordmcusers WHERE minecraft_uuid = ?);"
+        );
 
+        ps.setString(1, discordID);
+        ps.setString(2, minecraftUUID);
+        ps.setString(3, minecraftUUID);
+
+        ps.execute();
+    }
+
+    public void addToWhitelist(String uuid) throws SQLException {
+        Connection c = this.getConnection();
+        PreparedStatement ps = c.prepareStatement(
+                "INSERT INTO " + plugin.getConfig().getString("database.tablePrefix") + "_whitelist (uuid) " +
+                "SELECT ? FROM (SELECT 1) as A WHERE NOT EXISTS (" +
+                "SELECT * FROM " + plugin.getConfig().getString("database.tablePrefix") + "_whitelist WHERE uuid = ?);");
+
+        ps.setString(1, uuid);
+        ps.setString(2, uuid);
+
+        ps.execute();
+    }
+
+    public void removeFromWhitelist(String uuid) throws SQLException {
+        Connection c = this.getConnection();
+        PreparedStatement ps = c.prepareStatement("DELETE FROM "
+                + plugin.getConfig().getString("database.tablePrefix") + "_whitelist WHERE uuid = ?");
+
+        ps.setString(1, uuid);
+
+        ps.execute();
     }
 }

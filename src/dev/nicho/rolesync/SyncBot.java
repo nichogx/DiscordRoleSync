@@ -3,15 +3,22 @@ package dev.nicho.rolesync;
 import dev.nicho.rolesync.db.DatabaseHandler;
 import dev.nicho.rolesync.db.MySQLHandler;
 import dev.nicho.rolesync.db.SQLiteHandler;
+import dev.nicho.rolesync.permissionapis.LuckPermsAPI;
+import dev.nicho.rolesync.permissionapis.PermPluginNotFoundException;
+import dev.nicho.rolesync.permissionapis.PermissionsAPI;
+import dev.nicho.rolesync.util.JDAUtils;
 import dev.nicho.rolesync.util.MojangAPI;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.ReadyEvent;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleRemoveEvent;
 import net.dv8tion.jda.api.events.guild.member.update.GenericGuildMemberUpdateEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import org.apache.commons.lang3.StringUtils;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -28,8 +35,10 @@ public class SyncBot extends ListenerAdapter {
     private DatabaseHandler db = null;
     private CommandHandler ch = null;
     private YamlConfiguration lang = null;
+    private PermissionsAPI permPlugin = null;
+    private JDA bot = null;
 
-    public SyncBot(@Nonnull JavaPlugin plugin, YamlConfiguration language) throws IOException, SQLException {
+    public SyncBot(@Nonnull JavaPlugin plugin, YamlConfiguration language) throws IOException, SQLException, PermPluginNotFoundException {
         super();
         this.plugin = plugin;
         this.lang = language;
@@ -45,11 +54,17 @@ public class SyncBot extends ListenerAdapter {
         } else {
             this.db = new SQLiteHandler(plugin, new File(plugin.getDataFolder(), "database.db"));
         }
+
+        if (plugin.getConfig().getString("permissionPlugin").equalsIgnoreCase("luckperms")) {
+            this.permPlugin = new LuckPermsAPI();
+        }
     }
 
     @Override
     public void onReady(@Nonnull ReadyEvent event) {
-        this.ch = new CommandHandler(plugin, event.getJDA(), db, lang);
+        this.bot = event.getJDA();
+        this.ch = new CommandHandler(plugin, bot, db, lang);
+
         plugin.getLogger().info("Logged in: " + event.getJDA().getSelfUser().getName());
     }
 
@@ -67,12 +82,63 @@ public class SyncBot extends ListenerAdapter {
 
         if (argv[0].equalsIgnoreCase("info")) {
             ch.info(argv, event);
+        } else if (argv[0].equalsIgnoreCase("link")) {
+            ch.link(argv, event);
+            checkRoles(event.getAuthor());
         }
     }
 
-    @Override
-    public void onGenericGuildMemberUpdate(@Nonnull GenericGuildMemberUpdateEvent event) {
 
+    @Override
+    public void onGuildMemberRoleAdd(@Nonnull GuildMemberRoleAddEvent event) {
+        plugin.getLogger().warning("GuildMemberRoleAddEvent: " + event.getUser().getAsTag()); // TODO remove
+        checkRoles(event.getUser());
+    }
+
+    @Override
+    public void onGuildMemberRoleRemove(@Nonnull GuildMemberRoleRemoveEvent event) {
+        plugin.getLogger().warning("GuildMemberRoleRemoveEvent: " + event.getUser().getAsTag()); // TODO remove
+        checkRoles(event.getUser());
+    }
+
+    void checkRoles(User user) {
+        try {
+            ConfigurationSection perms = plugin.getConfig().getConfigurationSection("permissions");
+            String uuid = db.findUUIDByDiscordID(user.getId());
+            plugin.getLogger().warning("CheckRoles: " + user.getAsTag() + " uuid: " + uuid); // TODO remove
+            if (uuid == null) { // user not linked
+                return; // ignore
+            }
+
+            List<String> permsToHave = new ArrayList<String>();
+            List<String> managedPerms = new ArrayList<String>();
+            for (String perm : perms.getKeys(true)) {
+                if (perm.equals("group")) continue; // TODO find out how to ignore non-leaves?
+                final boolean hasRole = JDAUtils.hasRoleFromList(user, perms.getStringList(perm), bot);
+                plugin.getLogger().warning("CheckRoles: " + user.getAsTag() + " hasRole: " + hasRole); // TODO remove
+                if (hasRole) {
+                    plugin.getLogger().warning("adding " + perm); // TODO remove
+                    permsToHave.add(perm);
+                }
+                managedPerms.add(perm);
+            }
+            permPlugin.setPermissions(uuid, permsToHave, managedPerms);
+
+
+            if (plugin.getConfig().getBoolean("manageWhitelist")) {
+                if (JDAUtils.hasRoleFromList(user, plugin.getConfig().getStringList("whitelistRoles"), bot)) {
+                    plugin.getLogger().warning("CheckRoles: " + user.getAsTag() + " has whitelist"); // TODO remove
+                    db.addToWhitelist(uuid);
+                } else {
+                    plugin.getLogger().warning("CheckRoles: " + user.getAsTag() + " no whitelist"); // TODO remove
+                    db.removeFromWhitelist(uuid);
+                }
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().severe("An error occured while trying to check roles for the user. " +
+                    "Please check the stack trace below and contact the developer.");
+            e.printStackTrace();
+        }
     }
 }
 
@@ -91,12 +157,13 @@ class CommandHandler {
     }
 
     void info(String[] argv, MessageReceivedEvent event) {
-        if (!hasRoleFromList(event.getAuthor(), plugin.getConfig().getStringList("adminCommandRoles"))) {
-            this.reactAndDelete(plugin.getConfig().getString("react.onPermissionError"), event.getMessage());
+        if (!JDAUtils.hasRoleFromList(event.getAuthor(), plugin.getConfig().getStringList("adminCommandRoles"), bot)) {
+            JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onPermissionError"), event.getMessage(), plugin.getConfig());
+            return;
         }
 
         if (argv.length < 2) {
-            this.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage());
+            JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig());
         }
 
         try {
@@ -105,21 +172,25 @@ class CommandHandler {
                     String uuid = db.findUUIDByDiscordID(argv[1]);
 
                     if (uuid == null) {
-                        this.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage());
+                        JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig());
                         return;
                     }
 
                     String name = MojangAPI.uuidToName(uuid);
 
-                    this.reactAndDelete(plugin.getConfig().getString("react.onSuccessError"), event.getMessage());
-                    event.getChannel().sendMessage(this.lang.getString("linkedTo") + " " + name + " (" + uuid + ")" ).queue();
+                    JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onSuccess"), event.getMessage(), plugin.getConfig());
+                    event.getChannel().sendMessage(this.lang.getString("linkedTo") + " " + name + " (" + uuid + ")" )
+                            .queue(msg -> {
+                                if (plugin.getConfig().getBoolean("deleteCommands"))
+                                    msg.delete().queueAfter(plugin.getConfig().getInt("deleteAfter"), TimeUnit.SECONDS);
+                            });
 
             } else { // try minecraft nick
                 String uuid = MojangAPI.nameToUUID(argv[1]);
-                String id = db.findDiscordIDbyUUID(UUID.fromString(uuid).toString());
+                String id = db.findDiscordIDbyUUID(uuid);
 
                 if (id == null) {
-                    this.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage());
+                    JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig());
                     return;
                 }
 
@@ -129,49 +200,62 @@ class CommandHandler {
                     name = usr.getAsTag();
                 }
 
-                this.reactAndDelete(plugin.getConfig().getString("react.onSuccessError"), event.getMessage());
+                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onSuccess"), event.getMessage(), plugin.getConfig());
                 event.getChannel().sendMessage(this.lang.getString("linkedTo") + " " + name + " (" + id + ")" )
-                        .queue(msg -> msg.delete()
-                                .queueAfter(plugin.getConfig().getInt("deleteAfter"), TimeUnit.SECONDS));
+                        .queue(msg -> {
+                            if (plugin.getConfig().getBoolean("deleteCommands"))
+                                msg.delete().queueAfter(plugin.getConfig().getInt("deleteAfter"), TimeUnit.SECONDS);
+                        });
             }
         } catch (SQLException | IOException e) {
-            reactAndDelete(plugin.getConfig().getString("react.onBotError"), event.getMessage());
+            JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onBotError"), event.getMessage(), plugin.getConfig());
+            plugin.getLogger().severe("An error occured while getting info for the user. " +
+                    "Please check the stack trace below and contact the developer.");
             e.printStackTrace();
         }
     }
 
     void link(String[] argv, MessageReceivedEvent event) {
-        if (!hasRoleFromList(event.getAuthor(), plugin.getConfig().getStringList("adminCommandRoles"))) {
-            this.reactAndDelete(plugin.getConfig().getString("react.onPermissionError"), event.getMessage());
+        if (!plugin.getConfig().getStringList("botInfo.channelsToListen").contains(event.getChannel().getId())
+                && !JDAUtils.hasRoleFromList(event.getAuthor(), plugin.getConfig().getStringList("adminCommandRoles"), bot)) {
+            JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onPermissionError"), event.getMessage(), plugin.getConfig());
+            return;
         }
 
         if (argv.length < 2) {
-            this.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage());
+            JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig());
         }
-    }
 
-    private void reactAndDelete(String reaction, Message message) {
-        message.addReaction(reaction).queue();
+        try {
+            String linkedUUID = db.findUUIDByDiscordID(event.getAuthor().getId());
+            if (linkedUUID != null) {
+                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig());
+                event.getAuthor().openPrivateChannel().queue(channel -> {
+                    channel.sendMessage(lang.getString("discordAlreadyLinked")).queue();
+                });
 
-        if (plugin.getConfig().getBoolean("deleteCommands")) {
-            message.delete().queueAfter(plugin.getConfig().getInt("deleteAfter"), TimeUnit.SECONDS);
-        }
-    }
-
-    private boolean hasRoleFromList(User user, List<String> roleList) {
-        for (Guild guild : bot.getGuilds()) {
-            final Member member = guild.getMember(user);
-            if (member != null) {
-                for (String roleID : roleList) {
-                    Role roleFound = member.getRoles().stream().filter(role -> role.getId().equals(roleID)).findFirst().orElse(null);
-
-                    if (roleFound != null) {
-                        return true;
-                    }
-                }
+                return;
             }
-        }
 
-        return false;
+            String uuid = MojangAPI.nameToUUID(argv[1]);
+            String linkedID = db.findDiscordIDbyUUID(uuid);
+
+            if (linkedID != null) {
+                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig());
+                event.getAuthor().openPrivateChannel().queue(channel -> {
+                    channel.sendMessage(lang.getString("minecraftAlreadyLinked")).queue();
+                });
+
+                return;
+            }
+
+            db.linkUser(event.getAuthor().getId(), uuid);
+            JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onSuccess"), event.getMessage(), plugin.getConfig());
+        } catch (SQLException | IOException e) {
+            JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onBotError"), event.getMessage(), plugin.getConfig());
+            plugin.getLogger().severe("An error occured while trying to check link the user. " +
+                    "Please check the stack trace below and contact the developer.");
+            e.printStackTrace();
+        }
     }
 }

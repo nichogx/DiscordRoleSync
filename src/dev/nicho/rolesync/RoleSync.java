@@ -1,8 +1,13 @@
 package dev.nicho.rolesync;
 
 import dev.nicho.rolesync.db.SQLiteHandler;
+import dev.nicho.rolesync.permissionapis.PermPluginNotFoundException;
+import dev.nicho.rolesync.util.JDAUtils;
 import net.dv8tion.jda.api.AccountType;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.cache.CacheFlag;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -11,6 +16,10 @@ import javax.security.auth.login.LoginException;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Map;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Handler;
+import java.util.logging.Level;
 
 public class RoleSync extends JavaPlugin {
 
@@ -33,15 +42,22 @@ public class RoleSync extends JavaPlugin {
         } catch (IOException | InvalidConfigurationException e) {
             e.printStackTrace();
         }
-
-        getLogger().info(language.getString("test"));
     }
 
     @Override
     public void onEnable() {
         getLogger().info("Initializing bot");
-        JDABuilder builder = new JDABuilder(AccountType.BOT);
-        builder.setToken(getConfig().getString("botInfo.token"));
+        JDABuilder builder = JDABuilder
+                .create(getConfig().getString("botInfo.token"),
+                        GatewayIntent.GUILD_MEMBERS,
+                        GatewayIntent.GUILD_MESSAGES,
+                        GatewayIntent.DIRECT_MESSAGES)
+                .disableCache(
+                        CacheFlag.EMOTE,
+                        CacheFlag.VOICE_STATE,
+                        CacheFlag.ACTIVITY,
+                        CacheFlag.CLIENT_STATUS
+                );
         try {
             builder.addEventListeners(new SyncBot(this, language));
             builder.build();
@@ -53,6 +69,11 @@ public class RoleSync extends JavaPlugin {
             return;
         } catch (LoginException e) {
             getLogger().severe("Error logging in. Did you set your token in config.yml?");
+            this.setEnabled(false);
+
+            return;
+        } catch (PermPluginNotFoundException e) {
+            getLogger().severe("Permission plugin was not found: " + e.getMessage());
             this.setEnabled(false);
 
             return;

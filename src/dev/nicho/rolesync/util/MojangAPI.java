@@ -13,16 +13,23 @@ import java.util.UUID;
 public class MojangAPI {
 
     public static String uuidToName(String uuid) throws IOException {
+        System.out.println(uuidRemoveDashes(uuid)); // TODO remove
         URL url = new URL("https://api.mojang.com/user/profiles/" + uuidRemoveDashes(uuid) + "/names");
         HttpURLConnection c = (HttpURLConnection) url.openConnection();
         c.setRequestMethod("GET");
         InputStream response = c.getInputStream();
+        c.connect();
+        if (c.getResponseCode() == 200) {
+            System.out.println("status 200"); // TODO remove
+            Scanner scanner = new Scanner(response);
 
-        Scanner scanner = new Scanner(response);
+            JSONArray json = new JSONArray(scanner.useDelimiter("\\A").next());
+            return json.getJSONObject(json.length() - 1).getString("name");
+        }
 
-        JSONObject body = new JSONObject(scanner.useDelimiter("\\A").next());
-        JSONArray json = body.getJSONArray("");
-        return json.getJSONObject(json.length() - 1).getString("name");
+        System.out.println("status not 200"); // TODO remove
+
+        return null;
     }
 
     public static String nameToUUID(String name) throws IOException {
