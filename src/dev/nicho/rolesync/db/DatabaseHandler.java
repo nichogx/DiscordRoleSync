@@ -105,15 +105,15 @@ public abstract class DatabaseHandler {
         ps.execute();
     }
 
-    public void unlink(String uuid_or_discord_id) throws SQLException {
+    public void unlink(String uuid) throws SQLException {
         Connection c = this.getConnection();
         PreparedStatement ps = c.prepareStatement("DELETE FROM "
-                + plugin.getConfig().getString("database.tablePrefix") + "_discordmcusers WHERE minecraft_uuid = ? " +
-                "OR discord_id = ?");
+                + plugin.getConfig().getString("database.tablePrefix") + "_discordmcusers WHERE minecraft_uuid = ?");
 
-        ps.setString(1, uuid_or_discord_id);
-        ps.setString(2, uuid_or_discord_id);
+        ps.setString(1, uuid);
 
         ps.execute();
+
+        removeFromWhitelist(uuid);
     }
 }

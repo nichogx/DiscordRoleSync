@@ -1,13 +1,9 @@
 package dev.nicho.rolesync;
 
-import dev.nicho.rolesync.db.SQLiteHandler;
 import dev.nicho.rolesync.permissionapis.PermPluginNotFoundException;
-import dev.nicho.rolesync.util.JDAUtils;
-import net.dv8tion.jda.api.AccountType;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -16,10 +12,6 @@ import javax.security.auth.login.LoginException;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Map;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Handler;
-import java.util.logging.Level;
 
 public class RoleSync extends JavaPlugin {
 
@@ -51,7 +43,8 @@ public class RoleSync extends JavaPlugin {
                 .create(getConfig().getString("botInfo.token"),
                         GatewayIntent.GUILD_MEMBERS,
                         GatewayIntent.GUILD_MESSAGES,
-                        GatewayIntent.DIRECT_MESSAGES)
+                        GatewayIntent.DIRECT_MESSAGES,
+                        GatewayIntent.GUILD_BANS)
                 .disableCache(
                         CacheFlag.EMOTE,
                         CacheFlag.VOICE_STATE,

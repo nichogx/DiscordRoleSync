@@ -11,23 +11,25 @@ import dev.nicho.rolesync.util.MojangAPI;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.ReadyEvent;
+import net.dv8tion.jda.api.events.guild.GuildBanEvent;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleRemoveEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class SyncBot extends ListenerAdapter {
@@ -85,34 +87,86 @@ public class SyncBot extends ListenerAdapter {
 
         if (!message.substring(0, prefix.length()).equals(prefix)) return; // ignore if no prefix
 
+        if (!plugin.getConfig().getStringList("botInfo.channelsToListen").contains(event.getChannel().getId())
+                && !JDAUtils.hasRoleFromList(event.getAuthor(), plugin.getConfig().getStringList("adminCommandRoles"), bot)) {
+            return; // ignore
+        }
+
         String[] argv = message.split(" ");
         argv[0] = argv[0].substring(prefix.length()); // remove prefix
 
-        if (argv[0].equalsIgnoreCase("info")) {
-            ch.info(argv, event);
-        } else if (argv[0].equalsIgnoreCase("link")) {
-            ch.link(argv, event);
-            checkRoles(event.getAuthor());
-        } else if (argv[0].equalsIgnoreCase("unlink")) {
-            ch.unlink(argv, event);
+        try {
+            if (argv[0].equalsIgnoreCase("info")) {
+                ch.info(argv, event);
+            } else if (argv[0].equalsIgnoreCase("link")) {
+                ch.link(argv, event);
+                User user = event.getAuthor();
+                checkRoles(user, db.findUUIDByDiscordID(user.getId()));
+            } else if (argv[0].equalsIgnoreCase("unlink")) {
+                ch.unlink(argv, event);
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().severe("An error occured while processing a command. " +
+                    "Please check the stack trace below and contact the developer.");
+            e.printStackTrace();
         }
+
     }
 
 
     @Override
     public void onGuildMemberRoleAdd(@Nonnull GuildMemberRoleAddEvent event) {
-        checkRoles(event.getUser());
+        userUpdated(event.getUser());
     }
 
     @Override
     public void onGuildMemberRoleRemove(@Nonnull GuildMemberRoleRemoveEvent event) {
-        checkRoles(event.getUser());
+        userUpdated(event.getUser());
     }
 
-    void checkRoles(User user) {
+    @Override
+    public void onGuildMemberRemove(@Nonnull GuildMemberRemoveEvent event) {
+        userUpdated(event.getUser());
+    }
+
+    @Override
+    public void onGuildBan(@Nonnull GuildBanEvent event) {
+        userUpdated(event.getUser());
+    }
+
+    void userUpdated(User user) {
+        try {
+            checkRoles(user, db.findUUIDByDiscordID(user.getId()));
+        } catch (SQLException e) {
+            plugin.getLogger().severe("An error occured while looking for the UUID of a user. " +
+                    "Please check the stack trace below and contact the developer.");
+            e.printStackTrace();
+        }
+    }
+
+//    void userLeft(User user) {
+//        // remove whitelist and roles
+//        try {
+//            String uuid = db.findUUIDByDiscordID(user.getId());
+//
+//            // remove all managed permissions
+//            permPlugin.setPermissions(uuid, null);
+//
+//            // remove whitelist
+//            db.removeFromWhitelist(uuid);
+//            if (plugin.getConfig().getBoolean("manageWhitelist"))
+//                Bukkit.getOfflinePlayer(UUID.fromString(uuid)).setWhitelisted(false);
+//
+//        } catch (SQLException e) {
+//            plugin.getLogger().severe("An error occured while looking for the UUID of a user. " +
+//                    "Please check the stack trace below and contact the developer.");
+//            e.printStackTrace();
+//        }
+//    }
+
+    void checkRoles(User user, String uuid) {
         try {
             ConfigurationSection perms = plugin.getConfig().getConfigurationSection("permissions");
-            String uuid = db.findUUIDByDiscordID(user.getId());
             if (uuid == null) { // user not linked
                 return; // ignore
             }
@@ -206,12 +260,6 @@ public class SyncBot extends ListenerAdapter {
         }
 
         void link(String[] argv, MessageReceivedEvent event) {
-            if (!plugin.getConfig().getStringList("botInfo.channelsToListen").contains(event.getChannel().getId())
-                    && !JDAUtils.hasRoleFromList(event.getAuthor(), plugin.getConfig().getStringList("adminCommandRoles"), bot)) {
-                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onPermissionError"), event.getMessage(), plugin.getConfig());
-                return;
-            }
-
             if (argv.length < 2) {
                 JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig());
             }
@@ -276,7 +324,7 @@ public class SyncBot extends ListenerAdapter {
                 permPlugin.setPermissions(uuid, null); // remove all managed permissions before unlinking
                 if (plugin.getConfig().getBoolean("manageWhitelist"))
                     Bukkit.getOfflinePlayer(UUID.fromString(uuid)).setWhitelisted(false); // remove whitelist before unlinking
-                db.unlink(argv[1]); // accepts uuid or discord id
+                db.unlink(uuid); // accepts uuid or discord id
 
                 JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onSuccess"), event.getMessage(), plugin.getConfig());
             } catch (SQLException | IOException e) {
