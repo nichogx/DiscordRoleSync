@@ -20,6 +20,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.annotation.Nonnull;
@@ -273,6 +274,8 @@ public class SyncBot extends ListenerAdapter {
                 }
 
                 permPlugin.setPermissions(uuid, null); // remove all managed permissions before unlinking
+                if (plugin.getConfig().getBoolean("manageWhitelist"))
+                    Bukkit.getOfflinePlayer(UUID.fromString(uuid)).setWhitelisted(false); // remove whitelist before unlinking
                 db.unlink(argv[1]); // accepts uuid or discord id
 
                 JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onSuccess"), event.getMessage(), plugin.getConfig());
