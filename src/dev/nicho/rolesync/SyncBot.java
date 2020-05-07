@@ -16,6 +16,8 @@ import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleRemoveEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.StringUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -128,8 +130,10 @@ public class SyncBot extends ListenerAdapter {
             if (plugin.getConfig().getBoolean("manageWhitelist")) {
                 if (JDAUtils.hasRoleFromList(user, plugin.getConfig().getStringList("whitelistRoles"), bot)) {
                     db.addToWhitelist(uuid);
+                    Bukkit.getOfflinePlayer(UUID.fromString(uuid)).setWhitelisted(true);
                 } else {
                     db.removeFromWhitelist(uuid);
+                    Bukkit.getOfflinePlayer(UUID.fromString(uuid)).setWhitelisted(false);
                 }
             }
         } catch (SQLException e) {
