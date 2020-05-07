@@ -1,8 +1,6 @@
 package dev.nicho.rolesync;
 
 import dev.nicho.rolesync.db.DatabaseHandler;
-import dev.nicho.rolesync.db.MySQLHandler;
-import dev.nicho.rolesync.db.SQLiteHandler;
 import dev.nicho.rolesync.permissionapis.LuckPermsAPI;
 import dev.nicho.rolesync.permissionapis.PermPluginNotFoundException;
 import dev.nicho.rolesync.permissionapis.PermissionsAPI;
@@ -24,7 +22,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.annotation.Nonnull;
-import java.io.File;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
