@@ -13,11 +13,12 @@ public class SQLiteHandler extends DatabaseHandler {
     private File db = null;
 
     public SQLiteHandler(JavaPlugin plugin, File db) throws IOException, SQLException {
+        super(plugin);
+
         if (!db.exists()) {
             db.createNewFile();
         }
 
-        this.plugin = plugin;
         this.db = db;
 
         try {

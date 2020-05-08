@@ -12,23 +12,20 @@ public abstract class DatabaseHandler {
     protected Connection connection = null;
     protected JavaPlugin plugin = null;
 
+    protected DatabaseHandler(JavaPlugin plugin) {
+        this.plugin = plugin;
+    }
+
     protected abstract Connection getConnection() throws SQLException;
 
     protected void initialize() throws SQLException {
         Connection c = this.getConnection();
         PreparedStatement ps = c.prepareStatement(
                 "CREATE TABLE IF NOT EXISTS `" + plugin.getConfig().getString("database.tablePrefix") + "_discordmcusers` ("
-                    + "`discord_id` varchar(18) NOT NULL,"
-                    + "`minecraft_uuid` varchar(36) NOT NULL,"
-                    + "PRIMARY KEY (`discord_id`));"
-        );
-
-        ps.execute();
-
-        ps = c.prepareStatement(
-                "CREATE TABLE IF NOT EXISTS `" + plugin.getConfig().getString("database.tablePrefix") + "_whitelist` ("
-                        + "`uuid` varchar(36) NOT NULL,"
-                        + "PRIMARY KEY (`uuid`));"
+                        + "`discord_id` varchar(18) NOT NULL,"
+                        + "`minecraft_uuid` varchar(36) NOT NULL,"
+                        + "`whitelisted` boolean NOT NULL DEFAULT false,"
+                        + "PRIMARY KEY (`discord_id`));"
         );
 
         ps.execute();
@@ -85,20 +82,19 @@ public abstract class DatabaseHandler {
     public void addToWhitelist(String uuid) throws SQLException {
         Connection c = this.getConnection();
         PreparedStatement ps = c.prepareStatement(
-                "INSERT INTO " + plugin.getConfig().getString("database.tablePrefix") + "_whitelist (uuid) " +
-                "SELECT ? FROM (SELECT 1) as A WHERE NOT EXISTS (" +
-                "SELECT * FROM " + plugin.getConfig().getString("database.tablePrefix") + "_whitelist WHERE uuid = ?);");
+                "UPDATE " + plugin.getConfig().getString("database.tablePrefix") + "_discordmcusers " +
+                        "SET whitelisted = true WHERE minecraft_uuid = ?");
 
         ps.setString(1, uuid);
-        ps.setString(2, uuid);
 
         ps.execute();
     }
 
     public void removeFromWhitelist(String uuid) throws SQLException {
         Connection c = this.getConnection();
-        PreparedStatement ps = c.prepareStatement("DELETE FROM "
-                + plugin.getConfig().getString("database.tablePrefix") + "_whitelist WHERE uuid = ?");
+        PreparedStatement ps = c.prepareStatement(
+                "UPDATE " + plugin.getConfig().getString("database.tablePrefix") + "_discordmcusers " +
+                        "SET whitelisted = false WHERE minecraft_uuid = ?");
 
         ps.setString(1, uuid);
 
@@ -119,7 +115,7 @@ public abstract class DatabaseHandler {
 
     public ResultSet getAllLinkedUsers() throws SQLException {
         Connection c = this.getConnection();
-        PreparedStatement ps = c.prepareStatement("SELECT * FROM "
+        PreparedStatement ps = c.prepareStatement("SELECT discord_id, minecraft_uuid FROM "
                 + plugin.getConfig().getString("database.tablePrefix") + "_discordmcusers");
 
         return ps.executeQuery();
@@ -127,8 +123,8 @@ public abstract class DatabaseHandler {
 
     public ResultSet getWhitelist() throws SQLException {
         Connection c = this.getConnection();
-        PreparedStatement ps = c.prepareStatement("SELECT * FROM "
-                + plugin.getConfig().getString("database.tablePrefix") + "_whitelist");
+        PreparedStatement ps = c.prepareStatement("SELECT minecraft_uuid FROM "
+                + plugin.getConfig().getString("database.tablePrefix") + "_discordmcusers WHERE whitelisted = true");
 
         return ps.executeQuery();
     }
