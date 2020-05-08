@@ -250,7 +250,7 @@ public class SyncBot extends ListenerAdapter {
                 if (linkedUUID != null) {
                     JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig());
                     event.getAuthor().openPrivateChannel().queue(channel -> {
-                        channel.sendMessage(lang.getString("discordAlreadyLinked")).queue();
+                        channel.sendMessage(lang.getString("discordAlreadyLinked")).queue(null, err -> { });
                     });
 
                     return;
@@ -262,7 +262,7 @@ public class SyncBot extends ListenerAdapter {
                 if (linkedID != null) {
                     JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig());
                     event.getAuthor().openPrivateChannel().queue(channel -> {
-                        channel.sendMessage(lang.getString("minecraftAlreadyLinked")).queue();
+                        channel.sendMessage(lang.getString("minecraftAlreadyLinked")).queue(null, err -> { });
                     });
 
                     return;
