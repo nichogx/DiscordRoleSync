@@ -40,7 +40,7 @@ public class RoleSync extends JavaPlugin {
         dm = new DependencyManager(libFolder);
 
         try {
-            // on mavel central
+            // on maven central
             dm.addDependency(new URL("https://repo1.maven.org/maven2/org/apache/commons/commons-lang3/3.10/commons-lang3-3.10.jar"));
             dm.addDependency(new URL("https://repo1.maven.org/maven2/org/json/json/20190722/json-20190722.jar"));
             dm.addDependency(new URL("https://repo1.maven.org/maven2/org/xerial/sqlite-jdbc/3.31.1/sqlite-jdbc-3.31.1.jar"));
@@ -54,6 +54,8 @@ public class RoleSync extends JavaPlugin {
         try {
             getLogger().info("Reading config.yml");
             saveDefaultConfig();
+
+            // TODO validate config
 
             loadLang();
         } catch (InvalidConfigurationException e) {
