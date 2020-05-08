@@ -39,7 +39,7 @@ public class SyncBot extends ListenerAdapter {
     private PermissionsAPI permPlugin = null;
     private JDA bot = null;
 
-    public SyncBot(@Nonnull JavaPlugin plugin, YamlConfiguration language, DatabaseHandler db) throws IOException, SQLException, PermPluginNotFoundException {
+    public SyncBot(@Nonnull JavaPlugin plugin, YamlConfiguration language, DatabaseHandler db) throws PermPluginNotFoundException {
         super();
         this.plugin = plugin;
         this.lang = language;

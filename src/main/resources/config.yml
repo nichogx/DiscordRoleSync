@@ -58,13 +58,13 @@ permissionPlugin: "luckperms"
 # permissions to add to users with one of the roles in the list
 # follow the example and add more as needed
 permissions:
-  - group.admin:
-      - "000000000000000000" # administrator
-  - group.mod:
-      - "000000000000000000" # moderator
-  - group.vip:
-      - "000000000000000000" # twitch subs
-      - "000000000000000000" # irl friends or something
+  group.admin:
+    - "000000000000000000" # administrator
+  group.mod:
+    - "000000000000000000" # moderator
+  group.vip:
+    - "000000000000000000" # twitch subs
+    - "000000000000000000" # irl friends or something
 
 # emojis to use for reaction
 # to use a custom emoji, you can put its ID instead of the actual
