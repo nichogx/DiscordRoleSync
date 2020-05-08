@@ -3,9 +3,8 @@ version: 1.0.0-BETA
 author: Nicho
 description: Plugin to synchronize LuckPerms permissions with Discord roles and manage the whitelist with a Discord role if wanted.
 main: dev.nicho.rolesync.RoleSync
-loadbefore:
+softdepend:
   - LuckPerms
-  - someplugin
 commands:
   discordrolesync:
     description: Commands to manage the DiscordRoleSync plugin.

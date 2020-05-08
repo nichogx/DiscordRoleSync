@@ -1,5 +1,6 @@
 package dev.nicho.rolesync;
 
+import dev.nicho.dependencymanager.DependencyManager;
 import dev.nicho.rolesync.db.DatabaseHandler;
 import dev.nicho.rolesync.db.MySQLHandler;
 import dev.nicho.rolesync.db.SQLiteHandler;
@@ -18,6 +19,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import javax.security.auth.login.LoginException;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
@@ -27,8 +30,27 @@ public class RoleSync extends JavaPlugin {
     private YamlConfiguration language = null;
     private DatabaseHandler db = null;
 
+    private DependencyManager dm = null;
+
     @Override
     public void onLoad() {
+
+        File libFolder = new File(getDataFolder(), "lib");
+        libFolder.mkdirs();
+        dm = new DependencyManager(libFolder);
+
+        try {
+            // on mavel central
+            dm.addDependency(new URL("https://repo1.maven.org/maven2/org/apache/commons/commons-lang3/3.10/commons-lang3-3.10.jar"));
+            dm.addDependency(new URL("https://repo1.maven.org/maven2/org/json/json/20190722/json-20190722.jar"));
+            dm.addDependency(new URL("https://repo1.maven.org/maven2/org/xerial/sqlite-jdbc/3.31.1/sqlite-jdbc-3.31.1.jar"));
+
+            // jda
+            dm.addDependency(new URL("https://ci.dv8tion.net/job/JDA/lastSuccessfulBuild/artifact/build/libs/JDA-4.1.1_146-withDependencies-min.jar"));
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
         try {
             getLogger().info("Reading config.yml");
             saveDefaultConfig();
@@ -47,6 +69,20 @@ public class RoleSync extends JavaPlugin {
 
     @Override
     public void onEnable() {
+
+        long start = System.currentTimeMillis();
+        getLogger().info("Fetching dependencies... This might take a while if this is the first start.");
+        try {
+            dm.downloadAll();
+            dm.addAllToClasspath();
+        } catch (Exception e) {
+            getLogger().severe("An error occurred while downloading the dependencies. Please check the stack trace below and contact the developer.");
+            e.printStackTrace();
+            setEnabled(false);
+            return;
+        }
+        getLogger().info("Fetched all dependencies! (took " + (System.currentTimeMillis() - start) + "ms)");
+
         getLogger().info("Initializing bot");
         JDABuilder builder = JDABuilder
                 .create(getConfig().getString("botInfo.token"),
@@ -60,6 +96,7 @@ public class RoleSync extends JavaPlugin {
                         CacheFlag.ACTIVITY,
                         CacheFlag.CLIENT_STATUS
                 );
+
         try {
             if (getConfig().getString("database.type").equalsIgnoreCase("mysql")) {
                 this.db = new MySQLHandler(this,
