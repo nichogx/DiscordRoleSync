@@ -39,9 +39,7 @@ public class MySQLHandler extends DatabaseHandler {
             return connection;
         }
 
-        connection = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + db
-                + "?user=" + user + "&password=" + passwd);
-
+        connection = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + db, user, passwd);
         return connection;
     }
 }
