@@ -4,8 +4,6 @@ discordAlreadyLinked: "Sua conta do Discord já está linkada a uma conta do Min
 minecraftAlreadyLinked: "Sua conta do Minecraft já está linkada a uma conta do Discord"
 
 whitelistResetComplete: "Reset da whitelist completo"
-whitelistEnabled: "Gerenciamento de whitelist habilidato. Por favor habilite a whitelist usando /whitelist on"
-whitelistDisabled: "Gerenciamento de whitelist desabilidato. Por favor desabilite a whitelist usando /whitelist off caso queira"
 whitelistNotEnabled: "Gerenciamento de whitelist não habilitado nesse servidor"
 
 noPermissionError: "Você não tem permissão para rodar esse comando."
@@ -16,5 +14,3 @@ drsWhitelistDescription: "Gerenciar whitelist"
 drsReloadDescription: "Dar reload nos arquivos de config e línguas"
 
 drsWhitelistResetDescription: "Reseta a whitelist apenas com os usuários que tem o(s) cargo(s)."
-drsWhitelistEnableDescription: "Habilita gerenciamento de whitelist."
-drsWhitelistDisableDescription: "Desabilita gerenciamento de whitelist."

@@ -154,9 +154,7 @@ public class RoleSync extends JavaPlugin {
 
             if (args.length < 2) { // print usage and return
                 sender.sendMessage(language.getString("usage") + "\n" +
-                        "/drs whitelist reset: " + language.getString("drsWhitelistResetDescription") + "\n" +
-                        "/drs whitelist enable: " + language.getString("drsWhitelistEnableDescription") + "\n" +
-                        "/drs whitelist disable: " + language.getString("drsWhitelistDisableDescription")
+                        "/drs whitelist reset: " + language.getString("drsWhitelistResetDescription")
                 );
 
                 return true;
@@ -191,18 +189,6 @@ public class RoleSync extends JavaPlugin {
                     e.printStackTrace();
                     return false;
                 }
-
-                return true;
-            } else if (args[1].equalsIgnoreCase("enable")) {
-                getConfig().set("manageWhitelist", true);
-                saveConfig();
-                sender.sendMessage(language.getString("whitelistEnabled"));
-
-                return true;
-            } else if (args[1].equalsIgnoreCase("disable")) {
-                getConfig().set("manageWhitelist", false);
-                saveConfig();
-                sender.sendMessage(language.getString("whitelistDisabled"));
 
                 return true;
             }
