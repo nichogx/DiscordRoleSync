@@ -94,7 +94,7 @@ public class SyncBot extends ListenerAdapter {
         String message = event.getMessage().getContentRaw();
         String prefix = this.plugin.getConfig().getString("botInfo.prefix");
 
-        if (!message.substring(0, prefix.length()).equals(prefix)) return; // ignore if no prefix
+        if (message.length() < prefix.length() || !message.substring(0, prefix.length()).equals(prefix)) return; // ignore if no prefix
 
         if (!plugin.getConfig().getStringList("botInfo.channelsToListen").contains(event.getChannel().getId())
                 && !JDAUtils.hasRoleFromList(event.getMember(), plugin.getConfig().getStringList("adminCommandRoles"), bot)) {
