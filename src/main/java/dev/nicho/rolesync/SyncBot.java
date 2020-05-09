@@ -271,6 +271,8 @@ public class SyncBot extends ListenerAdapter {
 
                 if (uuid == null) {
                     JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig());
+
+                    return;
                 }
 
                 if (linkedID != null) {
