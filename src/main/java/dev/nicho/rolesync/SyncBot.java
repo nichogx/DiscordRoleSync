@@ -128,14 +128,14 @@ public class SyncBot extends ListenerAdapter {
 
     @Override
     public void onGuildMemberRemove(@Nonnull GuildMemberRemoveEvent event) {
-        // TODO remove roles
-
         try {
             String uuid = db.findUUIDByDiscordID(event.getMember().getId());
-            db.removeFromWhitelist(uuid);
-            Bukkit.getOfflinePlayer(UUID.fromString(uuid)).setWhitelisted(false);
+            if (uuid != null) {
+                db.removeFromWhitelist(uuid);
+                Bukkit.getOfflinePlayer(UUID.fromString(uuid)).setWhitelisted(false);
 
-            permPlugin.setPermissions(uuid, null);
+                permPlugin.setPermissions(uuid, null);
+            }
         } catch (SQLException | NullPointerException e) {
             plugin.getLogger().severe("An error occured while removing kicked/banned/left member from whitelist. " +
                     "Please check the stack trace below and contact the developer.");
