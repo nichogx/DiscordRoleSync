@@ -38,6 +38,7 @@ public class SyncBot extends ListenerAdapter {
     private YamlConfiguration lang = null;
     private PermissionsAPI permPlugin = null;
     private JDA bot = null;
+    private MojangAPI mojang = null;
 
     public SyncBot(@Nonnull JavaPlugin plugin, YamlConfiguration language, DatabaseHandler db) throws PermPluginNotFoundException {
         super();
@@ -45,6 +46,14 @@ public class SyncBot extends ListenerAdapter {
         this.lang = language;
         this.db = db;
         plugin.getLogger().info("Finished initializing bot.");
+
+        String alternateServer = plugin.getConfig().getString("alternativeServer");
+        if (alternateServer.isEmpty()) {
+            this.mojang = new MojangAPI();
+        } else {
+            this.mojang = new MojangAPI(alternateServer);
+        }
+
 
         ConfigurationSection perms = plugin.getConfig().getConfigurationSection("permissions");
         List<String> managedPerms = new ArrayList<String>();
@@ -201,7 +210,7 @@ public class SyncBot extends ListenerAdapter {
                         return;
                     }
 
-                    String name = MojangAPI.uuidToName(uuid);
+                    String name = mojang.uuidToName(uuid);
 
                     JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onSuccess"), event.getMessage(), plugin.getConfig());
                     event.getChannel().sendMessage(lang.getString("linkedTo") + " " + name + " (" + uuid + ")" )
@@ -211,7 +220,7 @@ public class SyncBot extends ListenerAdapter {
                             });
 
                 } else { // try minecraft nick
-                    String uuid = MojangAPI.nameToUUID(argv[1]);
+                    String uuid = mojang.nameToUUID(argv[1]);
                     String id = db.findDiscordIDbyUUID(uuid);
 
                     if (id == null) {
@@ -256,7 +265,7 @@ public class SyncBot extends ListenerAdapter {
                     return;
                 }
 
-                String uuid = MojangAPI.nameToUUID(argv[1]);
+                String uuid = mojang.nameToUUID(argv[1]);
                 String linkedID = db.findDiscordIDbyUUID(uuid);
 
                 if (linkedID != null) {
@@ -294,7 +303,7 @@ public class SyncBot extends ListenerAdapter {
                 if (argv[1].length() > 16 && StringUtils.isNumeric(argv[1])) { // looks like Discord ID
                     uuid = db.findUUIDByDiscordID(argv[1]);
                 } else { // try minecraft nick
-                    uuid = MojangAPI.nameToUUID(argv[1]);
+                    uuid = mojang.nameToUUID(argv[1]);
                 }
 
                 if (uuid == null) {

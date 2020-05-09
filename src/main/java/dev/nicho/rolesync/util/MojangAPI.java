@@ -6,15 +6,34 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Scanner;
 import java.util.UUID;
 
 public class MojangAPI {
 
-    public static String uuidToName(String uuid) throws IOException {
-        URL url = new URL("https://api.mojang.com/user/profiles/" + uuidRemoveDashes(uuid) + "/names");
-        HttpURLConnection c = (HttpURLConnection) url.openConnection();
+    private URL url = null;
+
+    public MojangAPI() {
+        try {
+            this.url = new URL("https://api.mojang.com");
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public MojangAPI(String alternateServer) {
+        try {
+            this.url = new URL(alternateServer);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String uuidToName(String uuid) throws IOException {
+        URL reqUrl = new URL(this.url,"user/profiles/" + uuidRemoveDashes(uuid) + "/names");
+        HttpURLConnection c = (HttpURLConnection) reqUrl.openConnection();
         c.setRequestMethod("GET");
         InputStream response = c.getInputStream();
         c.connect();
@@ -29,9 +48,9 @@ public class MojangAPI {
         return null;
     }
 
-    public static String nameToUUID(String name) throws IOException {
-        URL url = new URL("https://api.mojang.com/users/profiles/minecraft/" + name);
-        HttpURLConnection c = (HttpURLConnection) url.openConnection();
+    public String nameToUUID(String name) throws IOException {
+        URL reqUrl = new URL(this.url,"users/profiles/minecraft/" + name);
+        HttpURLConnection c = (HttpURLConnection) reqUrl.openConnection();
         c.setRequestMethod("GET");
         InputStream response = c.getInputStream();
 

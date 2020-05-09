@@ -5,6 +5,8 @@ description: Plugin to synchronize LuckPerms permissions with Discord roles and 
 main: dev.nicho.rolesync.RoleSync
 softdepend:
   - LuckPerms
+loadbefore: # Minecord uses an older API version. The methods from their version have been deprecated but not removed.
+  - Minecord
 commands:
   discordrolesync:
     description: Commands to manage the DiscordRoleSync plugin.

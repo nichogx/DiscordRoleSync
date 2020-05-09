@@ -74,3 +74,7 @@ react:
   onUserError: "❌"
   onBotError: "⚠"
   onPermissionError: "🛑"
+
+# other server to use instead of Mojang API
+# leave blank to use default Mojang one
+alternativeServer: ""

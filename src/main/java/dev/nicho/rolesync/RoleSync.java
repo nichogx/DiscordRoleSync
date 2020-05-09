@@ -44,9 +44,11 @@ public class RoleSync extends JavaPlugin {
             dm.addDependency(new URL("https://repo1.maven.org/maven2/org/apache/commons/commons-lang3/3.10/commons-lang3-3.10.jar"));
             dm.addDependency(new URL("https://repo1.maven.org/maven2/org/json/json/20190722/json-20190722.jar"));
             dm.addDependency(new URL("https://repo1.maven.org/maven2/org/xerial/sqlite-jdbc/3.31.1/sqlite-jdbc-3.31.1.jar"));
+            dm.addDependency(new URL("https://repo1.maven.org/maven2/commons-dbcp/commons-dbcp/1.4/commons-dbcp-1.4.jar"));
+            dm.addDependency(new URL("https://repo1.maven.org/maven2/commons-pool/commons-pool/1.6/commons-pool-1.6.jar"));
 
             // jda
-            dm.addDependency(new URL("https://ci.dv8tion.net/job/JDA/lastSuccessfulBuild/artifact/build/libs/JDA-4.1.1_146-withDependencies-min.jar"));
+            dm.addDependency(new URL("https://ci.dv8tion.net/job/JDA/146/artifact/build/libs/JDA-4.1.1_146-withDependencies-min.jar"));
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }

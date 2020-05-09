@@ -11,6 +11,7 @@ import java.sql.SQLException;
 public class SQLiteHandler extends DatabaseHandler {
 
     private File db = null;
+    private Connection connection = null;
 
     public SQLiteHandler(JavaPlugin plugin, File db) throws IOException, SQLException {
         super(plugin);
@@ -27,7 +28,6 @@ public class SQLiteHandler extends DatabaseHandler {
             e.printStackTrace();
         }
 
-        Connection c = this.getConnection();
         this.initialize();
     }
 

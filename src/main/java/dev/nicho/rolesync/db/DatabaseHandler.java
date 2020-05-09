@@ -9,7 +9,6 @@ import java.sql.SQLException;
 
 public abstract class DatabaseHandler {
 
-    protected Connection connection = null;
     protected JavaPlugin plugin = null;
 
     protected DatabaseHandler(JavaPlugin plugin) {
