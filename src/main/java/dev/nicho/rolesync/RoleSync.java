@@ -21,7 +21,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
 
@@ -164,24 +163,27 @@ public class RoleSync extends JavaPlugin {
 
             // check for subcommands
             if (args[1].equalsIgnoreCase("reset")) {
+                System.out.println("reset");
                 if (!getConfig().getBoolean("manageWhitelist")) {
                     sender.sendMessage(ChatColor.RED + language.getString("whitelistNotEnabled"));
 
                     return false;
                 }
 
-                try {
-                    ResultSet res = db.getWhitelist();
+                System.out.println("reset b4 try");
 
+                try {
                     // delete all from whitelist
+                    System.out.println("ii");
                     Bukkit.getWhitelistedPlayers().forEach(offlinePlayer -> {
                         offlinePlayer.setWhitelisted(false);
                     });
 
-                    while(res.next()) {
-                        String uuid = res.getString(1);
+                    System.out.println("aa");
+                    db.forAllWhitelisted((discordID, uuid) -> {
                         Bukkit.getOfflinePlayer(UUID.fromString(uuid)).setWhitelisted(true);
-                    }
+                    });
+                    System.out.println("bb");
 
                     sender.sendMessage(ChatColor.GREEN + language.getString("whitelistResetComplete"));
                 } catch (Exception e) {
@@ -194,6 +196,8 @@ public class RoleSync extends JavaPlugin {
 
                 return true;
             }
+
+            return false;
         } else if (args[0].equalsIgnoreCase("reload")) {
             if (!sender.hasPermission("discordrolesync.reload")) {
                 sender.sendMessage(ChatColor.RED + language.getString("noPermissionError"));

@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.function.BiConsumer;
 
 public abstract class DatabaseHandler {
 
@@ -28,6 +29,7 @@ public abstract class DatabaseHandler {
         );
 
         ps.execute();
+        c.close();
     }
 
     public String findUUIDByDiscordID(String id) throws SQLException {
@@ -40,10 +42,12 @@ public abstract class DatabaseHandler {
         ps.setString(1, id);
 
         ResultSet res = ps.executeQuery();
+        String ret = null;
+        if (res.next()) ret = res.getString(1);
 
-        if (res.next()) return res.getString(1);
+        c.close();
 
-        return null;
+        return ret;
     }
 
     public String findDiscordIDbyUUID(String uuid) throws SQLException {
@@ -56,10 +60,12 @@ public abstract class DatabaseHandler {
         ps.setString(1, uuid);
 
         ResultSet res = ps.executeQuery();
+        String ret = null;
+        if (res.next()) ret = res.getString(1);
 
-        if (res.next()) return res.getString(1);
+        c.close();
 
-        return null;
+        return ret;
     }
 
     public void linkUser(String discordID, String minecraftUUID) throws SQLException {
@@ -76,6 +82,8 @@ public abstract class DatabaseHandler {
         ps.setString(3, minecraftUUID);
 
         ps.execute();
+
+        c.close();
     }
 
     public void addToWhitelist(String uuid) throws SQLException {
@@ -87,6 +95,8 @@ public abstract class DatabaseHandler {
         ps.setString(1, uuid);
 
         ps.execute();
+
+        c.close();
     }
 
     public void removeFromWhitelist(String uuid) throws SQLException {
@@ -98,6 +108,8 @@ public abstract class DatabaseHandler {
         ps.setString(1, uuid);
 
         ps.execute();
+
+        c.close();
     }
 
     public void unlink(String uuid) throws SQLException {
@@ -109,22 +121,40 @@ public abstract class DatabaseHandler {
 
         ps.execute();
 
+        c.close();
+
         removeFromWhitelist(uuid);
     }
 
-    public ResultSet getAllLinkedUsers() throws SQLException {
+    public void forAllLinkedUsers(BiConsumer<String, String> callback) throws SQLException {
         Connection c = this.getConnection();
         PreparedStatement ps = c.prepareStatement("SELECT discord_id, minecraft_uuid FROM "
                 + plugin.getConfig().getString("database.tablePrefix") + "_discordmcusers");
 
-        return ps.executeQuery();
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            String discordID = rs.getString(1);
+            String uuid = rs.getString(2);
+
+            callback.accept(discordID, uuid);
+        }
+
+        c.close();
     }
 
-    public ResultSet getWhitelist() throws SQLException {
+    public void forAllWhitelisted(BiConsumer<String, String> callback) throws SQLException {
         Connection c = this.getConnection();
-        PreparedStatement ps = c.prepareStatement("SELECT minecraft_uuid FROM "
+        PreparedStatement ps = c.prepareStatement("SELECT discord_id, minecraft_uuid FROM "
                 + plugin.getConfig().getString("database.tablePrefix") + "_discordmcusers WHERE whitelisted = true");
 
-        return ps.executeQuery();
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            String discordID = rs.getString(1);
+            String uuid = rs.getString(2);
+
+            callback.accept(discordID, uuid);
+        }
+
+        c.close();
     }
 }

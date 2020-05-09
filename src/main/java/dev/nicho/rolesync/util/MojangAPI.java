@@ -16,16 +16,21 @@ public class MojangAPI {
     private URL url = null;
 
     public MojangAPI() {
-        try {
-            this.url = new URL("https://api.mojang.com");
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
+        setMojang();
     }
 
     public MojangAPI(String alternateServer) {
         try {
             this.url = new URL(alternateServer);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            setMojang();
+        }
+    }
+
+    private void setMojang() {
+        try {
+            this.url = new URL("https://api.mojang.com");
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }

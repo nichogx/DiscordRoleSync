@@ -14,6 +14,8 @@ botInfo:
   # it will always reply to commands from who has the roles in adminCommandRoles
   channelsToListen:
     - "000000000000000000" # general
+  # server where the bot will look for roles
+  server: "000000000000000000"
 
 database:
   # which database to use. Options are sqlite (file) or mysql
