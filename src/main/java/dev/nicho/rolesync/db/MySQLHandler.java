@@ -18,6 +18,8 @@ public class MySQLHandler extends DatabaseHandler {
         ds.setUrl("jdbc:mysql://" + host + ":" + port + "/" + db);
         ds.setUsername(user);
         ds.setPassword(passwd);
+        ds.setValidationQuery("SELECT 1");
+        ds.setTestOnBorrow(true);
 
         this.initialize();
     }
