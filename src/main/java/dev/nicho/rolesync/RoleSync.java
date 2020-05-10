@@ -5,6 +5,7 @@ import dev.nicho.rolesync.db.DatabaseHandler;
 import dev.nicho.rolesync.db.MySQLHandler;
 import dev.nicho.rolesync.db.SQLiteHandler;
 import dev.nicho.rolesync.permissionapis.PermPluginNotFoundException;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
@@ -28,8 +29,9 @@ public class RoleSync extends JavaPlugin {
 
     private YamlConfiguration language = null;
     private DatabaseHandler db = null;
-
+    private SyncBot listener = null;
     private DependencyManager dm = null;
+    private JDA jda = null;
 
     @Override
     public void onLoad() {
@@ -86,20 +88,6 @@ public class RoleSync extends JavaPlugin {
         }
         getLogger().info("Fetched all dependencies! (took " + (System.currentTimeMillis() - start) + "ms)");
 
-        getLogger().info("Initializing bot");
-        JDABuilder builder = JDABuilder
-                .create(getConfig().getString("botInfo.token"),
-                        GatewayIntent.GUILD_MEMBERS,
-                        GatewayIntent.GUILD_MESSAGES,
-                        GatewayIntent.DIRECT_MESSAGES,
-                        GatewayIntent.GUILD_BANS)
-                .disableCache(
-                        CacheFlag.EMOTE,
-                        CacheFlag.VOICE_STATE,
-                        CacheFlag.ACTIVITY,
-                        CacheFlag.CLIENT_STATUS
-                );
-
         try {
             if (getConfig().getString("database.type").equalsIgnoreCase("mysql")) {
                 this.db = new MySQLHandler(this,
@@ -112,8 +100,9 @@ public class RoleSync extends JavaPlugin {
                 this.db = new SQLiteHandler(this, new File(getDataFolder(), "database.db"));
             }
 
-            builder.addEventListeners(new SyncBot(this, language, this.db));
-            builder.build();
+            listener = new SyncBot(this, language, this.db);
+            startBot();
+
         } catch (IOException | SQLException e) {
             getLogger().severe("Error setting up database");
             e.printStackTrace();
@@ -223,6 +212,22 @@ public class RoleSync extends JavaPlugin {
 
                 return false;
             }
+        } else if (args[0].equalsIgnoreCase("botrestart")) {
+            if (!sender.hasPermission("discordrolesync.botrestart")) {
+                sender.sendMessage(ChatColor.RED + language.getString("noPermissionError"));
+
+                return false;
+            }
+
+            jda.shutdown();
+
+            try {
+                startBot();
+            } catch (LoginException e) {
+                e.printStackTrace();
+            }
+
+            return true;
         }
 
         return true;
@@ -256,5 +261,24 @@ public class RoleSync extends JavaPlugin {
         }
 
         return langFile;
+    }
+
+    private void startBot() throws LoginException {
+        getLogger().info("Initializing bot");
+        JDABuilder builder = JDABuilder
+                .create(getConfig().getString("botInfo.token"),
+                        GatewayIntent.GUILD_MEMBERS,
+                        GatewayIntent.GUILD_MESSAGES,
+                        GatewayIntent.DIRECT_MESSAGES,
+                        GatewayIntent.GUILD_BANS)
+                .disableCache(
+                        CacheFlag.EMOTE,
+                        CacheFlag.VOICE_STATE,
+                        CacheFlag.ACTIVITY,
+                        CacheFlag.CLIENT_STATUS
+                );
+
+        builder.addEventListeners(listener);
+        this.jda = builder.build();
     }
 }
