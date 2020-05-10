@@ -97,7 +97,7 @@ public class SyncBot extends ListenerAdapter {
         if (message.length() < prefix.length() || !message.substring(0, prefix.length()).equals(prefix)) return; // ignore if no prefix
 
         if (!plugin.getConfig().getStringList("botInfo.channelsToListen").contains(event.getChannel().getId())
-                && !JDAUtils.hasRoleFromList(event.getMember(), plugin.getConfig().getStringList("adminCommandRoles"), bot)) {
+                && !JDAUtils.hasRoleFromList(event.getMember(), plugin.getConfig().getStringList("adminCommandRoles"))) {
             return; // ignore
         }
 
@@ -163,7 +163,7 @@ public class SyncBot extends ListenerAdapter {
             List<String> permsToHave = new ArrayList<String>();
             for (String perm : perms.getKeys(true)) {
                 if (perms.getStringList(perm).isEmpty()) continue;
-                final boolean hasRole = JDAUtils.hasRoleFromList(member, perms.getStringList(perm), bot);
+                final boolean hasRole = JDAUtils.hasRoleFromList(member, perms.getStringList(perm));
                 if (hasRole) {
                     permsToHave.add(perm);
                 }
@@ -172,7 +172,7 @@ public class SyncBot extends ListenerAdapter {
 
 
             if (plugin.getConfig().getBoolean("manageWhitelist")) {
-                if (JDAUtils.hasRoleFromList(member, plugin.getConfig().getStringList("whitelistRoles"), bot)) {
+                if (JDAUtils.hasRoleFromList(member, plugin.getConfig().getStringList("whitelistRoles"))) {
                     System.out.println("User has whitelist: " + member.getUser().getAsTag());
                     db.addToWhitelist(uuid);
                     Bukkit.getOfflinePlayer(UUID.fromString(uuid)).setWhitelisted(true);
@@ -191,7 +191,7 @@ public class SyncBot extends ListenerAdapter {
     class CommandHandler {
 
         void info(String[] argv, MessageReceivedEvent event) {
-            if (!JDAUtils.hasRoleFromList(event.getMember(), plugin.getConfig().getStringList("adminCommandRoles"), bot)) {
+            if (!JDAUtils.hasRoleFromList(event.getMember(), plugin.getConfig().getStringList("adminCommandRoles"))) {
                 JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onPermissionError"), event.getMessage(), plugin.getConfig());
                 return;
             }
@@ -295,7 +295,7 @@ public class SyncBot extends ListenerAdapter {
         }
 
         void unlink(String[] argv, MessageReceivedEvent event) {
-            if (!JDAUtils.hasRoleFromList(event.getMember(), plugin.getConfig().getStringList("adminCommandRoles"), bot)) {
+            if (!JDAUtils.hasRoleFromList(event.getMember(), plugin.getConfig().getStringList("adminCommandRoles"))) {
                 JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onPermissionError"), event.getMessage(), plugin.getConfig());
                 return;
             }

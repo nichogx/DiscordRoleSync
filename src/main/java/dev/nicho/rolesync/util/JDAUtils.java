@@ -17,7 +17,7 @@ public class JDAUtils {
         }
     }
 
-    public static boolean hasRoleFromList(Member member, List<String> roleList, JDA bot) {
+    public static boolean hasRoleFromList(Member member, List<String> roleList) {
         if (member != null) {
             for (String roleID : roleList) {
                 Role roleFound = member.getRoles().stream().filter(role -> role.getId().equals(roleID)).findFirst().orElse(null);
