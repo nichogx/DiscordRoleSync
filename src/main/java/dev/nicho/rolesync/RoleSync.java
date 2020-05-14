@@ -1,5 +1,6 @@
 package dev.nicho.rolesync;
 
+import org.bstats.bukkit.Metrics;
 import dev.nicho.dependencymanager.DependencyManager;
 import dev.nicho.rolesync.db.DatabaseHandler;
 import dev.nicho.rolesync.db.MySQLHandler;
@@ -32,6 +33,7 @@ public class RoleSync extends JavaPlugin {
     private SyncBot listener = null;
     private DependencyManager dm = null;
     private JDA jda = null;
+    private Metrics metrics = null;
 
     @Override
     public void onLoad() {
@@ -120,6 +122,8 @@ public class RoleSync extends JavaPlugin {
 
             return;
         }
+
+        metrics = new Metrics(this, 7533);
     }
 
     @Override
