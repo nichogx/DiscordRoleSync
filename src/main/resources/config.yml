@@ -58,7 +58,7 @@ adminCommandRoles:
 permissionPlugin: "luckperms"
 
 # permissions to add to users with one of the roles in the list
-# follow the example and add more as needed
+# follow the example and remove or add more as needed
 permissions:
   group.admin:
     - "000000000000000000" # administrator
@@ -72,9 +72,14 @@ permissions:
 # to use a custom emoji, you can put its ID instead of the actual
 # unicode emoji
 react:
+  # if the command was successful
   onSuccess: "✅"
+  # if the user made an error (account already linked, Minecraft user does not exist, etc.)
   onUserError: "❌"
+  # if something went wrong with the bot (this should never happen. If it does, either something is wrong
+  # with the config or the bot. If you need help, contact the developer).
   onBotError: "⚠"
+  # if the user does not have permission for that command
   onPermissionError: "🛑"
 
 # other server to use instead of Mojang API
