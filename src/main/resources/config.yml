@@ -42,7 +42,7 @@ deleteCommands: false
 deleteAfter: 10
 
 # should the bot manage the whitelist.json file?
-manageWhitelist: true
+manageWhitelist: false
 
 # IDs of the roles that should have their members in the whitelist.json file
 whitelistRoles:
