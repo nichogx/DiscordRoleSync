@@ -25,6 +25,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 
 public class RoleSync extends JavaPlugin {
 
@@ -130,6 +131,44 @@ public class RoleSync extends JavaPlugin {
         }
 
         metrics = new Metrics(this, 7533);
+        metrics.addCustomChart(new Metrics.SimplePie("used_language", new Callable<String>() {
+            @Override
+            public String call() {
+                return getConfig().getString("language");
+            }
+        }));
+
+        metrics.addCustomChart(new Metrics.SimplePie("whitelist_enabled", new Callable<String>() {
+            @Override
+            public String call() {
+                return String.valueOf(getConfig().getBoolean("manageWhitelist"));
+            }
+        }));
+
+        metrics.addCustomChart(new Metrics.SimplePie("delete_commands", new Callable<String>() {
+            @Override
+            public String call() {
+                return String.valueOf(getConfig().getBoolean("deleteCommands"));
+            }
+        }));
+
+        metrics.addCustomChart(new Metrics.SimplePie("database_type", new Callable<String>() {
+            @Override
+            public String call() {
+                return getConfig().getString("database.type");
+            }
+        }));
+
+        metrics.addCustomChart(new Metrics.SimplePie("changed_alternative_server", new Callable<String>() {
+            @Override
+            public String call() {
+                if (getConfig().getString("alternativeServer").isEmpty()) {
+                    return "not changed";
+                } else {
+                    return "changed";
+                }
+            }
+        }));
     }
 
     @Override

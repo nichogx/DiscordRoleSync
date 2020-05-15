@@ -18,6 +18,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
@@ -131,7 +132,7 @@ public class SyncBot extends ListenerAdapter {
                 db.removeFromWhitelist(uuid);
                 Bukkit.getOfflinePlayer(UUID.fromString(uuid)).setWhitelisted(false);
 
-                vault.setPermissions(uuid, null);
+                setPermissions(uuid, null);
             }
         } catch (SQLException | NullPointerException e) {
             plugin.getLogger().severe("An error occurred while removing kicked/banned/left member from whitelist. " +
@@ -165,7 +166,7 @@ public class SyncBot extends ListenerAdapter {
                     permsToHave.add(perm);
                 }
             }
-            vault.setPermissions(uuid, permsToHave);
+            setPermissions(uuid, permsToHave);
 
 
             if (plugin.getConfig().getBoolean("manageWhitelist")) {
@@ -181,6 +182,15 @@ public class SyncBot extends ListenerAdapter {
             plugin.getLogger().severe("An error occurred while trying to check roles for the user. " +
                     "Please check the stack trace below and contact the developer.");
             e.printStackTrace();
+        }
+    }
+
+    void setPermissions(String uuid, List<String> permsToHave) {
+        VaultSetPermissionsTask vpt = new VaultSetPermissionsTask(uuid, permsToHave);
+        if (plugin.getServer().getPluginManager().getPlugin("PermissionsEx") != null) { // using PEX, do it synchronously
+            vpt.runTask(plugin);
+        } else {
+            vpt.runTaskAsynchronously(plugin);
         }
     }
 
@@ -314,7 +324,7 @@ public class SyncBot extends ListenerAdapter {
                     return;
                 }
 
-                vault.setPermissions(uuid, null); // remove all managed permissions before unlinking
+                setPermissions(uuid, null); // remove all managed permissions before unlinking
                 if (plugin.getConfig().getBoolean("manageWhitelist"))
                     Bukkit.getOfflinePlayer(UUID.fromString(uuid)).setWhitelisted(false); // remove whitelist before unlinking
                 db.unlink(uuid); // accepts uuid or discord id
@@ -326,6 +336,22 @@ public class SyncBot extends ListenerAdapter {
                         "Please check the stack trace below and contact the developer.");
                 e.printStackTrace();
             }
+        }
+    }
+
+    class VaultSetPermissionsTask extends BukkitRunnable {
+
+        private List<String> permsToHave = null;
+        private String uuid = null;
+
+        public VaultSetPermissionsTask(String uuid, List<String> permsToHave) {
+            this.uuid = uuid;
+            this.permsToHave = permsToHave;
+        }
+
+        @Override
+        public void run() {
+            vault.setPermissions(uuid, permsToHave);
         }
     }
 }
