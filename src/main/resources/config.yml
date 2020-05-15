@@ -53,7 +53,7 @@ adminCommandRoles:
   - "000000000000000000" # administrator
   - "000000000000000000" # moderator
 
-# permissions to add to users with one of the roles in the list
+# permission groups to add to users with one of the roles in the list
 # follow the example and remove or add more as needed
 groups:
   admin:
