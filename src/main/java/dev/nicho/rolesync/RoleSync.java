@@ -80,8 +80,14 @@ public class RoleSync extends JavaPlugin {
         long start = System.currentTimeMillis();
         getLogger().info("Fetching dependencies... This might take a while if this is the first start.");
         try {
-            dm.downloadAll();
-            dm.addAllToClasspath();
+            int newDownloaded = dm.downloadAll();
+            if (newDownloaded == 0) {
+                getLogger().info("All dependencies were already downloaded.");
+            } else {
+                getLogger().warning("" + newDownloaded + " new dependencies downloaded. Please restart the server.");
+                setEnabled(false);
+                return;
+            }
         } catch (Exception e) {
             getLogger().severe("An error occurred while downloading the dependencies. Please check the stack trace below and contact the developer.");
             e.printStackTrace();

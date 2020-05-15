@@ -12,6 +12,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
+
     </properties>
 
     <build>
@@ -48,6 +49,21 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                        </manifest>
+                        <manifestEntries>
+                            <Class-Path>./DiscordRoleSync/lib/commons-dbcp-1.4.jar ./DiscordRoleSync/lib/commons-lang3-3.10.jar ./DiscordRoleSync/lib/commons-pool-1.6.jar ./DiscordRoleSync/lib/JDA-4.1.1_146-withDependencies-min.jar ./DiscordRoleSync/lib/json-20190722.jar ./DiscordRoleSync/lib/sqlite-jdbc-3.31.1.jar</Class-Path>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
             </plugin>
         </plugins>
     </build>

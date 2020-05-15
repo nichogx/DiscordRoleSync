@@ -37,30 +37,20 @@ public class DependencyManager {
         dependencies.add(new Dependency(url, fileName));
     }
 
-    public void downloadAll() throws IOException {
+    public int downloadAll() throws IOException {
 
+        int newDownloaded = 0;
         for (final Dependency dep : dependencies) {
 
             final File dlFile = new File(libFolder, dep.getFileName());
             if (dlFile.exists()) continue;
 
             FileUtils.copyURLToFile(dep.getUrl(), dlFile, CONNECT_TIMEOUT, READ_TIMEOUT);
+            newDownloaded++;
 
             if (!dlFile.exists()) throw new IOException("Dependency not downloaded: " + dep.getFileName());
         }
-    }
 
-    public void addAllToClasspath() throws Exception {
-        for (final Dependency dep : dependencies) {
-            File f = new File(libFolder, dep.getFileName());
-
-            // https://stackoverflow.com/questions/7884393/can-a-directory-be-added-to-the-class-path-at-runtime
-            URI u = f.toURI();
-            URLClassLoader urlClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
-            Class<URLClassLoader> urlClass = URLClassLoader.class;
-            Method method = urlClass.getDeclaredMethod("addURL", new Class[]{URL.class});
-            method.setAccessible(true);
-            method.invoke(urlClassLoader, new Object[]{u.toURL()});
-        }
+        return newDownloaded;
     }
 }
