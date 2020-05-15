@@ -1,10 +1,10 @@
 name: DiscordRoleSync
-version: 1.0.0-BETA.5
+version: 1.0.0-BETA.6
 author: Nicho
-description: Plugin to synchronize LuckPerms permissions with Discord roles and manage the whitelist with a Discord role if wanted.
+description: Sync Discord roles with the server's whitelist and permission plugins.
 main: dev.nicho.rolesync.RoleSync
-softdepend:
-  - LuckPerms
+depend:
+  - Vault
 loadbefore: # Minecord uses an older API version. The methods from their version have been deprecated but not removed.
   - Minecord
 commands:

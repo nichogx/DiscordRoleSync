@@ -1,11 +1,11 @@
 package dev.nicho.rolesync;
 
+import dev.nicho.rolesync.util.APIException;
 import org.bstats.bukkit.Metrics;
 import dev.nicho.dependencymanager.DependencyManager;
 import dev.nicho.rolesync.db.DatabaseHandler;
 import dev.nicho.rolesync.db.MySQLHandler;
 import dev.nicho.rolesync.db.SQLiteHandler;
-import dev.nicho.rolesync.permissionapis.PermPluginNotFoundException;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -122,8 +122,8 @@ public class RoleSync extends JavaPlugin {
             this.setEnabled(false);
 
             return;
-        } catch (PermPluginNotFoundException e) {
-            getLogger().severe("Permission plugin was not found: " + e.getMessage());
+        } catch (APIException e) {
+            getLogger().severe("Vault is not installed. Please install vault.");
             this.setEnabled(false);
 
             return;
@@ -162,27 +162,21 @@ public class RoleSync extends JavaPlugin {
 
             // check for subcommands
             if (args[1].equalsIgnoreCase("reset")) {
-                System.out.println("reset");
                 if (!getConfig().getBoolean("manageWhitelist")) {
                     sender.sendMessage(ChatColor.RED + language.getString("whitelistNotEnabled"));
 
                     return false;
                 }
 
-                System.out.println("reset b4 try");
-
                 try {
                     // delete all from whitelist
-                    System.out.println("ii");
                     Bukkit.getWhitelistedPlayers().forEach(offlinePlayer -> {
                         offlinePlayer.setWhitelisted(false);
                     });
 
-                    System.out.println("aa");
                     db.forAllWhitelisted((discordID, uuid) -> {
                         Bukkit.getOfflinePlayer(UUID.fromString(uuid)).setWhitelisted(true);
                     });
-                    System.out.println("bb");
 
                     sender.sendMessage(ChatColor.GREEN + language.getString("whitelistResetComplete"));
                 } catch (Exception e) {

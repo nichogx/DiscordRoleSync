@@ -53,18 +53,14 @@ adminCommandRoles:
   - "000000000000000000" # administrator
   - "000000000000000000" # moderator
 
-# the permission plugin you are using
-# check the Spigot page for supported plugins
-permissionPlugin: "luckperms"
-
 # permissions to add to users with one of the roles in the list
 # follow the example and remove or add more as needed
-permissions:
-  group.admin:
+groups:
+  admin:
     - "000000000000000000" # administrator
-  group.mod:
+  mod:
     - "000000000000000000" # moderator
-  group.vip:
+  vip:
     - "000000000000000000" # twitch subs
     - "000000000000000000" # irl friends or something
 

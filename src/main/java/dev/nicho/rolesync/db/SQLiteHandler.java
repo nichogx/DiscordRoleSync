@@ -40,4 +40,9 @@ public class SQLiteHandler extends DatabaseHandler {
         connection = DriverManager.getConnection("jdbc:sqlite:" + db);
         return connection;
     }
+
+    @Override
+    protected void closeConnection(Connection c) throws SQLException {
+        // do nothing. SQLite connection will be kept open forever
+    }
 }

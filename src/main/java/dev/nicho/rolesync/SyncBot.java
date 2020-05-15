@@ -1,9 +1,8 @@
 package dev.nicho.rolesync;
 
 import dev.nicho.rolesync.db.DatabaseHandler;
-import dev.nicho.rolesync.permissionapis.LuckPermsAPI;
-import dev.nicho.rolesync.permissionapis.PermPluginNotFoundException;
-import dev.nicho.rolesync.permissionapis.PermissionsAPI;
+import dev.nicho.rolesync.util.APIException;
+import dev.nicho.rolesync.util.VaultAPI;
 import dev.nicho.rolesync.util.JDAUtils;
 import dev.nicho.rolesync.util.MojangAPI;
 import net.dv8tion.jda.api.JDA;
@@ -26,6 +25,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 public class SyncBot extends ListenerAdapter {
@@ -34,11 +34,11 @@ public class SyncBot extends ListenerAdapter {
     private DatabaseHandler db = null;
     private CommandHandler ch = null;
     private YamlConfiguration lang = null;
-    private PermissionsAPI permPlugin = null;
+    private VaultAPI vault = null;
     private JDA bot = null;
     private MojangAPI mojang = null;
 
-    public SyncBot(@Nonnull JavaPlugin plugin, YamlConfiguration language, DatabaseHandler db) throws PermPluginNotFoundException {
+    public SyncBot(@Nonnull JavaPlugin plugin, YamlConfiguration language, DatabaseHandler db) throws APIException {
         super();
         this.plugin = plugin;
         this.lang = language;
@@ -53,16 +53,14 @@ public class SyncBot extends ListenerAdapter {
         }
 
 
-        ConfigurationSection perms = plugin.getConfig().getConfigurationSection("permissions");
-        List<String> managedPerms = new ArrayList<String>();
+        ConfigurationSection perms = plugin.getConfig().getConfigurationSection("groups");
+        List<String> managedGroups = new ArrayList<String>();
         for (String perm : perms.getKeys(true)) {
             if (perms.getStringList(perm).isEmpty()) continue;
-            managedPerms.add(perm);
+            managedGroups.add(perm);
         }
 
-        if (plugin.getConfig().getString("permissionPlugin").equalsIgnoreCase("luckperms")) {
-            this.permPlugin = new LuckPermsAPI(managedPerms);
-        }
+        this.vault = new VaultAPI(managedGroups);
     }
 
     @Override
@@ -78,10 +76,10 @@ public class SyncBot extends ListenerAdapter {
                     if (member != null) {
                         checkMemberRoles(member, uuid);
                     }
-                }, error -> {  });
+                }, error -> { });
             });
         } catch (SQLException e) {
-            plugin.getLogger().severe("An error occured while checking all users. " +
+            plugin.getLogger().severe("An error occurred while checking all users. " +
                     "Please check the stack trace below and contact the developer.");
             e.printStackTrace();
         }
@@ -134,10 +132,10 @@ public class SyncBot extends ListenerAdapter {
                 db.removeFromWhitelist(uuid);
                 Bukkit.getOfflinePlayer(UUID.fromString(uuid)).setWhitelisted(false);
 
-                permPlugin.setPermissions(uuid, null);
+                vault.setPermissions(uuid, null);
             }
         } catch (SQLException | NullPointerException e) {
-            plugin.getLogger().severe("An error occured while removing kicked/banned/left member from whitelist. " +
+            plugin.getLogger().severe("An error occurred while removing kicked/banned/left member from whitelist. " +
                     "Please check the stack trace below and contact the developer.");
             e.printStackTrace();
         }
@@ -147,7 +145,7 @@ public class SyncBot extends ListenerAdapter {
         try {
             checkMemberRoles(member, db.findUUIDByDiscordID(member.getId()));
         } catch (SQLException e) {
-            plugin.getLogger().severe("An error occured while looking for the UUID of a user. " +
+            plugin.getLogger().severe("An error occurred while looking for the UUID of a user. " +
                     "Please check the stack trace below and contact the developer.");
             e.printStackTrace();
         }
@@ -155,7 +153,7 @@ public class SyncBot extends ListenerAdapter {
 
     void checkMemberRoles(Member member, String uuid) {
         try {
-            ConfigurationSection perms = plugin.getConfig().getConfigurationSection("permissions");
+            ConfigurationSection perms = plugin.getConfig().getConfigurationSection("groups");
             if (uuid == null) { // user not linked
                 return; // ignore
             }
@@ -168,12 +166,11 @@ public class SyncBot extends ListenerAdapter {
                     permsToHave.add(perm);
                 }
             }
-            permPlugin.setPermissions(uuid, permsToHave);
+            vault.setPermissions(uuid, permsToHave);
 
 
             if (plugin.getConfig().getBoolean("manageWhitelist")) {
                 if (JDAUtils.hasRoleFromList(member, plugin.getConfig().getStringList("whitelistRoles"))) {
-                    System.out.println("User has whitelist: " + member.getUser().getAsTag());
                     db.addToWhitelist(uuid);
                     Bukkit.getOfflinePlayer(UUID.fromString(uuid)).setWhitelisted(true);
                 } else {
@@ -182,7 +179,7 @@ public class SyncBot extends ListenerAdapter {
                 }
             }
         } catch (SQLException e) {
-            plugin.getLogger().severe("An error occured while trying to check roles for the user. " +
+            plugin.getLogger().severe("An error occurred while trying to check roles for the user. " +
                     "Please check the stack trace below and contact the developer.");
             e.printStackTrace();
         }
@@ -244,7 +241,7 @@ public class SyncBot extends ListenerAdapter {
                 }
             } catch (SQLException | IOException e) {
                 JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onBotError"), event.getMessage(), plugin.getConfig());
-                plugin.getLogger().severe("An error occured while getting info for the user. " +
+                plugin.getLogger().severe("An error occurred while getting info for the user. " +
                         "Please check the stack trace below and contact the developer.");
                 e.printStackTrace();
             }
@@ -288,7 +285,7 @@ public class SyncBot extends ListenerAdapter {
                 JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onSuccess"), event.getMessage(), plugin.getConfig());
             } catch (SQLException | IOException e) {
                 JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onBotError"), event.getMessage(), plugin.getConfig());
-                plugin.getLogger().severe("An error occured while trying to check link the user. " +
+                plugin.getLogger().severe("An error occurred while trying to check link the user. " +
                         "Please check the stack trace below and contact the developer.");
                 e.printStackTrace();
             }
@@ -318,7 +315,7 @@ public class SyncBot extends ListenerAdapter {
                     return;
                 }
 
-                permPlugin.setPermissions(uuid, null); // remove all managed permissions before unlinking
+                vault.setPermissions(uuid, null); // remove all managed permissions before unlinking
                 if (plugin.getConfig().getBoolean("manageWhitelist"))
                     Bukkit.getOfflinePlayer(UUID.fromString(uuid)).setWhitelisted(false); // remove whitelist before unlinking
                 db.unlink(uuid); // accepts uuid or discord id
@@ -326,7 +323,7 @@ public class SyncBot extends ListenerAdapter {
                 JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onSuccess"), event.getMessage(), plugin.getConfig());
             } catch (SQLException | IOException e) {
                 JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onBotError"), event.getMessage(), plugin.getConfig());
-                plugin.getLogger().severe("An error occured while getting info for the user. " +
+                plugin.getLogger().severe("An error occurred while getting info for the user. " +
                         "Please check the stack trace below and contact the developer.");
                 e.printStackTrace();
             }

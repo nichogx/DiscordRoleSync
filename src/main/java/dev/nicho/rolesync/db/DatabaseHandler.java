@@ -17,6 +17,7 @@ public abstract class DatabaseHandler {
     }
 
     protected abstract Connection getConnection() throws SQLException;
+    protected abstract void closeConnection(Connection c) throws SQLException;
 
     protected void initialize() throws SQLException {
         Connection c = this.getConnection();
@@ -29,7 +30,6 @@ public abstract class DatabaseHandler {
         );
 
         ps.execute();
-        c.close();
     }
 
     public String findUUIDByDiscordID(String id) throws SQLException {
@@ -45,7 +45,7 @@ public abstract class DatabaseHandler {
         String ret = null;
         if (res.next()) ret = res.getString(1);
 
-        c.close();
+        this.closeConnection(c);
 
         return ret;
     }
@@ -63,7 +63,7 @@ public abstract class DatabaseHandler {
         String ret = null;
         if (res.next()) ret = res.getString(1);
 
-        c.close();
+        this.closeConnection(c);
 
         return ret;
     }
@@ -83,7 +83,7 @@ public abstract class DatabaseHandler {
 
         ps.execute();
 
-        c.close();
+        this.closeConnection(c);
     }
 
     public void addToWhitelist(String uuid) throws SQLException {
@@ -96,7 +96,7 @@ public abstract class DatabaseHandler {
 
         ps.execute();
 
-        c.close();
+        this.closeConnection(c);
     }
 
     public void removeFromWhitelist(String uuid) throws SQLException {
@@ -109,7 +109,7 @@ public abstract class DatabaseHandler {
 
         ps.execute();
 
-        c.close();
+        this.closeConnection(c);
     }
 
     public void unlink(String uuid) throws SQLException {
@@ -121,7 +121,7 @@ public abstract class DatabaseHandler {
 
         ps.execute();
 
-        c.close();
+        this.closeConnection(c);
 
         removeFromWhitelist(uuid);
     }
@@ -139,7 +139,7 @@ public abstract class DatabaseHandler {
             callback.accept(discordID, uuid);
         }
 
-        c.close();
+        this.closeConnection(c);
     }
 
     public void forAllWhitelisted(BiConsumer<String, String> callback) throws SQLException {
@@ -155,6 +155,6 @@ public abstract class DatabaseHandler {
             callback.accept(discordID, uuid);
         }
 
-        c.close();
+        this.closeConnection(c);
     }
 }

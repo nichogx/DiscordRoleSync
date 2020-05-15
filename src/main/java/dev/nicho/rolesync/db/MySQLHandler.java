@@ -8,7 +8,7 @@ import java.sql.SQLException;
 
 public class MySQLHandler extends DatabaseHandler {
 
-    protected BasicDataSource ds = null;
+    private BasicDataSource ds = null;
 
     public MySQLHandler(JavaPlugin plugin, String host, int port, String db, String user, String passwd) throws SQLException {
         super(plugin);
@@ -27,5 +27,10 @@ public class MySQLHandler extends DatabaseHandler {
     @Override
     protected Connection getConnection() throws SQLException {
         return ds.getConnection();
+    }
+
+    @Override
+    protected void closeConnection(Connection c) throws SQLException {
+        c.close();
     }
 }
