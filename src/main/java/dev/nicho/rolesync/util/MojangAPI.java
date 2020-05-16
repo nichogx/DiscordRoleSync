@@ -36,7 +36,7 @@ public class MojangAPI {
         }
     }
 
-    public String uuidToName(String uuid) throws IOException {
+    public MojangSearchResult uuidToName(String uuid) throws IOException {
         URL reqUrl = new URL(this.url,"user/profiles/" + uuidRemoveDashes(uuid) + "/names");
         HttpURLConnection c = (HttpURLConnection) reqUrl.openConnection();
         c.setRequestMethod("GET");
@@ -46,14 +46,17 @@ public class MojangAPI {
             Scanner scanner = new Scanner(response);
 
             JSONArray json = new JSONArray(scanner.useDelimiter("\\A").next());
-            return json.getJSONObject(json.length() - 1).getString("name");
+            return new MojangSearchResult(
+                    json.getJSONObject(json.length() - 1).getString("name"),
+                    uuidAddDashes(uuid)
+            );
         }
 
 
-        return null;
+        return new MojangSearchResult();
     }
 
-    public String nameToUUID(String name) throws IOException {
+    public MojangSearchResult nameToUUID(String name) throws IOException {
         URL reqUrl = new URL(this.url,"users/profiles/minecraft/" + name);
         HttpURLConnection c = (HttpURLConnection) reqUrl.openConnection();
         c.setRequestMethod("GET");
@@ -64,10 +67,13 @@ public class MojangAPI {
             Scanner scanner = new Scanner(response);
 
             JSONObject body = new JSONObject(scanner.useDelimiter("\\A").next());
-            return uuidAddDashes(body.getString("id"));
+            return new MojangSearchResult(
+                    body.getString("name"),
+                    uuidAddDashes(body.getString("id"))
+            );
         }
 
-        return null;
+        return new MojangSearchResult();
     }
 
     public static String uuidAddDashes(String uuid) {
@@ -78,5 +84,19 @@ public class MojangAPI {
 
     public static String uuidRemoveDashes(String uuid) {
         return uuid.replace("-", "");
+    }
+
+    public class MojangSearchResult {
+        public String name = null;
+        public String uuid = null;
+
+        MojangSearchResult() {
+
+        }
+
+        MojangSearchResult(String name, String uuid) {
+            this.name = name;
+            this.uuid = uuid;
+        }
     }
 }

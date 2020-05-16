@@ -152,10 +152,27 @@ public class RoleSync extends JavaPlugin {
             }
         }));
 
+        metrics.addCustomChart(new Metrics.SimplePie("change_nicknames", new Callable<String>() {
+            @Override
+            public String call() {
+                if (getConfig().getString("changeNicknames").equalsIgnoreCase("after")) {
+                    return "After";
+                } else if (getConfig().getString("changeNicknames").equalsIgnoreCase("replace")) {
+                    return "Replace";
+                }
+
+                return "No"; // default is no
+            }
+        }));
+
         metrics.addCustomChart(new Metrics.SimplePie("database_type", new Callable<String>() {
             @Override
             public String call() {
-                return getConfig().getString("database.type");
+                if (getConfig().getString("database.type").equalsIgnoreCase("mysql")) {
+                    return "MySQL";
+                }
+
+                return "SQLite"; // default is sqlite
             }
         }));
 
@@ -163,10 +180,23 @@ public class RoleSync extends JavaPlugin {
             @Override
             public String call() {
                 if (getConfig().getString("alternativeServer").isEmpty()) {
-                    return "not changed";
+                    return "Not changed";
                 } else {
-                    return "changed";
+                    return "Changed";
                 }
+            }
+        }));
+
+        metrics.addCustomChart(new Metrics.SimplePie("permissions_plugin", new Callable<String>() {
+            @Override
+            public String call() throws Exception {
+                if (getServer().getPluginManager().getPlugin("LuckPerms") != null) {
+                    return "LuckPerms";
+                } else if (getServer().getPluginManager().getPlugin("PermissionsEx") != null) {
+                    return "PermissionsEx";
+                }
+
+                return "unknown/other";
             }
         }));
     }

@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleRemoveEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
@@ -194,6 +195,18 @@ public class SyncBot extends ListenerAdapter {
         }
     }
 
+    void setNicknameIfEnabled(Member member, String mcUser) {
+        try {
+            if (plugin.getConfig().getString("changeNicknames").equalsIgnoreCase("after")) {
+                member.modifyNickname(member.getUser().getName() + " (" + mcUser + ")").queue(null, error -> { });
+            } else if (plugin.getConfig().getString("changeNicknames").equalsIgnoreCase("replace")) {
+                member.modifyNickname(mcUser).queue(null, error -> { });
+            }
+        } catch (PermissionException e) {
+            // no perms :(
+        }
+    }
+
     class CommandHandler {
 
         void info(String[] argv, MessageReceivedEvent event) {
@@ -216,7 +229,7 @@ public class SyncBot extends ListenerAdapter {
                         return;
                     }
 
-                    String name = mojang.uuidToName(uuid);
+                    String name = mojang.uuidToName(uuid).name;
 
                     JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onSuccess"), event.getMessage(), plugin.getConfig());
                     event.getChannel().sendMessage(lang.getString("linkedTo") + " " + name + " (" + uuid + ")" )
@@ -226,7 +239,7 @@ public class SyncBot extends ListenerAdapter {
                             });
 
                 } else { // try minecraft nick
-                    String uuid = mojang.nameToUUID(argv[1]);
+                    String uuid = mojang.nameToUUID(argv[1]).uuid;
                     String id = db.findDiscordIDbyUUID(uuid);
 
                     if (id == null) {
@@ -272,7 +285,8 @@ public class SyncBot extends ListenerAdapter {
                     return;
                 }
 
-                String uuid = mojang.nameToUUID(argv[1]);
+                MojangAPI.MojangSearchResult result = mojang.nameToUUID(argv[1]);
+                String uuid = result.uuid;
                 String linkedID = db.findDiscordIDbyUUID(uuid);
 
                 if (uuid == null) {
@@ -291,6 +305,7 @@ public class SyncBot extends ListenerAdapter {
                 }
 
                 db.linkUser(event.getAuthor().getId(), uuid);
+                setNicknameIfEnabled(event.getMember(), result.name);
                 JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onSuccess"), event.getMessage(), plugin.getConfig());
             } catch (SQLException | IOException e) {
                 JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onBotError"), event.getMessage(), plugin.getConfig());
@@ -316,7 +331,7 @@ public class SyncBot extends ListenerAdapter {
                 if (argv[1].length() > 16 && StringUtils.isNumeric(argv[1])) { // looks like Discord ID
                     uuid = db.findUUIDByDiscordID(argv[1]);
                 } else { // try minecraft nick
-                    uuid = mojang.nameToUUID(argv[1]);
+                    uuid = mojang.nameToUUID(argv[1]).uuid;
                 }
 
                 if (uuid == null) {

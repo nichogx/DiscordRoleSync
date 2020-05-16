@@ -41,6 +41,15 @@ deleteCommands: false
 # this is ignored if deleteCommands is false, but is necessary
 deleteAfter: 10
 
+# how the bot should change the Discord nicknames when the user is linked
+# possible values are:
+# - no: the bot will not touch the Discord nicknames
+# - after: the bot will put the Minecraft user in parenthesis: discord name (mc user)
+# - replace: the bot will replace the user's Discord nickname with the Minecraft user
+# IF YOU SET THIS TO ANYTHING OTHER THAN "no" YOU NEED TO GIVE THE BOT A DISCORD ROLE
+# HIGHER THAN ANY OTHER ROLES. Nickname editing will also not work with server owners :(
+changeNicknames: "no"
+
 # should the bot manage the whitelist.json file?
 manageWhitelist: false
 
