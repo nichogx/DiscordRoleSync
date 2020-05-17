@@ -406,7 +406,7 @@ public class SyncBot extends ListenerAdapter {
                     Bukkit.getOfflinePlayer(UUID.fromString(uuid)).setWhitelisted(false); // remove whitelist before unlinking
                 db.unlink(uuid);
 
-                removeLinkedRole(discordID);
+                if (discordID != null) removeLinkedRole(discordID);
                 JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onSuccess"), event.getMessage(), plugin.getConfig());
             } catch (SQLException | IOException e) {
                 JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onBotError"), event.getMessage(), plugin.getConfig());
