@@ -152,6 +152,13 @@ public class RoleSync extends JavaPlugin {
             }
         }));
 
+        metrics.addCustomChart(new Metrics.SimplePie("linked_role", new Callable<String>() {
+            @Override
+            public String call() {
+                return String.valueOf(getConfig().getBoolean("giveLinkedRole"));
+            }
+        }));
+
         metrics.addCustomChart(new Metrics.SimplePie("change_nicknames", new Callable<String>() {
             @Override
             public String call() {

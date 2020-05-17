@@ -57,6 +57,12 @@ manageWhitelist: false
 whitelistRoles:
   - "000000000000000000" # whitelisted
 
+# if the bot should give the linked players a role (which will be removed if they are unlinked)
+giveLinkedRole: false
+
+# the role that should be given to linked users. Ignored if giveLinkedRole is false
+linkedRole: "000000000000000000" # linked
+
 # IDs of the roles that should be allowed to use admin commands such as unlink and info
 adminCommandRoles:
   - "000000000000000000" # administrator

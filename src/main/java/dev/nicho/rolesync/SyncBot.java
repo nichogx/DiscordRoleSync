@@ -8,6 +8,7 @@ import dev.nicho.rolesync.util.MojangAPI;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.ReadyEvent;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleRemoveEvent;
@@ -126,6 +127,19 @@ public class SyncBot extends ListenerAdapter {
     }
 
     @Override
+    public void onGuildMemberJoin(@Nonnull GuildMemberJoinEvent event) {
+        try {
+            if (db.findUUIDByDiscordID(event.getMember().getId()) != null) {
+                giveLinkedRole(event.getMember());
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().severe("An error occurred while checking if a new member is linked. " +
+                    "Please check the stack trace below and contact the developer.");
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public void onGuildMemberRemove(@Nonnull GuildMemberRemoveEvent event) {
         try {
             String uuid = db.findUUIDByDiscordID(event.getMember().getId());
@@ -201,6 +215,37 @@ public class SyncBot extends ListenerAdapter {
                 member.modifyNickname(member.getUser().getName() + " (" + mcUser + ")").queue(null, error -> { });
             } else if (plugin.getConfig().getString("changeNicknames").equalsIgnoreCase("replace")) {
                 member.modifyNickname(mcUser).queue(null, error -> { });
+            }
+        } catch (PermissionException e) {
+            // no perms :(
+        }
+    }
+
+    void giveLinkedRole(Member member) {
+        try {
+            if (plugin.getConfig().getBoolean("giveLinkedRole")) {
+                Role role = member.getGuild().getRoleById(plugin.getConfig().getString("linkedRole"));
+                if (role == null) return; // role does not exist
+
+                member.getGuild().addRoleToMember(member, role).queue(null, error -> { });
+            }
+        } catch (PermissionException e) {
+            // no perms :(
+        }
+    }
+
+    void removeLinkedRole(String memberId) {
+        try {
+            if (plugin.getConfig().getBoolean("giveLinkedRole")) {
+                Guild guild = bot.getGuildById(plugin.getConfig().getString("botInfo.server"));
+                if (guild == null) return;
+
+                guild.retrieveMemberById(memberId).queue(member -> {
+                    Role role = member.getGuild().getRoleById(plugin.getConfig().getString("linkedRole"));
+                    if (role == null) return; // role does not exist
+
+                    member.getGuild().removeRoleFromMember(member, role).queue(null, error -> { });
+                }, err -> { });
             }
         } catch (PermissionException e) {
             // no perms :(
@@ -306,6 +351,7 @@ public class SyncBot extends ListenerAdapter {
 
                 db.linkUser(event.getAuthor().getId(), uuid);
                 setNicknameIfEnabled(event.getMember(), result.name);
+                giveLinkedRole(event.getMember());
                 JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onSuccess"), event.getMessage(), plugin.getConfig());
             } catch (SQLException | IOException e) {
                 JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onBotError"), event.getMessage(), plugin.getConfig());
@@ -327,11 +373,14 @@ public class SyncBot extends ListenerAdapter {
 
             try {
                 String uuid = null;
+                String discordID = null;
 
                 if (argv[1].length() > 16 && StringUtils.isNumeric(argv[1])) { // looks like Discord ID
                     uuid = db.findUUIDByDiscordID(argv[1]);
+                    discordID = argv[1];
                 } else { // try minecraft nick
                     uuid = mojang.nameToUUID(argv[1]).uuid;
+                    discordID = db.findDiscordIDbyUUID(uuid);
                 }
 
                 if (uuid == null) {
@@ -342,8 +391,9 @@ public class SyncBot extends ListenerAdapter {
                 setPermissions(uuid, null); // remove all managed permissions before unlinking
                 if (plugin.getConfig().getBoolean("manageWhitelist"))
                     Bukkit.getOfflinePlayer(UUID.fromString(uuid)).setWhitelisted(false); // remove whitelist before unlinking
-                db.unlink(uuid); // accepts uuid or discord id
+                db.unlink(uuid);
 
+                removeLinkedRole(discordID);
                 JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onSuccess"), event.getMessage(), plugin.getConfig());
             } catch (SQLException | IOException e) {
                 JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onBotError"), event.getMessage(), plugin.getConfig());
