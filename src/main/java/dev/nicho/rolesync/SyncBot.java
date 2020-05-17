@@ -225,12 +225,17 @@ public class SyncBot extends ListenerAdapter {
         try {
             if (plugin.getConfig().getBoolean("giveLinkedRole")) {
                 Role role = member.getGuild().getRoleById(plugin.getConfig().getString("linkedRole"));
-                if (role == null) return; // role does not exist
+                if (role == null) {
+                    plugin.getLogger().warning("Linked role does not exist.");
+                    return;
+                }
 
-                member.getGuild().addRoleToMember(member, role).queue(null, error -> { });
+                member.getGuild().addRoleToMember(member, role).queue(null, error -> {
+                    plugin.getLogger().warning("Error while adding role: " + error.getMessage());
+                });
             }
         } catch (PermissionException e) {
-            // no perms :(
+            plugin.getLogger().warning("Bot has no permissions to add roles.");
         }
     }
 
@@ -238,17 +243,25 @@ public class SyncBot extends ListenerAdapter {
         try {
             if (plugin.getConfig().getBoolean("giveLinkedRole")) {
                 Guild guild = bot.getGuildById(plugin.getConfig().getString("botInfo.server"));
-                if (guild == null) return;
+                if (guild == null) {
+                    plugin.getLogger().warning("Guild not found while trying to remove a linked role.");
+                    return;
+                }
 
                 guild.retrieveMemberById(memberId).queue(member -> {
                     Role role = member.getGuild().getRoleById(plugin.getConfig().getString("linkedRole"));
-                    if (role == null) return; // role does not exist
+                    if (role == null) {
+                        plugin.getLogger().warning("Linked role does not exist.");
+                        return;
+                    }
 
-                    member.getGuild().removeRoleFromMember(member, role).queue(null, error -> { });
+                    member.getGuild().removeRoleFromMember(member, role).queue(null, error -> {
+                        plugin.getLogger().warning("Error while adding role: " + error.getMessage());
+                    });
                 }, err -> { });
             }
         } catch (PermissionException e) {
-            // no perms :(
+            plugin.getLogger().warning("Bot has no permissions to remove roles.");
         }
     }
 
