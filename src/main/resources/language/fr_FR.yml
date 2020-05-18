@@ -1,0 +1,19 @@
+linkedTo: "Lié à"
+unknownUser: "Utilisateur inconnu"
+discordAlreadyLinked: "Ton compte Discord a déjà été lié à un compte Minecraft"
+minecraftAlreadyLinked: "Ton compte Minecraft a déjà été lié à un compte Discord"
+
+whitelistResetComplete: "La Whitelist a été reconfiguré avec succès!"
+whitelistNotEnabled: "La gestion de la Whitelist n'est pas active dans ce serveur."
+
+noPermissionError: "Vous n'avez pas la permission d'utiliser cette commande."
+commandError: "Il y a eu un problème pendant l'execution de cette commande. Vérifiez les erreurs dans la Console."
+
+usage: "Utilisation:"
+drsWhitelistDescription: "Gestion de la whitelist"
+drsReloadDescription: "Les fichiers de langage et config ont été récharché."
+
+drsWhitelistResetDescription: "La whitelist a été reconfiguré avec les utilisateurs qui ont le rôle."
+
+drsBotRestartDescription: "Redémarre le Bot"
+botRestarted: "Le Bot a été redémarré."
