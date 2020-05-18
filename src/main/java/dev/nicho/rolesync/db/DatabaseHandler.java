@@ -32,6 +32,20 @@ public abstract class DatabaseHandler {
         ps.execute();
     }
 
+    public int getLinkedUserCount() throws SQLException {
+        Connection c = this.getConnection();
+        PreparedStatement ps = c.prepareStatement("SELECT COUNT(*) FROM "
+                + plugin.getConfig().getString("database.tablePrefix") + "_discordmcusers");
+
+        ResultSet res = ps.executeQuery();
+        int ret = 0;
+        if (res.next()) ret = res.getInt(1);
+
+        this.closeConnection(c);
+
+        return ret;
+    }
+
     public String findUUIDByDiscordID(String id) throws SQLException {
         Connection c = this.getConnection();
         PreparedStatement ps = c.prepareStatement(

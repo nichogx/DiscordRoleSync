@@ -206,6 +206,13 @@ public class RoleSync extends JavaPlugin {
                 return "unknown/other";
             }
         }));
+
+        metrics.addCustomChart(new Metrics.SingleLineChart("linked_users", new Callable<Integer>() {
+            @Override
+            public Integer call() throws Exception {
+                return db.getLinkedUserCount();
+            }
+        }));
     }
 
     @Override
