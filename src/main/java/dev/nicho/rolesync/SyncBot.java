@@ -287,10 +287,15 @@ public class SyncBot extends ListenerAdapter {
                         return;
                     }
 
-                    String name = mojang.uuidToName(uuid).name;
+                    String name = null;
+                    String msgToSend = lang.getString("linkedTo") + " " + uuid;
+                    if (Bukkit.getOnlineMode()) {
+                        name = mojang.onlineUuidToName(uuid).name;
+                        msgToSend = lang.getString("linkedTo") + " " + name + " (" + uuid + ")";
+                    }
 
                     JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onSuccess"), event.getMessage(), plugin.getConfig());
-                    event.getChannel().sendMessage(lang.getString("linkedTo") + " " + name + " (" + uuid + ")" )
+                    event.getChannel().sendMessage(msgToSend)
                             .queue(msg -> {
                                 if (plugin.getConfig().getBoolean("deleteCommands"))
                                     msg.delete().queueAfter(plugin.getConfig().getInt("deleteAfter"), TimeUnit.SECONDS);

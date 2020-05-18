@@ -1,5 +1,6 @@
 package dev.nicho.rolesync.util;
 
+import org.bukkit.Bukkit;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -8,6 +9,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 import java.util.UUID;
 
@@ -36,7 +38,7 @@ public class MojangAPI {
         }
     }
 
-    public MojangSearchResult uuidToName(String uuid) throws IOException {
+    public MojangSearchResult onlineUuidToName(String uuid) throws IOException {
         URL reqUrl = new URL(this.url,"user/profiles/" + uuidRemoveDashes(uuid) + "/names");
         HttpURLConnection c = (HttpURLConnection) reqUrl.openConnection();
         c.setRequestMethod("GET");
@@ -57,6 +59,12 @@ public class MojangAPI {
     }
 
     public MojangSearchResult nameToUUID(String name) throws IOException {
+        if (!Bukkit.getOnlineMode()) return new MojangSearchResult(
+                name,
+                UUID.nameUUIDFromBytes(("OfflinePlayer:" + name).getBytes(StandardCharsets.UTF_8)).toString()
+        );
+
+
         URL reqUrl = new URL(this.url,"users/profiles/minecraft/" + name);
         HttpURLConnection c = (HttpURLConnection) reqUrl.openConnection();
         c.setRequestMethod("GET");
