@@ -14,3 +14,6 @@ drsWhitelistDescription: "Manage whitelist"
 drsReloadDescription: "Reload config and language files"
 
 drsWhitelistResetDescription: "Resets the whitelist with only the players that have the role(s)."
+
+drsBotRestartDescription: "Restarts the bot"
+botRestarted: "Bot has been restarted."

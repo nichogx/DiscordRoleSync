@@ -14,3 +14,6 @@ drsWhitelistDescription: "Gerenciar whitelist"
 drsReloadDescription: "Dar reload nos arquivos de config e línguas"
 
 drsWhitelistResetDescription: "Reseta a whitelist apenas com os usuários que tem o(s) cargo(s)."
+
+drsBotRestartDescription: "Reinicia o bot"
+botRestarted: "Bot reiniciado."

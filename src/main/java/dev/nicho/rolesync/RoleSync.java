@@ -222,7 +222,8 @@ public class RoleSync extends JavaPlugin {
         if (args.length < 1) { // print usage and return
             sender.sendMessage(language.getString("usage") + "\n" +
                     "/drs whitelist: " + language.getString("drsWhitelistDescription") + "\n" +
-                    "/drs reload: " + language.getString("drsReloadDescription")
+                    "/drs reload: " + language.getString("drsReloadDescription") + "\n" +
+                    "/drs botrestart: " + language.getString("drsBotRestartDescription")
             );
 
             return true;
@@ -310,6 +311,7 @@ public class RoleSync extends JavaPlugin {
 
             try {
                 startBot();
+                sender.sendMessage(ChatColor.GREEN + language.getString("botRestarted"));
             } catch (LoginException e) {
                 e.printStackTrace();
             }
