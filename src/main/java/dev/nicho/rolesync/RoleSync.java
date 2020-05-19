@@ -1,6 +1,7 @@
 package dev.nicho.rolesync;
 
 import dev.nicho.rolesync.util.APIException;
+import dev.nicho.rolesync.util.VaultAPI;
 import org.bstats.bukkit.Metrics;
 import dev.nicho.dependencymanager.DependencyManager;
 import dev.nicho.rolesync.db.DatabaseHandler;
@@ -14,6 +15,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -24,6 +26,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
@@ -35,6 +39,7 @@ public class RoleSync extends JavaPlugin {
     private DependencyManager dm = null;
     private JDA jda = null;
     private Metrics metrics = null;
+    private VaultAPI vault = null;
 
     @Override
     public void onLoad() {
@@ -109,7 +114,16 @@ public class RoleSync extends JavaPlugin {
                 this.db = new SQLiteHandler(this, new File(getDataFolder(), "database.db"));
             }
 
-            listener = new SyncBot(this, language, this.db);
+            // get all managed groups
+            ConfigurationSection perms = getConfig().getConfigurationSection("groups");
+            List<String> managedGroups = new ArrayList<String>();
+            for (String perm : perms.getKeys(true)) {
+                if (perms.getStringList(perm).isEmpty()) continue;
+                managedGroups.add(perm);
+            }
+
+            this.vault = new VaultAPI(managedGroups);
+            listener = new SyncBot(this, language, this.db, this.vault);
             startBot();
 
         } catch (IOException | SQLException e) {
@@ -197,12 +211,9 @@ public class RoleSync extends JavaPlugin {
         metrics.addCustomChart(new Metrics.SimplePie("permissions_plugin", new Callable<String>() {
             @Override
             public String call() throws Exception {
-                if (getServer().getPluginManager().getPlugin("LuckPerms") != null) {
-                    return "LuckPerms";
-                } else if (getServer().getPluginManager().getPlugin("PermissionsEx") != null) {
-                    return "PermissionsEx";
-                }
+                String permPlugin = vault.getPermProvider().getName();
 
+                if (permPlugin != null && !permPlugin.isEmpty()) return permPlugin;
                 return "unknown/other";
             }
         }));

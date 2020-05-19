@@ -37,4 +37,8 @@ public class VaultAPI {
             permProvider.playerAddGroup(null, player, perm);
         });
     }
+
+    public Permission getPermProvider() {
+        return this.permProvider;
+    }
 }

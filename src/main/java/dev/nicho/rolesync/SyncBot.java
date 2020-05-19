@@ -1,7 +1,6 @@
 package dev.nicho.rolesync;
 
 import dev.nicho.rolesync.db.DatabaseHandler;
-import dev.nicho.rolesync.util.APIException;
 import dev.nicho.rolesync.util.VaultAPI;
 import dev.nicho.rolesync.util.JDAUtils;
 import dev.nicho.rolesync.util.MojangAPI;
@@ -40,7 +39,7 @@ public class SyncBot extends ListenerAdapter {
     private JDA bot = null;
     private MojangAPI mojang = null;
 
-    public SyncBot(@Nonnull JavaPlugin plugin, YamlConfiguration language, DatabaseHandler db) throws APIException {
+    public SyncBot(@Nonnull JavaPlugin plugin, YamlConfiguration language, DatabaseHandler db, VaultAPI vault) {
         super();
         this.plugin = plugin;
         this.lang = language;
@@ -54,15 +53,7 @@ public class SyncBot extends ListenerAdapter {
             this.mojang = new MojangAPI(alternateServer);
         }
 
-
-        ConfigurationSection perms = plugin.getConfig().getConfigurationSection("groups");
-        List<String> managedGroups = new ArrayList<String>();
-        for (String perm : perms.getKeys(true)) {
-            if (perms.getStringList(perm).isEmpty()) continue;
-            managedGroups.add(perm);
-        }
-
-        this.vault = new VaultAPI(managedGroups);
+        this.vault = vault;
     }
 
     @Override
