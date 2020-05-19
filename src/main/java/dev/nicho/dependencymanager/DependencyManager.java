@@ -13,8 +13,8 @@ public class DependencyManager {
     final int CONNECT_TIMEOUT = 4000;
     final int READ_TIMEOUT = 10000;
 
-    private List<Dependency> dependencies = null;
-    private File libFolder = null;
+    private final List<Dependency> dependencies;
+    private final File libFolder;
 
     public DependencyManager(File libFolder) {
         if (!libFolder.isDirectory()) {
@@ -23,7 +23,7 @@ public class DependencyManager {
 
         this.libFolder = libFolder;
 
-        dependencies = new ArrayList<Dependency>();
+        dependencies = new ArrayList<>();
     }
 
     public void addDependency(URL url) {

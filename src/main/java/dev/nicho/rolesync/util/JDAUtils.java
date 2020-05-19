@@ -1,6 +1,5 @@
 package dev.nicho.rolesync.util;
 
-import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
 import org.bukkit.configuration.file.FileConfiguration;
 

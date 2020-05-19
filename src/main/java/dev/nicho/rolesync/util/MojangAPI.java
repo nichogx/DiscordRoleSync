@@ -94,7 +94,7 @@ public class MojangAPI {
         return uuid.replace("-", "");
     }
 
-    public class MojangSearchResult {
+    public static class MojangSearchResult {
         public String name = null;
         public String uuid = null;
 

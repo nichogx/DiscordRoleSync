@@ -4,8 +4,8 @@ import java.net.URL;
 
 class Dependency {
 
-    private URL url = null;
-    private String fileName = null;
+    private final URL url;
+    private final String fileName;
 
     Dependency(URL url) {
         this.url = url;

@@ -8,7 +8,7 @@ import java.sql.SQLException;
 
 public class MySQLHandler extends DatabaseHandler {
 
-    private BasicDataSource ds = null;
+    private final BasicDataSource ds;
 
     public MySQLHandler(JavaPlugin plugin, String host, int port, String db, String user, String passwd) throws SQLException {
         super(plugin);

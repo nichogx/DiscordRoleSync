@@ -29,7 +29,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.Callable;
 
 public class RoleSync extends JavaPlugin {
 
@@ -38,7 +37,6 @@ public class RoleSync extends JavaPlugin {
     private SyncBot listener = null;
     private DependencyManager dm = null;
     private JDA jda = null;
-    private Metrics metrics = null;
     private VaultAPI vault = null;
 
     @Override
@@ -116,7 +114,7 @@ public class RoleSync extends JavaPlugin {
 
             // get all managed groups
             ConfigurationSection perms = getConfig().getConfigurationSection("groups");
-            List<String> managedGroups = new ArrayList<String>();
+            List<String> managedGroups = new ArrayList<>();
             for (String perm : perms.getKeys(true)) {
                 if (perms.getStringList(perm).isEmpty()) continue;
                 managedGroups.add(perm);
@@ -144,86 +142,54 @@ public class RoleSync extends JavaPlugin {
             return;
         }
 
-        metrics = new Metrics(this, 7533);
-        metrics.addCustomChart(new Metrics.SimplePie("used_language", new Callable<String>() {
-            @Override
-            public String call() {
-                return getConfig().getString("language");
+        Metrics metrics = new Metrics(this, 7533);
+        metrics.addCustomChart(new Metrics.SimplePie("used_language",
+                () -> getConfig().getString("language")));
+
+        metrics.addCustomChart(new Metrics.SimplePie("whitelist_enabled",
+                () -> String.valueOf(getConfig().getBoolean("manageWhitelist"))));
+
+        metrics.addCustomChart(new Metrics.SimplePie("delete_commands",
+                () -> String.valueOf(getConfig().getBoolean("deleteCommands"))));
+
+        metrics.addCustomChart(new Metrics.SimplePie("linked_role",
+                () -> String.valueOf(getConfig().getBoolean("giveLinkedRole"))));
+
+        metrics.addCustomChart(new Metrics.SimplePie("change_nicknames", () -> {
+            if (getConfig().getString("changeNicknames").equalsIgnoreCase("after")) {
+                return "After";
+            } else if (getConfig().getString("changeNicknames").equalsIgnoreCase("replace")) {
+                return "Replace";
             }
+
+            return "No"; // default is no
         }));
 
-        metrics.addCustomChart(new Metrics.SimplePie("whitelist_enabled", new Callable<String>() {
-            @Override
-            public String call() {
-                return String.valueOf(getConfig().getBoolean("manageWhitelist"));
+        metrics.addCustomChart(new Metrics.SimplePie("database_type", () -> {
+            if (getConfig().getString("database.type").equalsIgnoreCase("mysql")) {
+                return "MySQL";
             }
+
+            return "SQLite"; // default is sqlite
         }));
 
-        metrics.addCustomChart(new Metrics.SimplePie("delete_commands", new Callable<String>() {
-            @Override
-            public String call() {
-                return String.valueOf(getConfig().getBoolean("deleteCommands"));
+        metrics.addCustomChart(new Metrics.SimplePie("changed_alternative_server", () -> {
+            if (getConfig().getString("alternativeServer").isEmpty()) {
+                return "Not changed";
             }
+
+            return "Changed";
         }));
 
-        metrics.addCustomChart(new Metrics.SimplePie("linked_role", new Callable<String>() {
-            @Override
-            public String call() {
-                return String.valueOf(getConfig().getBoolean("giveLinkedRole"));
-            }
+        metrics.addCustomChart(new Metrics.SimplePie("permissions_plugin", () -> {
+            String permPlugin = vault.getPermProvider().getName();
+
+            if (permPlugin != null && !permPlugin.isEmpty()) return permPlugin;
+            return "unknown/other";
         }));
 
-        metrics.addCustomChart(new Metrics.SimplePie("change_nicknames", new Callable<String>() {
-            @Override
-            public String call() {
-                if (getConfig().getString("changeNicknames").equalsIgnoreCase("after")) {
-                    return "After";
-                } else if (getConfig().getString("changeNicknames").equalsIgnoreCase("replace")) {
-                    return "Replace";
-                }
-
-                return "No"; // default is no
-            }
-        }));
-
-        metrics.addCustomChart(new Metrics.SimplePie("database_type", new Callable<String>() {
-            @Override
-            public String call() {
-                if (getConfig().getString("database.type").equalsIgnoreCase("mysql")) {
-                    return "MySQL";
-                }
-
-                return "SQLite"; // default is sqlite
-            }
-        }));
-
-        metrics.addCustomChart(new Metrics.SimplePie("changed_alternative_server", new Callable<String>() {
-            @Override
-            public String call() {
-                if (getConfig().getString("alternativeServer").isEmpty()) {
-                    return "Not changed";
-                } else {
-                    return "Changed";
-                }
-            }
-        }));
-
-        metrics.addCustomChart(new Metrics.SimplePie("permissions_plugin", new Callable<String>() {
-            @Override
-            public String call() throws Exception {
-                String permPlugin = vault.getPermProvider().getName();
-
-                if (permPlugin != null && !permPlugin.isEmpty()) return permPlugin;
-                return "unknown/other";
-            }
-        }));
-
-        metrics.addCustomChart(new Metrics.SingleLineChart("linked_users", new Callable<Integer>() {
-            @Override
-            public Integer call() throws Exception {
-                return db.getLinkedUserCount();
-            }
-        }));
+        metrics.addCustomChart(new Metrics.SingleLineChart("linked_users",
+                () -> db.getLinkedUserCount()));
     }
 
     @Override
@@ -265,13 +231,9 @@ public class RoleSync extends JavaPlugin {
 
                 try {
                     // delete all from whitelist
-                    Bukkit.getWhitelistedPlayers().forEach(offlinePlayer -> {
-                        offlinePlayer.setWhitelisted(false);
-                    });
+                    Bukkit.getWhitelistedPlayers().forEach(offlinePlayer -> offlinePlayer.setWhitelisted(false));
 
-                    db.forAllWhitelisted((discordID, uuid) -> {
-                        Bukkit.getOfflinePlayer(UUID.fromString(uuid)).setWhitelisted(true);
-                    });
+                    db.forAllWhitelisted((discordID, uuid) -> Bukkit.getOfflinePlayer(UUID.fromString(uuid)).setWhitelisted(true));
 
                     sender.sendMessage(ChatColor.GREEN + language.getString("whitelistResetComplete"));
                 } catch (Exception e) {

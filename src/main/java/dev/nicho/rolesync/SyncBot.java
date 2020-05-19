@@ -26,18 +26,19 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class SyncBot extends ListenerAdapter {
 
-    private JavaPlugin plugin = null;
-    private DatabaseHandler db = null;
+    private final JavaPlugin plugin;
+    private final DatabaseHandler db;
     private CommandHandler ch = null;
-    private YamlConfiguration lang = null;
-    private VaultAPI vault = null;
+    private final YamlConfiguration lang;
+    private final VaultAPI vault;
     private JDA bot = null;
-    private MojangAPI mojang = null;
+    private final MojangAPI mojang;
 
     public SyncBot(@Nonnull JavaPlugin plugin, YamlConfiguration language, DatabaseHandler db, VaultAPI vault) {
         super();
@@ -64,13 +65,13 @@ public class SyncBot extends ListenerAdapter {
         plugin.getLogger().info("Logged in: " + event.getJDA().getSelfUser().getName());
 
         try {
-            db.forAllLinkedUsers((discordID, uuid) -> {
-                bot.getGuildById(this.plugin.getConfig().getString("botInfo.server")).retrieveMemberById(discordID).queue(member -> {
-                    if (member != null) {
-                        checkMemberRoles(member, uuid);
-                    }
-                }, error -> { });
-            });
+            db.forAllLinkedUsers((discordID, uuid) ->
+                    Objects.requireNonNull(bot.getGuildById(this.plugin.getConfig().getString("botInfo.server")))
+                            .retrieveMemberById(discordID).queue(member -> {
+                                if (member != null) {
+                                    checkMemberRoles(member, uuid);
+                                }
+                            }, error -> { }));
         } catch (SQLException e) {
             plugin.getLogger().severe("An error occurred while checking all users. " +
                     "Please check the stack trace below and contact the developer.");
@@ -85,7 +86,7 @@ public class SyncBot extends ListenerAdapter {
         String message = event.getMessage().getContentRaw();
         String prefix = this.plugin.getConfig().getString("botInfo.prefix");
 
-        if (message.length() < prefix.length() || !message.substring(0, prefix.length()).equals(prefix)) return; // ignore if no prefix
+        if (message.length() < prefix.length() || !message.startsWith(prefix)) return; // ignore if no prefix
 
         if (!plugin.getConfig().getStringList("botInfo.channelsToListen").contains(event.getChannel().getId())
                 && !JDAUtils.hasRoleFromList(event.getMember(), plugin.getConfig().getStringList("adminCommandRoles"))) {
@@ -133,7 +134,7 @@ public class SyncBot extends ListenerAdapter {
     @Override
     public void onGuildMemberRemove(@Nonnull GuildMemberRemoveEvent event) {
         try {
-            String uuid = db.findUUIDByDiscordID(event.getMember().getId());
+            String uuid = db.findUUIDByDiscordID(Objects.requireNonNull(event.getMember()).getId());
             if (uuid != null) {
                 db.removeFromWhitelist(uuid);
                 Bukkit.getOfflinePlayer(UUID.fromString(uuid)).setWhitelisted(false);
@@ -164,7 +165,7 @@ public class SyncBot extends ListenerAdapter {
                 return; // ignore
             }
 
-            List<String> permsToHave = new ArrayList<String>();
+            List<String> permsToHave = new ArrayList<>();
             for (String perm : perms.getKeys(true)) {
                 if (perms.getStringList(perm).isEmpty()) continue;
                 final boolean hasRole = JDAUtils.hasRoleFromList(member, perms.getStringList(perm));
@@ -221,9 +222,8 @@ public class SyncBot extends ListenerAdapter {
                     return;
                 }
 
-                member.getGuild().addRoleToMember(member, role).queue(null, error -> {
-                    plugin.getLogger().warning("Error while adding role: " + error.getMessage());
-                });
+                member.getGuild().addRoleToMember(member, role).queue(null,
+                        error -> plugin.getLogger().warning("Error while adding role: " + error.getMessage()));
             }
         } catch (PermissionException e) {
             plugin.getLogger().warning("Bot has no permissions to add roles.");
@@ -246,9 +246,8 @@ public class SyncBot extends ListenerAdapter {
                         return;
                     }
 
-                    member.getGuild().removeRoleFromMember(member, role).queue(null, error -> {
-                        plugin.getLogger().warning("Error while adding role: " + error.getMessage());
-                    });
+                    member.getGuild().removeRoleFromMember(member, role).queue(null,
+                            error -> plugin.getLogger().warning("Error while adding role: " + error.getMessage()));
                 }, err -> { });
             }
         } catch (PermissionException e) {
@@ -278,7 +277,7 @@ public class SyncBot extends ListenerAdapter {
                         return;
                     }
 
-                    String name = null;
+                    String name;
                     String msgToSend = lang.getString("linkedTo") + " " + uuid;
                     if (Bukkit.getOnlineMode()) {
                         name = mojang.onlineUuidToName(uuid).name;
@@ -332,9 +331,9 @@ public class SyncBot extends ListenerAdapter {
                 String linkedUUID = db.findUUIDByDiscordID(event.getAuthor().getId());
                 if (linkedUUID != null) {
                     JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig());
-                    event.getAuthor().openPrivateChannel().queue(channel -> {
-                        channel.sendMessage(lang.getString("discordAlreadyLinked")).queue(null, err -> { });
-                    });
+                    event.getAuthor().openPrivateChannel().queue(
+                            channel -> channel.sendMessage(lang.getString("discordAlreadyLinked"))
+                                    .queue(null, err -> { }));
 
                     return;
                 }
@@ -351,9 +350,9 @@ public class SyncBot extends ListenerAdapter {
 
                 if (linkedID != null) {
                     JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig());
-                    event.getAuthor().openPrivateChannel().queue(channel -> {
-                        channel.sendMessage(lang.getString("minecraftAlreadyLinked")).queue(null, err -> { });
-                    });
+                    event.getAuthor().openPrivateChannel().queue(
+                            channel -> channel.sendMessage(lang.getString("minecraftAlreadyLinked"))
+                                    .queue(null, err -> { }));
 
                     return;
                 }
@@ -381,8 +380,8 @@ public class SyncBot extends ListenerAdapter {
             }
 
             try {
-                String uuid = null;
-                String discordID = null;
+                String uuid;
+                String discordID;
 
                 if (argv[1].length() > 16 && StringUtils.isNumeric(argv[1])) { // looks like Discord ID
                     uuid = db.findUUIDByDiscordID(argv[1]);
@@ -415,8 +414,8 @@ public class SyncBot extends ListenerAdapter {
 
     class VaultSetPermissionsTask extends BukkitRunnable {
 
-        private List<String> permsToHave = null;
-        private String uuid = null;
+        private final List<String> permsToHave;
+        private final String uuid;
 
         public VaultSetPermissionsTask(String uuid, List<String> permsToHave) {
             this.uuid = uuid;

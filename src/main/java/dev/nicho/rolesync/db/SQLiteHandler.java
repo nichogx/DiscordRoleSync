@@ -10,8 +10,8 @@ import java.sql.SQLException;
 
 public class SQLiteHandler extends DatabaseHandler {
 
-    private File db = null;
-    private Connection connection = null;
+    private final File db;
+    private Connection connection;
 
     public SQLiteHandler(JavaPlugin plugin, File db) throws IOException, SQLException {
         super(plugin);
@@ -42,7 +42,7 @@ public class SQLiteHandler extends DatabaseHandler {
     }
 
     @Override
-    protected void closeConnection(Connection c) throws SQLException {
+    protected void closeConnection(Connection c) {
         // do nothing. SQLite connection will be kept open forever
     }
 }

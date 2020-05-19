@@ -11,8 +11,8 @@ import java.util.UUID;
 
 public class VaultAPI {
 
-    private Permission permProvider = null;
-    private List<String> managedGroups = null;
+    private final Permission permProvider;
+    private final List<String> managedGroups;
 
     public VaultAPI(List<String> managedGroups) throws APIException {
         RegisteredServiceProvider<Permission> rsp = Bukkit.getServicesManager().getRegistration(Permission.class);
@@ -33,9 +33,7 @@ public class VaultAPI {
             permProvider.playerRemoveGroup(null, player, managedPerm);
         }
 
-        if (permissions != null) permissions.forEach(perm -> {
-            permProvider.playerAddGroup(null, player, perm);
-        });
+        if (permissions != null) permissions.forEach(perm -> permProvider.playerAddGroup(null, player, perm));
     }
 
     public Permission getPermProvider() {

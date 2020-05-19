@@ -10,7 +10,7 @@ import java.util.function.BiConsumer;
 
 public abstract class DatabaseHandler {
 
-    protected JavaPlugin plugin = null;
+    protected final JavaPlugin plugin;
 
     protected DatabaseHandler(JavaPlugin plugin) {
         this.plugin = plugin;
