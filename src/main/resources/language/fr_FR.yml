@@ -13,7 +13,7 @@ usage: "Utilisation:"
 drsWhitelistDescription: "Gestion de la whitelist"
 drsReloadDescription: "Les fichiers de langage et config ont été récharché."
 
-drsWhitelistResetDescription: "La whitelist a été reconfiguré avec les utilisateurs qui ont le rôle."
+drsWhitelistResetDescription: "Réinitialiser la whitelist avec uniquement les utilisateurs qui ont le rôle."
 
 drsBotRestartDescription: "Redémarre le Bot"
 botRestarted: "Le Bot a été redémarré."
