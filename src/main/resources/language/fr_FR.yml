@@ -3,9 +3,6 @@ unknownUser: "Utilisateur inconnu"
 discordAlreadyLinked: "Ton compte Discord a déjà été lié à un compte Minecraft"
 minecraftAlreadyLinked: "Ton compte Minecraft a déjà été lié à un compte Discord"
 
-whitelistResetComplete: "La Whitelist a été reconfiguré avec succès!"
-whitelistNotEnabled: "La gestion de la Whitelist n'est pas active dans ce serveur."
-
 noPermissionError: "Vous n'avez pas la permission d'utiliser cette commande."
 commandError: "Il y a eu un problème pendant l'execution de cette commande. Vérifiez les erreurs dans la Console."
 
@@ -14,3 +11,19 @@ drsReloadDescription: "Les fichiers de langage et config ont été récharché."
 
 drsBotRestartDescription: "Redémarre le Bot"
 botRestarted: "Le Bot a été redémarré."
+
+drsVerifyDescription: "Veuillez vérifier votre Compte Discord"
+alreadyVerified: "Compte déjà vérifié!"
+verificationInstructions: "Envoi un msg privé au Bot avec le Code suivant:"
+
+pleaseLink: "Veuillez lier votre compte avec notre Serveur Discord s'il vous plait"
+
+whitelistErrorKickMsg: "Il y a eu un souci pendant le controle de vos permissions en whitelist. Veuillez le signaler à l'amministrateur."
+whitelistNotVerifiedKickMsg: "Votre Compte n'a pas encore été vérifié. Envoi un msg privé au Bot avec le Code suivant:"
+notWhitelistedKickMsg: "Vous n'êtes pas dans la whitelist de ce Serveur."
+
+notLatestVersion: "Nouvelle mise à jour disponible pour DiscordRoleSync."
+latest: "Derniere version:"
+current: "Version utilisée:"
+
+reloadComplete: "Redémarrage completé!"

@@ -3,9 +3,6 @@ unknownUser: "usuário desconhecido"
 discordAlreadyLinked: "Sua conta do Discord já está linkada a uma conta do Minecraft"
 minecraftAlreadyLinked: "Sua conta do Minecraft já está linkada a uma conta do Discord"
 
-whitelistResetComplete: "Reset da whitelist completo"
-whitelistNotEnabled: "Gerenciamento de whitelist não habilitado nesse servidor"
-
 noPermissionError: "Você não tem permissão para rodar esse comando."
 commandError: "Erro ao rodar esse comando. Por favor veja o console."
 

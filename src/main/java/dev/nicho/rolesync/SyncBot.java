@@ -89,7 +89,7 @@ public class SyncBot extends ListenerAdapter {
         if (event.getAuthor().isBot()) return; // ignore bots
 
         String message = event.getMessage().getContentRaw();
-        if (plugin.getConfig().getBoolean("requireVerification") && event.getChannel().getType() == ChannelType.PRIVATE) {
+        if (event.getChannel().getType() == ChannelType.PRIVATE) {
             ch.verify(message.split(" "), event);
         }
 

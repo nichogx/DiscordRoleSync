@@ -203,7 +203,7 @@ public abstract class DatabaseHandler {
                 ret = new LinkedUserInfo(
                         res.getString(1), // discord id
                         res.getString(2), // minecraft uuid
-                        false, // whitelisted
+                        res.getBoolean(3), // whitelisted
                         false, // verified
                         verificationCode,
                         res.getString(6) // username when linked

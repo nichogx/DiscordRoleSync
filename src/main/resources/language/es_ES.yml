@@ -1,0 +1,29 @@
+linkedTo: "Conectado a"
+unknownUser: "Usuario Desconocido"
+discordAlreadyLinked: "Tu cuenta de Discord ya está conectada con una cuenta de Minecraft"
+minecraftAlreadyLinked: "Tu cuenta de Minecraft ya está conectada con una cuenta de Discord"
+
+noPermissionError: "No tienes permisos para ejecutar este comando."
+commandError: "Ha surgido un error mientras se ejecutaba el comando. Por favor, revisa la consola."
+
+usage: "Uso:"
+drsReloadDescription: "Recargar la configuración y los archivos del idioma"
+
+drsBotRestartDescription: "Reinicia el bot"
+botRestarted: "El bot ha sido reiniciado correctamente."
+
+drsVerifyDescription: "Verifica tu cuenta de Discord"
+alreadyVerified: "Ya estás verificado"
+verificationInstructions: "Por favor, envía este código por mensaje privado al bot de Discord: "
+
+pleaseLink: "Por favor, conecta tu cuenta en nuestro servidor de Discord:"
+
+whitelistErrorKickMsg: "Un error ha ocurrido mientras comprobabamos si estabas en la whitelist. Por favor contacta con el administrador del servidor."
+whitelistNotVerifiedKickMsg: "No estás verificado. Por favor envía este código por mensaje privado al bot de Discord:"
+notWhitelistedKickMsg: "No estás en la whitelist (lista de jugadores admitidos) del servidor"
+
+notLatestVersion: "No estás ejecutando la última versión de DiscordRoleSync."
+latest: "Última:"
+current: "Actual:"
+
+reloadComplete: "Recarga completa"
