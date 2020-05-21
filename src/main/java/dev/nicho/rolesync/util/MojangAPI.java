@@ -48,6 +48,8 @@ public class MojangAPI {
             Scanner scanner = new Scanner(response);
 
             JSONArray json = new JSONArray(scanner.useDelimiter("\\A").next());
+            scanner.close();
+            response.close();
             return new MojangSearchResult(
                     json.getJSONObject(json.length() - 1).getString("name"),
                     uuidAddDashes(uuid)
@@ -75,6 +77,8 @@ public class MojangAPI {
             Scanner scanner = new Scanner(response);
 
             JSONObject body = new JSONObject(scanner.useDelimiter("\\A").next());
+            scanner.close();
+            response.close();
             return new MojangSearchResult(
                     body.getString("name"),
                     uuidAddDashes(body.getString("id"))
@@ -95,11 +99,11 @@ public class MojangAPI {
     }
 
     public static class MojangSearchResult {
-        public String name = null;
-        public String uuid = null;
+        public final String name;
+        public final String uuid;
 
         MojangSearchResult() {
-
+            this(null, null);
         }
 
         MojangSearchResult(String name, String uuid) {

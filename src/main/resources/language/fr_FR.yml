@@ -10,10 +10,7 @@ noPermissionError: "Vous n'avez pas la permission d'utiliser cette commande."
 commandError: "Il y a eu un problème pendant l'execution de cette commande. Vérifiez les erreurs dans la Console."
 
 usage: "Utilisation:"
-drsWhitelistDescription: "Gestion de la whitelist"
 drsReloadDescription: "Les fichiers de langage et config ont été récharché."
-
-drsWhitelistResetDescription: "Réinitialiser la whitelist avec uniquement les utilisateurs qui ont le rôle."
 
 drsBotRestartDescription: "Redémarre le Bot"
 botRestarted: "Le Bot a été redémarré."

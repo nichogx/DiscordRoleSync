@@ -1,5 +1,5 @@
 name: DiscordRoleSync
-version: 1.0.0-BETA.11
+version: 1.0.0-BETA.12
 author: Nicho
 description: Sync Discord roles with the server's whitelist and permission plugins.
 main: dev.nicho.rolesync.RoleSync

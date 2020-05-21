@@ -65,11 +65,16 @@ public class SyncBot extends ListenerAdapter {
         plugin.getLogger().info("Logged in: " + event.getJDA().getSelfUser().getName());
 
         try {
-            db.forAllLinkedUsers((discordID, uuid) ->
+            db.forAllLinkedUsers((userInfo) ->
                     Objects.requireNonNull(bot.getGuildById(this.plugin.getConfig().getString("botInfo.server")))
-                            .retrieveMemberById(discordID).queue(member -> {
+                            .retrieveMemberById(userInfo.discordId).queue(member -> {
                                 if (member != null) {
-                                    checkMemberRoles(member, uuid);
+                                    if (userInfo.verified) {
+                                        giveRoleAndNickname(member, null);
+                                    } else {
+                                        removeRoleAndNickname(member);
+                                    }
+                                    checkMemberRoles(member, userInfo.uuid);
                                 }
                             }, error -> { }));
         } catch (SQLException e) {
@@ -84,8 +89,11 @@ public class SyncBot extends ListenerAdapter {
         if (event.getAuthor().isBot()) return; // ignore bots
 
         String message = event.getMessage().getContentRaw();
-        String prefix = this.plugin.getConfig().getString("botInfo.prefix");
+        if (plugin.getConfig().getBoolean("requireVerification") && event.getChannel().getType() == ChannelType.PRIVATE) {
+            ch.verify(message.split(" "), event);
+        }
 
+        String prefix = this.plugin.getConfig().getString("botInfo.prefix");
         if (message.length() < prefix.length() || !message.startsWith(prefix)) return; // ignore if no prefix
 
         if (!plugin.getConfig().getStringList("botInfo.channelsToListen").contains(event.getChannel().getId())
@@ -107,7 +115,6 @@ public class SyncBot extends ListenerAdapter {
 
     }
 
-
     @Override
     public void onGuildMemberRoleAdd(@Nonnull GuildMemberRoleAddEvent event) {
         checkMemberRoles(event.getMember());
@@ -121,10 +128,16 @@ public class SyncBot extends ListenerAdapter {
     @Override
     public void onGuildMemberJoin(@Nonnull GuildMemberJoinEvent event) {
         try {
-            if (db.findUUIDByDiscordID(event.getMember().getId()) != null) {
-                giveLinkedRole(event.getMember());
+            DatabaseHandler.LinkedUserInfo userInfo = db.getLinkedUserInfo(event.getMember().getId());
+            if (userInfo != null) {
+                if (!plugin.getConfig().getBoolean("requireVerification") || userInfo.verified) {
+                    if (Bukkit.getOnlineMode())
+                        giveRoleAndNickname(event.getMember(), mojang.onlineUuidToName(userInfo.uuid).name);
+                    else
+                        giveRoleAndNickname(event.getMember(), userInfo.username);
+                }
             }
-        } catch (SQLException e) {
+        } catch (SQLException | IOException e) {
             plugin.getLogger().severe("An error occurred while checking if a new member is linked. " +
                     "Please check the stack trace below and contact the developer.");
             e.printStackTrace();
@@ -137,7 +150,6 @@ public class SyncBot extends ListenerAdapter {
             String uuid = db.findUUIDByDiscordID(Objects.requireNonNull(event.getMember()).getId());
             if (uuid != null) {
                 db.removeFromWhitelist(uuid);
-                Bukkit.getOfflinePlayer(UUID.fromString(uuid)).setWhitelisted(false);
 
                 setPermissions(uuid, null);
             }
@@ -179,10 +191,8 @@ public class SyncBot extends ListenerAdapter {
             if (plugin.getConfig().getBoolean("manageWhitelist")) {
                 if (JDAUtils.hasRoleFromList(member, plugin.getConfig().getStringList("whitelistRoles"))) {
                     db.addToWhitelist(uuid);
-                    Bukkit.getOfflinePlayer(UUID.fromString(uuid)).setWhitelisted(true);
                 } else {
                     db.removeFromWhitelist(uuid);
-                    Bukkit.getOfflinePlayer(UUID.fromString(uuid)).setWhitelisted(false);
                 }
             }
         } catch (SQLException e) {
@@ -201,19 +211,46 @@ public class SyncBot extends ListenerAdapter {
         }
     }
 
-    void setNicknameIfEnabled(Member member, String mcUser) {
+    void removeRoleAndNickname(Member member) {
         try {
-            if (plugin.getConfig().getString("changeNicknames").equalsIgnoreCase("after")) {
-                member.modifyNickname(member.getUser().getName() + " (" + mcUser + ")").queue(null, error -> { });
-            } else if (plugin.getConfig().getString("changeNicknames").equalsIgnoreCase("replace")) {
-                member.modifyNickname(mcUser).queue(null, error -> { });
+            if (plugin.getConfig().getBoolean("giveLinkedRole")) {
+                // remove role
+                Role role = member.getGuild().getRoleById(plugin.getConfig().getString("linkedRole"));
+                if (role == null) {
+                    plugin.getLogger().warning("Linked role does not exist.");
+                    return;
+                }
+
+                member.getGuild().removeRoleFromMember(member, role).queue(null,
+                        error -> plugin.getLogger().warning("Error while adding role: " + error.getMessage()));
             }
         } catch (PermissionException e) {
-            // no perms :(
+            plugin.getLogger().warning("Bot has no permissions to remove roles for a user.");
+        }
+
+        try {
+            // reset nickname
+            if (plugin.getConfig().getString("changeNicknames").equalsIgnoreCase("after")) {
+                member.modifyNickname(null).queue(null, error -> { });
+            }
+        } catch (PermissionException e) {
+            plugin.getLogger().warning("Bot has no permissions to reset nickname of a user.");
         }
     }
 
-    void giveLinkedRole(Member member) {
+    void giveRoleAndNickname(@Nonnull Member member, String mcUser) {
+        try {
+            if (mcUser != null) {
+                if (plugin.getConfig().getString("changeNicknames").equalsIgnoreCase("after")) {
+                    member.modifyNickname(member.getUser().getName() + " (" + mcUser + ")").queue(null, error -> { });
+                } else if (plugin.getConfig().getString("changeNicknames").equalsIgnoreCase("replace")) {
+                    member.modifyNickname(mcUser).queue(null, error -> { });
+                }
+            }
+        } catch (PermissionException e) {
+            plugin.getLogger().warning("Bot has no permissions to change nicknames for a user.");
+        }
+
         try {
             if (plugin.getConfig().getBoolean("giveLinkedRole")) {
                 Role role = member.getGuild().getRoleById(plugin.getConfig().getString("linkedRole"));
@@ -226,32 +263,7 @@ public class SyncBot extends ListenerAdapter {
                         error -> plugin.getLogger().warning("Error while adding role: " + error.getMessage()));
             }
         } catch (PermissionException e) {
-            plugin.getLogger().warning("Bot has no permissions to add roles.");
-        }
-    }
-
-    void removeLinkedRole(String memberId) {
-        try {
-            if (plugin.getConfig().getBoolean("giveLinkedRole")) {
-                Guild guild = bot.getGuildById(plugin.getConfig().getString("botInfo.server"));
-                if (guild == null) {
-                    plugin.getLogger().warning("Guild not found while trying to remove a linked role.");
-                    return;
-                }
-
-                guild.retrieveMemberById(memberId).queue(member -> {
-                    Role role = member.getGuild().getRoleById(plugin.getConfig().getString("linkedRole"));
-                    if (role == null) {
-                        plugin.getLogger().warning("Linked role does not exist.");
-                        return;
-                    }
-
-                    member.getGuild().removeRoleFromMember(member, role).queue(null,
-                            error -> plugin.getLogger().warning("Error while adding role: " + error.getMessage()));
-                }, err -> { });
-            }
-        } catch (PermissionException e) {
-            plugin.getLogger().warning("Bot has no permissions to remove roles.");
+            plugin.getLogger().warning("Bot has no permissions to add roles for a user.");
         }
     }
 
@@ -358,8 +370,7 @@ public class SyncBot extends ListenerAdapter {
                 }
 
                 db.linkUser(event.getAuthor().getId(), uuid);
-                setNicknameIfEnabled(event.getMember(), result.name);
-                giveLinkedRole(event.getMember());
+                if (!plugin.getConfig().getBoolean("requireVerification")) giveRoleAndNickname(event.getMember(), result.name);
                 JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onSuccess"), event.getMessage(), plugin.getConfig());
             } catch (SQLException | IOException e) {
                 JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onBotError"), event.getMessage(), plugin.getConfig());
@@ -397,13 +408,69 @@ public class SyncBot extends ListenerAdapter {
                 }
 
                 setPermissions(uuid, null); // remove all managed permissions before unlinking
-                if (plugin.getConfig().getBoolean("manageWhitelist"))
-                    Bukkit.getOfflinePlayer(UUID.fromString(uuid)).setWhitelisted(false); // remove whitelist before unlinking
                 db.unlink(uuid);
 
-                if (discordID != null) removeLinkedRole(discordID);
+                if (discordID != null) {
+                    Guild guild = bot.getGuildById(plugin.getConfig().getString("botInfo.server"));
+                    if (guild == null) {
+                        plugin.getLogger().warning("Guild not found while trying to remove a linked role.");
+                        return;
+                    }
+
+                    guild.retrieveMemberById(discordID).queue(SyncBot.this::removeRoleAndNickname, err -> { });
+                }
                 JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onSuccess"), event.getMessage(), plugin.getConfig());
             } catch (SQLException | IOException e) {
+                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onBotError"), event.getMessage(), plugin.getConfig());
+                plugin.getLogger().severe("An error occurred while getting info for the user. " +
+                        "Please check the stack trace below and contact the developer.");
+                e.printStackTrace();
+            }
+        }
+
+        void verify(String[] argv, MessageReceivedEvent event) {
+            String received = argv[0].trim();
+
+            int code;
+            try {
+                if (!StringUtils.isNumeric(received) || received.length() != 6)
+                    throw new NumberFormatException("Must be 6 digits long");
+
+                code = Integer.parseInt(received);
+            } catch (NumberFormatException e) {
+                // TODO not a verification code
+
+                return;
+            }
+
+            try {
+                DatabaseHandler.LinkedUserInfo userInfo = db.getLinkedUserInfo(event.getAuthor().getId());
+                if (userInfo == null) {
+                    JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig());
+                    event.getChannel().sendMessage(lang.getString("pleaseLink")).queue(null, err -> { });
+                } else if (db.verify(event.getAuthor().getId(), code)) {
+                    Guild guild = bot.getGuildById(plugin.getConfig().getString("botInfo.server"));
+                    if (guild == null) {
+                        plugin.getLogger().warning("Guild not found while trying to remove a linked role.");
+                        return;
+                    }
+
+                    guild.retrieveMemberById(event.getAuthor().getId()).queue(member -> {
+                        String mcUser = userInfo.username;
+                        if (Bukkit.getOnlineMode()) {
+                            try {
+                                mcUser = mojang.onlineUuidToName(userInfo.uuid).name;
+                            } catch (IOException ignored) { }
+                        }
+
+                        giveRoleAndNickname(member, mcUser);
+
+                        JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onSuccess"), event.getMessage(), plugin.getConfig());
+                    }, err -> { });
+                } else {
+                    JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig());
+                }
+            } catch (SQLException e) {
                 JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onBotError"), event.getMessage(), plugin.getConfig());
                 plugin.getLogger().severe("An error occurred while getting info for the user. " +
                         "Please check the stack trace below and contact the developer.");

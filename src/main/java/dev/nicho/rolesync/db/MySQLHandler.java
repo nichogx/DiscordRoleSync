@@ -4,6 +4,8 @@ import org.apache.commons.dbcp.BasicDataSource;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class MySQLHandler extends DatabaseHandler {
@@ -32,5 +34,25 @@ public class MySQLHandler extends DatabaseHandler {
     @Override
     protected void closeConnection(Connection c) throws SQLException {
         c.close();
+    }
+
+    @Override
+    protected boolean hasColumn(String table, String column) throws SQLException {
+        Connection c = this.getConnection();
+
+        PreparedStatement ps = c.prepareStatement("SHOW COLUMNS FROM " + table + " LIKE ?");
+
+        ps.setString(1, column);
+
+        ResultSet res = ps.executeQuery();
+
+        boolean ret = false;
+        if (res.next() && res.getString(1).equalsIgnoreCase(column)) {
+            ret = true;
+        }
+
+        closeConnection(c);
+
+        return ret;
     }
 }

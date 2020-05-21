@@ -10,10 +10,23 @@ noPermissionError: "Você não tem permissão para rodar esse comando."
 commandError: "Erro ao rodar esse comando. Por favor veja o console."
 
 usage: "Uso:"
-drsWhitelistDescription: "Gerenciar whitelist"
 drsReloadDescription: "Dar reload nos arquivos de config e línguas"
-
-drsWhitelistResetDescription: "Reseta a whitelist apenas com os usuários que tem o(s) cargo(s)."
 
 drsBotRestartDescription: "Reinicia o bot"
 botRestarted: "Bot reiniciado."
+
+drsVerifyDescription: "Verificar sua conta do Discord"
+alreadyVerified: "Você já é verificado"
+verificationInstructions: "Por favor envie esse código na DM do bot do Discord:"
+
+pleaseLink: "Por favor, faça link da sua conta no nosso servidor do Discord:"
+
+whitelistErrorKickMsg: "Um erro ocorreu ao checar se você tem whitelist. Por favor contate o administrador do servidor."
+whitelistNotVerifiedKickMsg: "Você não está verificado. Por favor envie esse código na DM do bot do Discord:"
+notWhitelistedKickMsg: "Você não está na whitelist desse servidor"
+
+notLatestVersion: "Você não está na última versão do DiscordRoleSync."
+latest: "Última:"
+current: "Atual:"
+
+reloadComplete: "Reload Completo"

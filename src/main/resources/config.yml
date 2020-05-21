@@ -33,6 +33,14 @@ database:
     dbuser: ""
     dbpass: ""
 
+# if the bot should require users to be verified
+# to verify, users should type /drs verify in the chat
+requireVerification: false
+
+# the URL of an invite for your Discord server (will be sent to unlinked users when
+# they try to verify their account)
+discordUrl: ""
+
 # whether or not to delete the user commands after
 # reacting and a few seconds pass
 deleteCommands: false
