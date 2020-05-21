@@ -59,7 +59,9 @@ deleteAfter: 10
 # HIGHER THAN ANY OTHER ROLES. Nickname editing will also not work with server owners :(
 changeNicknames: "no"
 
-# should the bot manage the whitelist.json file?
+# should the bot manage a whitelist?
+# it will kick those that don't have the whitelist role if enabled.
+# please disable the default whitelist with /whitelist off if you are using this.
 manageWhitelist: false
 
 # IDs of the roles that should have their members in the whitelist.json file
