@@ -74,7 +74,7 @@ public class SyncBot extends ListenerAdapter {
                                     } else {
                                         removeRoleAndNickname(member);
                                     }
-                                    checkMemberRoles(member, userInfo.uuid);
+                                    checkMemberRoles(member, userInfo);
                                 }
                             }, error -> { }));
         } catch (SQLException e) {
@@ -162,7 +162,7 @@ public class SyncBot extends ListenerAdapter {
 
     void checkMemberRoles(Member member) {
         try {
-            checkMemberRoles(member, db.findUUIDByDiscordID(member.getId()));
+            checkMemberRoles(member, db.getLinkedUserInfo(member.getId()));
         } catch (SQLException e) {
             plugin.getLogger().severe("An error occurred while looking for the UUID of a user. " +
                     "Please check the stack trace below and contact the developer.");
@@ -170,11 +170,16 @@ public class SyncBot extends ListenerAdapter {
         }
     }
 
-    void checkMemberRoles(Member member, String uuid) {
+    void checkMemberRoles(Member member, DatabaseHandler.LinkedUserInfo userInfo) {
         try {
             ConfigurationSection perms = plugin.getConfig().getConfigurationSection("groups");
-            if (uuid == null) { // user not linked
+            if (userInfo == null) { // user not linked
                 return; // ignore
+            }
+
+            if (plugin.getConfig().getBoolean("requireVerification") && !userInfo.verified) {
+                setPermissions(userInfo.uuid, null);
+                return; // not verified
             }
 
             List<String> permsToHave = new ArrayList<>();
@@ -185,14 +190,14 @@ public class SyncBot extends ListenerAdapter {
                     permsToHave.add(perm);
                 }
             }
-            setPermissions(uuid, permsToHave);
+            setPermissions(userInfo.uuid, permsToHave);
 
 
             if (plugin.getConfig().getBoolean("manageWhitelist")) {
                 if (JDAUtils.hasRoleFromList(member, plugin.getConfig().getStringList("whitelistRoles"))) {
-                    db.addToWhitelist(uuid);
+                    db.addToWhitelist(userInfo.uuid);
                 } else {
-                    db.removeFromWhitelist(uuid);
+                    db.removeFromWhitelist(userInfo.uuid);
                 }
             }
         } catch (SQLException e) {
@@ -460,6 +465,7 @@ public class SyncBot extends ListenerAdapter {
                         }
 
                         giveRoleAndNickname(member, mcUser);
+                        checkMemberRoles(member, userInfo);
 
                         JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onSuccess"), event.getMessage(), plugin.getConfig());
                     }, err -> { });
