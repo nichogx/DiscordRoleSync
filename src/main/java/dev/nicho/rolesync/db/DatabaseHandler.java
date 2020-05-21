@@ -56,42 +56,6 @@ public abstract class DatabaseHandler {
         return ret;
     }
 
-    public String findUUIDByDiscordID(String id) throws SQLException {
-        Connection c = this.getConnection();
-        PreparedStatement ps = c.prepareStatement(
-                "SELECT minecraft_uuid FROM " + plugin.getConfig().getString("database.tablePrefix") + "_discordmcusers " +
-                        "WHERE discord_id = ?"
-        );
-
-        ps.setString(1, id);
-
-        ResultSet res = ps.executeQuery();
-        String ret = null;
-        if (res.next()) ret = res.getString(1);
-
-        this.closeConnection(c);
-
-        return ret;
-    }
-
-    public String findDiscordIDbyUUID(String uuid) throws SQLException {
-        Connection c = this.getConnection();
-        PreparedStatement ps = c.prepareStatement(
-                "SELECT discord_id FROM " + plugin.getConfig().getString("database.tablePrefix") + "_discordmcusers " +
-                        "WHERE minecraft_uuid = ?"
-        );
-
-        ps.setString(1, uuid);
-
-        ResultSet res = ps.executeQuery();
-        String ret = null;
-        if (res.next()) ret = res.getString(1);
-
-        this.closeConnection(c);
-
-        return ret;
-    }
-
     public void linkUser(String discordID, String minecraftUUID) throws SQLException {
         Connection c = this.getConnection();
         PreparedStatement ps = c.prepareStatement(
