@@ -391,34 +391,30 @@ public class SyncBot extends ListenerAdapter {
             }
 
             try {
-                String uuid;
-                String discordID;
+                DatabaseHandler.LinkedUserInfo userInfo = null;
 
                 if (argv[1].length() > 16 && StringUtils.isNumeric(argv[1])) { // looks like Discord ID
-                    uuid = db.findUUIDByDiscordID(argv[1]);
-                    discordID = argv[1];
+                    userInfo = db.getLinkedUserInfo(argv[1]);
                 } else { // try minecraft nick
-                    uuid = mojang.nameToUUID(argv[1]).uuid;
-                    discordID = db.findDiscordIDbyUUID(uuid);
+                    String uuid = mojang.nameToUUID(argv[1]).uuid;
+                    if (uuid != null) userInfo = db.getLinkedUserInfo(uuid);
                 }
 
-                if (uuid == null) {
+                if (userInfo == null) {
                     JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig());
                     return;
                 }
 
-                setPermissions(uuid, null); // remove all managed permissions before unlinking
-                db.unlink(uuid);
+                setPermissions(userInfo.uuid, null); // remove all managed permissions before unlinking
+                db.unlink(userInfo.uuid);
 
-                if (discordID != null) {
-                    Guild guild = bot.getGuildById(plugin.getConfig().getString("botInfo.server"));
-                    if (guild == null) {
-                        plugin.getLogger().warning("Guild not found while trying to remove a linked role.");
-                        return;
-                    }
-
-                    guild.retrieveMemberById(discordID).queue(SyncBot.this::removeRoleAndNickname, err -> { });
+                Guild guild = bot.getGuildById(plugin.getConfig().getString("botInfo.server"));
+                if (guild == null) {
+                    plugin.getLogger().warning("Guild not found while trying to remove a linked role.");
+                    return;
                 }
+
+                guild.retrieveMemberById(userInfo.discordId).queue(SyncBot.this::removeRoleAndNickname, err -> { });
                 JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onSuccess"), event.getMessage(), plugin.getConfig());
             } catch (SQLException | IOException e) {
                 JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onBotError"), event.getMessage(), plugin.getConfig());
