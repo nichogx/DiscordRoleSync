@@ -35,6 +35,7 @@ database:
 
 # if the bot should require users to be verified
 # to verify, users should type /drs verify in the chat
+# if DRS whitelist is enabled, they will be given the code when they try to join
 requireVerification: false
 
 # the URL of an invite for your Discord server (will be sent to unlinked users when
