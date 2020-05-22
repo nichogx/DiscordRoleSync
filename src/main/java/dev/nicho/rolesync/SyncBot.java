@@ -68,7 +68,7 @@ public class SyncBot extends ListenerAdapter {
                     Objects.requireNonNull(bot.getGuildById(this.plugin.getConfig().getString("botInfo.server")))
                             .retrieveMemberById(userInfo.discordId).queue(member -> {
                                 if (member != null) {
-                                    if (userInfo.verified) {
+                                    if (userInfo.verified || !plugin.getConfig().getBoolean("requireVerification")) {
                                         giveRoleAndNickname(member, null);
                                     } else {
                                         removeRoleAndNickname(member);
