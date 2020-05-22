@@ -198,7 +198,7 @@ public class RoleSync extends JavaPlugin {
         }));
 
         metrics.addCustomChart(new Metrics.SimplePie("permissions_plugin", () -> {
-            String permPlugin = vault.getPermProvider().getName();
+            String permPlugin = vault.getPermPluginName();
 
             if (permPlugin != null && !permPlugin.isEmpty()) return permPlugin;
             return "unknown/other";

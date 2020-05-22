@@ -207,11 +207,11 @@ public class SyncBot extends ListenerAdapter {
     }
 
     void setPermissions(String uuid, List<String> permsToHave) {
-        VaultSetPermissionsTask vpt = new VaultSetPermissionsTask(uuid, permsToHave);
+        VaultSetGroupsTask vgt = new VaultSetGroupsTask(uuid, permsToHave);
         if (plugin.getServer().getPluginManager().getPlugin("PermissionsEx") != null) { // using PEX, do it synchronously
-            vpt.runTask(plugin);
+            vgt.runTask(plugin);
         } else {
-            vpt.runTaskAsynchronously(plugin);
+            vgt.runTaskAsynchronously(plugin);
         }
     }
 
@@ -482,19 +482,19 @@ public class SyncBot extends ListenerAdapter {
         }
     }
 
-    class VaultSetPermissionsTask extends BukkitRunnable {
+    class VaultSetGroupsTask extends BukkitRunnable {
 
-        private final List<String> permsToHave;
+        private final List<String> groupsToHave;
         private final String uuid;
 
-        public VaultSetPermissionsTask(String uuid, List<String> permsToHave) {
+        public VaultSetGroupsTask(String uuid, List<String> permsToHave) {
             this.uuid = uuid;
-            this.permsToHave = permsToHave;
+            this.groupsToHave = permsToHave;
         }
 
         @Override
         public void run() {
-            vault.setPermissions(uuid, permsToHave);
+            vault.setGroups(uuid, groupsToHave);
         }
     }
 }

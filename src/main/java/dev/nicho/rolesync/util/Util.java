@@ -10,6 +10,12 @@ import java.util.Scanner;
 
 public class Util {
 
+    /**
+     * Gets the latest version number from Spigot
+     *
+     * @return the latest version number
+     * @throws IOException if an error occurs while connecting to the API
+     */
     public static String getLatestVersion() throws IOException {
         URL reqUrl;
         reqUrl = new URL("https://api.spigotmc.org/legacy/update.php?resource=78829");

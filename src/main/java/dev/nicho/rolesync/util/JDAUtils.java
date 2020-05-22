@@ -8,6 +8,13 @@ import java.util.concurrent.TimeUnit;
 
 public class JDAUtils {
 
+    /**
+     * Reacts to a message and deletes it if enabled on the configs
+     *
+     * @param reaction the reaction to add
+     * @param message the message to react to
+     * @param configs the configuration file
+     */
     public static void reactAndDelete(String reaction, Message message, FileConfiguration configs) {
         message.addReaction(reaction).queue();
 
@@ -16,6 +23,13 @@ public class JDAUtils {
         }
     }
 
+    /**
+     * Checks if a member has a role from a list
+     *
+     * @param member the member to check
+     * @param roleList a list of roles
+     * @return true if they have at least one role, false if they have none
+     */
     public static boolean hasRoleFromList(Member member, List<String> roleList) {
         if (member != null) {
             for (String roleID : roleList) {

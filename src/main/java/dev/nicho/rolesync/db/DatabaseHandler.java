@@ -7,7 +7,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public abstract class DatabaseHandler {
@@ -15,15 +14,47 @@ public abstract class DatabaseHandler {
     protected final JavaPlugin plugin;
     protected final SecureRandom random;
 
+    /**
+     * Creates a new database handler
+     *
+     * @param plugin a link to the plugin
+     */
     protected DatabaseHandler(JavaPlugin plugin) {
         this.plugin = plugin;
         this.random = new SecureRandom();
     }
 
+    /**
+     * Gets a connection for querying
+     *
+     * @return the connection
+     * @throws SQLException if an SQL error occurs
+     */
     protected abstract Connection getConnection() throws SQLException;
+
+    /**
+     * Closes a connection if it should be closed or returns it to the pool
+     *
+     * @param c the connection
+     * @throws SQLException if an SQL error occurs
+     */
     protected abstract void closeConnection(Connection c) throws SQLException;
+
+    /**
+     * Checks if a table has a column
+     *
+     * @param table name of the table
+     * @param column name of the column
+     * @return true if it exists, false otherwise
+     * @throws SQLException if an SQL error occurs
+     */
     protected abstract boolean hasColumn(String table, String column) throws SQLException;
 
+    /**
+     * Initializes the database, creating tables if needed.
+     *
+     * @throws SQLException if an SQL error occurs
+     */
     protected void initialize() throws SQLException {
         Connection c = this.getConnection();
         PreparedStatement ps = c.prepareStatement(
@@ -42,6 +73,12 @@ public abstract class DatabaseHandler {
         this.closeConnection(c);
     }
 
+    /**
+     * Gets the number of linked users.
+     *
+     * @return the number of linked users
+     * @throws SQLException if an SQL error occurs
+     */
     public int getLinkedUserCount() throws SQLException {
         Connection c = this.getConnection();
         PreparedStatement ps = c.prepareStatement("SELECT COUNT(*) FROM "
@@ -56,6 +93,13 @@ public abstract class DatabaseHandler {
         return ret;
     }
 
+    /**
+     * Links a user.
+     *
+     * @param discordID the Discord ID of the user
+     * @param minecraftUUID the Minecraft UUID of the user
+     * @throws SQLException if an SQL error occurs
+     */
     public void linkUser(String discordID, String minecraftUUID) throws SQLException {
         Connection c = this.getConnection();
         PreparedStatement ps = c.prepareStatement(
@@ -75,6 +119,12 @@ public abstract class DatabaseHandler {
         this.closeConnection(c);
     }
 
+    /**
+     * Sets a user as being whitelisted.
+     *
+     * @param uuid the UUID of the user to whitelist.
+     * @throws SQLException if an SQL error occurs
+     */
     public void addToWhitelist(String uuid) throws SQLException {
         Connection c = this.getConnection();
         PreparedStatement ps = c.prepareStatement(
@@ -88,6 +138,12 @@ public abstract class DatabaseHandler {
         this.closeConnection(c);
     }
 
+    /**
+     * Sets a user as not being whitelisted.
+     *
+     * @param uuid the UUID of the user to unwhitelist.
+     * @throws SQLException if an SQL error occurs
+     */
     public void removeFromWhitelist(String uuid) throws SQLException {
         Connection c = this.getConnection();
         PreparedStatement ps = c.prepareStatement(
@@ -101,6 +157,12 @@ public abstract class DatabaseHandler {
         this.closeConnection(c);
     }
 
+    /**
+     * Unlinks a user.
+     *
+     * @param uuid the UUID of the user to unlink
+     * @throws SQLException if an SQL error occurs
+     */
     public void unlink(String uuid) throws SQLException {
         Connection c = this.getConnection();
         PreparedStatement ps = c.prepareStatement("DELETE FROM "
@@ -115,6 +177,12 @@ public abstract class DatabaseHandler {
         removeFromWhitelist(uuid);
     }
 
+    /**
+     * Runs a callback for every linked user.
+     *
+     * @param callback the callback. Receives a LinkedUserInfo object.
+     * @throws SQLException if an SQL error occurs
+     */
     public void forAllLinkedUsers(Consumer<LinkedUserInfo> callback) throws SQLException {
         Connection c = this.getConnection();
         PreparedStatement ps = c.prepareStatement("SELECT discord_id, minecraft_uuid, whitelisted, verification_code, verified, username_when_linked FROM "
@@ -135,6 +203,13 @@ public abstract class DatabaseHandler {
         this.closeConnection(c);
     }
 
+    /**
+     * Gets info from a linked user
+     *
+     * @param identifier the Discord ID or Minecraft UUID of the user
+     * @return A LinkedUserInfo object with information about the user
+     * @throws SQLException if an SQL error occurs
+     */
     public LinkedUserInfo getLinkedUserInfo(String identifier) throws SQLException {
         Connection c = this.getConnection();
         PreparedStatement ps = c.prepareStatement("SELECT discord_id, minecraft_uuid, whitelisted, verification_code, verified, username_when_linked FROM "
@@ -192,6 +267,14 @@ public abstract class DatabaseHandler {
         return ret;
     }
 
+    /**
+     * Tries to verify a user.
+     *
+     * @param identifier the UUID or Discord ID of the user
+     * @param verificationCode the code the user entered
+     * @return true if the verification was successful or false otherwise (user not linked or code incorrect)
+     * @throws SQLException if an SQL error occurs
+     */
     public boolean verify(String identifier, int verificationCode) throws SQLException {
         LinkedUserInfo userInfo = getLinkedUserInfo(identifier);
         if (userInfo == null) return false;
@@ -216,6 +299,12 @@ public abstract class DatabaseHandler {
         return true;
     }
 
+    /**
+     * Migrates the database if needed.
+     *
+     * @return true if something was migrated. False if nothing was done.
+     * @throws SQLException if an SQL error occurs
+     */
     public boolean migrate() throws SQLException {
         boolean migrated = false;
 
@@ -252,14 +341,31 @@ public abstract class DatabaseHandler {
         return migrated;
     }
 
+    /**
+     * A class with information about the user.
+     */
     public static class LinkedUserInfo {
         public final int code;
         public final boolean verified;
         public final boolean whitelisted;
         public final String discordId;
         public final String uuid;
+
+        /**
+         * The username the player had WHEN THEY LINKED
+         */
         public final String username;
 
+        /**
+         * Constructor
+         *
+         * @param discordId of the user
+         * @param uuid of the user
+         * @param whitelisted if the user is whitelisted
+         * @param verified if the user is verified
+         * @param code the verification code for that user
+         * @param username the username of that user
+         */
         LinkedUserInfo(String discordId, String uuid, boolean whitelisted, boolean verified, int code, String username) {
             this.code = code;
             this.verified = verified;

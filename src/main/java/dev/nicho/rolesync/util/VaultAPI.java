@@ -14,6 +14,12 @@ public class VaultAPI {
     private final Permission permProvider;
     private final List<String> managedGroups;
 
+    /**
+     * Creates a VaultAPI that will manage the groups in the list.
+     *
+     * @param managedGroups the list of groups to manage
+     * @throws APIException if Vault is not loaded.
+     */
     public VaultAPI(List<String> managedGroups) throws APIException {
         RegisteredServiceProvider<Permission> rsp = Bukkit.getServicesManager().getRegistration(Permission.class);
 
@@ -26,17 +32,29 @@ public class VaultAPI {
         this.managedGroups = managedGroups;
     }
 
-    public void setPermissions(String uuid, @Nullable List<String> permissions) {
+    /**
+     * Sets a user's groups to the ones in the list, removing any managed groups
+     * that are not in the list.
+     *
+     * @param uuid the UUID of the user to manage permissions
+     * @param groups the list of groups to set or null to remove all managed
+     */
+    public void setGroups(String uuid, @Nullable List<String> groups) {
         OfflinePlayer player = Bukkit.getOfflinePlayer(UUID.fromString(uuid));
 
         for (String managedPerm : managedGroups) {
             permProvider.playerRemoveGroup(null, player, managedPerm);
         }
 
-        if (permissions != null) permissions.forEach(perm -> permProvider.playerAddGroup(null, player, perm));
+        if (groups != null) groups.forEach(perm -> permProvider.playerAddGroup(null, player, perm));
     }
 
-    public Permission getPermProvider() {
-        return this.permProvider;
+    /**
+     * Gets the name of the permission plugin Vault detected
+     *
+     * @return the name of the plugin
+     */
+    public String getPermPluginName() {
+        return this.permProvider.getName();
     }
 }
