@@ -1,0 +1,29 @@
+linkedTo: "Bağla: "
+unknownUser: "bilinmeyen kullanıcı"
+discordAlreadyLinked: "Discord hesabınız zaten Minecraft hesabınızla bağlandı."
+minecraftAlreadyLinked: "Minecraft hesabınız zaten bir Discord hesabı ile bağlı."
+
+noPermissionError: "Bu komutu çalıştırabilmek için yeterli izne sahip değilsiniz."
+commandError: "Komut çalıştırılırken bir hata oluştu, lütfen konsolu kontrol edin."
+
+usage: "Kullanım:"
+drsReloadDescription: "Yapılandırma dosyasını ve dil dosyasını yeniden yükler"
+
+drsBotRestartDescription: "Bot'u yeniden başlatır."
+botRestarted: "Bot yeniden başlatıldı."
+
+drsVerifyDescription: "Discord hesabınızı onaylayın."
+alreadyVerified: "Zaten onaylandınız."
+verificationInstructions: "Lütfen bu kodu Discord bot'una özel mesaj yoluyla gönderin:"
+
+pleaseLink: "Lütfen hesabınızı Discord sunucumuza bağlayın:"
+
+whitelistErrorKickMsg: "Beyaz liste kontrol edilirken bir hata oluştu. Lütfen sunucu yöneticisine danışın."
+whitelistNotVerifiedKickMsg: "Henüz onaylanmadınız. Lütfen bu kodu Discord bot'una özel mesaj yoluyla gönderin:"
+notWhitelistedKickMsg: "Beyaz listede ekli değilsiniz."
+
+notLatestVersion: "DiscordRoleSync eklentisinin son sürümünü kullanmıyorsunuz."
+latest: "En son:"
+current: "Şu anki:"
+
+reloadComplete: "Yeniden yükleme tamamlandı."
