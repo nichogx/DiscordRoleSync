@@ -1,5 +1,6 @@
 package dev.nicho.rolesync.db;
 
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.security.SecureRandom;
@@ -80,6 +81,8 @@ public abstract class DatabaseHandler {
      * @throws SQLException if an SQL error occurs
      */
     public int getLinkedUserCount() throws SQLException {
+        checkAsync();
+
         Connection c = this.getConnection();
         PreparedStatement ps = c.prepareStatement("SELECT COUNT(*) FROM "
                 + plugin.getConfig().getString("database.tablePrefix") + "_discordmcusers");
@@ -101,6 +104,8 @@ public abstract class DatabaseHandler {
      * @throws SQLException if an SQL error occurs
      */
     public void linkUser(String discordID, String minecraftUUID) throws SQLException {
+        checkAsync();
+
         Connection c = this.getConnection();
         PreparedStatement ps = c.prepareStatement(
                 "INSERT INTO " + plugin.getConfig().getString("database.tablePrefix") +
@@ -126,6 +131,8 @@ public abstract class DatabaseHandler {
      * @throws SQLException if an SQL error occurs
      */
     public void addToWhitelist(String uuid) throws SQLException {
+        checkAsync();
+
         Connection c = this.getConnection();
         PreparedStatement ps = c.prepareStatement(
                 "UPDATE " + plugin.getConfig().getString("database.tablePrefix") + "_discordmcusers " +
@@ -145,6 +152,8 @@ public abstract class DatabaseHandler {
      * @throws SQLException if an SQL error occurs
      */
     public void removeFromWhitelist(String uuid) throws SQLException {
+        checkAsync();
+
         Connection c = this.getConnection();
         PreparedStatement ps = c.prepareStatement(
                 "UPDATE " + plugin.getConfig().getString("database.tablePrefix") + "_discordmcusers " +
@@ -164,6 +173,8 @@ public abstract class DatabaseHandler {
      * @throws SQLException if an SQL error occurs
      */
     public void unlink(String uuid) throws SQLException {
+        checkAsync();
+
         Connection c = this.getConnection();
         PreparedStatement ps = c.prepareStatement("DELETE FROM "
                 + plugin.getConfig().getString("database.tablePrefix") + "_discordmcusers WHERE minecraft_uuid = ?");
@@ -184,6 +195,8 @@ public abstract class DatabaseHandler {
      * @throws SQLException if an SQL error occurs
      */
     public void forAllLinkedUsers(Consumer<LinkedUserInfo> callback) throws SQLException {
+        checkAsync();
+
         Connection c = this.getConnection();
         PreparedStatement ps = c.prepareStatement("SELECT discord_id, minecraft_uuid, whitelisted, verification_code, verified, username_when_linked FROM "
                 + plugin.getConfig().getString("database.tablePrefix") + "_discordmcusers");
@@ -211,6 +224,8 @@ public abstract class DatabaseHandler {
      * @throws SQLException if an SQL error occurs
      */
     public LinkedUserInfo getLinkedUserInfo(String identifier) throws SQLException {
+        checkAsync();
+
         Connection c = this.getConnection();
         PreparedStatement ps = c.prepareStatement("SELECT discord_id, minecraft_uuid, whitelisted, verification_code, verified, username_when_linked FROM "
                 + plugin.getConfig().getString("database.tablePrefix") + "_discordmcusers "
@@ -339,6 +354,12 @@ public abstract class DatabaseHandler {
         }
 
         return migrated;
+    }
+
+    private final void checkAsync() {
+        if (Bukkit.isPrimaryThread()) {
+            throw new IllegalStateException("Attempted to execute a database operation from the server thread!");
+        }
     }
 
     /**
