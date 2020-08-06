@@ -31,6 +31,7 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 public class RoleSync extends JavaPlugin {
 
@@ -134,11 +135,6 @@ public class RoleSync extends JavaPlugin {
         } catch (IOException | SQLException e) {
             getLogger().severe("Error setting up database");
             e.printStackTrace();
-            this.setEnabled(false);
-
-            return;
-        } catch (LoginException e) {
-            getLogger().severe("Error logging in. Did you set your token in config.yml?");
             this.setEnabled(false);
 
             return;
@@ -279,38 +275,32 @@ public class RoleSync extends JavaPlugin {
 
             jda.shutdown();
 
-            try {
-                startBot();
-                sender.sendMessage(ChatColor.BLUE + "[DRS] " + ChatColor.GREEN + language.getString("botRestarted"));
-            } catch (LoginException e) {
-                e.printStackTrace();
-
-                return false;
-            }
+            startBot();
+            sender.sendMessage(ChatColor.BLUE + "[DRS] " + ChatColor.GREEN + language.getString("botRestarted"));
 
             return true;
         } else if (args[0].equalsIgnoreCase("verify")) {
             if (sender instanceof Player) {
-                try {
-                    DatabaseHandler.LinkedUserInfo userInfo = db.getLinkedUserInfo(((Player) sender).getUniqueId().toString());
-                    if (userInfo == null) {
-                        sender.sendMessage(ChatColor.BLUE + "[DRS] " + ChatColor.RESET + language.getString("pleaseLink")
-                                + " " + getConfig().getString("discordUrl"));
-                    } else if (!userInfo.verified) {
-                        sender.sendMessage(ChatColor.BLUE + "[DRS] " + ChatColor.RESET + language.getString("verificationInstructions")
-                                + " " + ChatColor.AQUA + userInfo.code);
-                    } else {
-                        sender.sendMessage(ChatColor.BLUE + "[DRS] " + ChatColor.RESET + language.getString("alreadyVerified"));
+                this.getServer().getScheduler().runTaskAsynchronously(this, () -> {
+                    try {
+                        DatabaseHandler.LinkedUserInfo userInfo = db.getLinkedUserInfo(((Player) sender).getUniqueId().toString());
+                        if (userInfo == null) {
+                            sender.sendMessage(ChatColor.BLUE + "[DRS] " + ChatColor.RESET + language.getString("pleaseLink")
+                                    + " " + getConfig().getString("discordUrl"));
+                        } else if (!userInfo.verified) {
+                            sender.sendMessage(ChatColor.BLUE + "[DRS] " + ChatColor.RESET + language.getString("verificationInstructions")
+                                    + " " + ChatColor.AQUA + userInfo.code);
+                        } else {
+                            sender.sendMessage(ChatColor.BLUE + "[DRS] " + ChatColor.RESET + language.getString("alreadyVerified"));
+                        }
+                    } catch (SQLException e) {
+                        sender.sendMessage(ChatColor.RED + language.getString("commandError"));
+                        getLogger().severe("An error occurred while getting linked user info. Please check the stack trace below and contact the developer.");
+                        e.printStackTrace();
                     }
+                });
 
-                    return true;
-                } catch (SQLException e) {
-                    sender.sendMessage(ChatColor.RED + language.getString("commandError"));
-                    getLogger().severe("An error occurred while getting linked user info. Please check the stack trace below and contact the developer.");
-                    e.printStackTrace();
-
-                    return false;
-                }
+                return true;
             } else {
                 sender.sendMessage(ChatColor.BLUE + "[DRS] " + ChatColor.RED + "This command can only be used in game.");
 
@@ -351,22 +341,31 @@ public class RoleSync extends JavaPlugin {
         return langFile;
     }
 
-    private void startBot() throws LoginException {
-        getLogger().info("Initializing bot");
-        JDABuilder builder = JDABuilder
-                .create(getConfig().getString("botInfo.token"),
-                        GatewayIntent.GUILD_MEMBERS,
-                        GatewayIntent.GUILD_MESSAGES,
-                        GatewayIntent.DIRECT_MESSAGES,
-                        GatewayIntent.GUILD_BANS)
-                .disableCache(
-                        CacheFlag.EMOTE,
-                        CacheFlag.VOICE_STATE,
-                        CacheFlag.ACTIVITY,
-                        CacheFlag.CLIENT_STATUS
-                );
+    private void startBot() {
+        this.getServer().getScheduler().runTaskAsynchronously(this, () -> {
+            try {
+                getLogger().info("Initializing bot");
+                JDABuilder builder = JDABuilder
+                        .create(getConfig().getString("botInfo.token"),
+                                GatewayIntent.GUILD_MEMBERS,
+                                GatewayIntent.GUILD_MESSAGES,
+                                GatewayIntent.DIRECT_MESSAGES,
+                                GatewayIntent.GUILD_BANS)
+                        .disableCache(
+                                CacheFlag.EMOTE,
+                                CacheFlag.VOICE_STATE,
+                                CacheFlag.ACTIVITY,
+                                CacheFlag.CLIENT_STATUS
+                        );
 
-        builder.addEventListeners(listener);
-        this.jda = builder.build();
+                builder.addEventListeners(listener);
+                this.jda = builder.build();
+            } catch (LoginException e) {
+                getLogger().log(Level.SEVERE, "Error logging in. Did you set your token in config.yml?", e);
+
+                // Switch back to main thread to disable ourselves
+                this.getServer().getScheduler().runTask(this, () -> this.setEnabled(false));
+            }
+        });
     }
 }
