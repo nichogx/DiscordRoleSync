@@ -136,7 +136,7 @@ public abstract class DatabaseHandler {
         Connection c = this.getConnection();
         PreparedStatement ps = c.prepareStatement(
                 "UPDATE " + plugin.getConfig().getString("database.tablePrefix") + "_discordmcusers " +
-                        "SET whitelisted = true WHERE minecraft_uuid = ?");
+                        "SET whitelisted = 1 WHERE minecraft_uuid = ?");
 
         ps.setString(1, uuid);
 
@@ -157,7 +157,7 @@ public abstract class DatabaseHandler {
         Connection c = this.getConnection();
         PreparedStatement ps = c.prepareStatement(
                 "UPDATE " + plugin.getConfig().getString("database.tablePrefix") + "_discordmcusers " +
-                        "SET whitelisted = false WHERE minecraft_uuid = ?");
+                        "SET whitelisted = 0 WHERE minecraft_uuid = ?");
 
         ps.setString(1, uuid);
 

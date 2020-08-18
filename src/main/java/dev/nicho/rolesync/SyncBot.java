@@ -46,12 +46,7 @@ public class SyncBot extends ListenerAdapter {
         this.db = db;
         plugin.getLogger().info("Finished initializing bot.");
 
-        String alternateServer = plugin.getConfig().getString("alternativeServer");
-        if (alternateServer.isEmpty()) {
-            this.mojang = new MojangAPI();
-        } else {
-            this.mojang = new MojangAPI(alternateServer);
-        }
+        this.mojang = new MojangAPI(plugin);
 
         this.vault = vault;
     }
@@ -130,7 +125,7 @@ public class SyncBot extends ListenerAdapter {
             DatabaseHandler.LinkedUserInfo userInfo = db.getLinkedUserInfo(event.getMember().getId());
             if (userInfo != null) {
                 if (!plugin.getConfig().getBoolean("requireVerification") || userInfo.verified) {
-                    if (Bukkit.getOnlineMode())
+                    if (Bukkit.getOnlineMode() || plugin.getConfig().getBoolean("alwaysOnlineMode"))
                         giveRoleAndNickname(event.getMember(), mojang.onlineUuidToName(userInfo.uuid).name);
                     else
                         giveRoleAndNickname(event.getMember(), userInfo.username);
@@ -296,7 +291,7 @@ public class SyncBot extends ListenerAdapter {
 
                     String name;
                     String msgToSend;
-                    if (Bukkit.getOnlineMode()) {
+                    if (Bukkit.getOnlineMode() || plugin.getConfig().getBoolean("alwaysOnlineMode")) {
                         name = mojang.onlineUuidToName(userInfo.uuid).name;
                         msgToSend = lang.getString("linkedTo") + " " + name + " (" + userInfo.uuid + ")";
                     } else {
@@ -459,7 +454,7 @@ public class SyncBot extends ListenerAdapter {
 
                     guild.retrieveMemberById(event.getAuthor().getId()).queue(member -> {
                         String mcUser = userInfo.username;
-                        if (Bukkit.getOnlineMode()) {
+                        if (Bukkit.getOnlineMode() || plugin.getConfig().getBoolean("alwaysOnlineMode")) {
                             try {
                                 mcUser = mojang.onlineUuidToName(userInfo.uuid).name;
                             } catch (IOException ignored) { }

@@ -107,3 +107,9 @@ react:
 # other server to use instead of Mojang API
 # leave blank to use default Mojang one
 alternativeServer: ""
+
+# bungeecord servers run in offline mode but need the plugin to
+# run in online mode (this was a request). Put the following to true
+# if you want the plugin to run in ONLINE mode even if the server
+# is in offline mode.
+alwaysOnlineMode: false

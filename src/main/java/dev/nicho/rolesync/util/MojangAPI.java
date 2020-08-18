@@ -1,6 +1,7 @@
 package dev.nicho.rolesync.util;
 
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -16,26 +17,26 @@ import java.util.UUID;
 public class MojangAPI {
 
     private URL url = null;
-
-    /**
-     * Creates MojangAPI with the default server
-     */
-    public MojangAPI() {
-        setMojang();
-    }
+    private JavaPlugin plugin = null;
 
     /**
      * Creates MojangAPI with an alternative server.
-     * If the URL is invalid, the default server will be used.
+     * If the URL is invalid or empty, the default server will be used.
      *
-     * @param alternateServer the url of the alternative server
+     * @param plugin
      */
-    public MojangAPI(String alternateServer) {
-        try {
-            this.url = new URL(alternateServer);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
+    public MojangAPI(JavaPlugin plugin) {
+        this.plugin = plugin;
+        String alternateServer = plugin.getConfig().getString("alternativeServer");
+        if (alternateServer.isEmpty()) {
             setMojang();
+        } else {
+            try {
+                this.url = new URL(alternateServer);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+                setMojang();
+            }
         }
     }
 
@@ -88,7 +89,7 @@ public class MojangAPI {
      * @throws IOException if an error occurs while looking for user
      */
     public MojangSearchResult nameToUUID(String name) throws IOException {
-        if (!Bukkit.getOnlineMode()) return new MojangSearchResult(
+        if (!Bukkit.getOnlineMode() && !plugin.getConfig().getBoolean("alwaysOnlineMode")) return new MojangSearchResult(
                 name,
                 UUID.nameUUIDFromBytes(("OfflinePlayer:" + name).getBytes(StandardCharsets.UTF_8)).toString()
         );
