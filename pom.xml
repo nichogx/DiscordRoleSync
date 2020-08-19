@@ -6,7 +6,7 @@
 
     <groupId>dev.nicho.rolesync</groupId>
     <artifactId>discord_role_sync</artifactId>
-    <version>1.0.0-BETA.14</version>
+    <version>1.0.0-BETA.15</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
