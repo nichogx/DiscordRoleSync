@@ -17,6 +17,10 @@ public class MySQLHandler extends DatabaseHandler {
 
         this.ds = new BasicDataSource();
 
+        if (plugin.getConfig().getBoolean("database.mysql.disableSSL")) {
+            this.ds.addConnectionProperty("useSSL", "false");
+        }
+
         ds.setUrl("jdbc:mysql://" + host + ":" + port + "/" + db);
         ds.setUsername(user);
         ds.setPassword(passwd);

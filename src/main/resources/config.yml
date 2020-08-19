@@ -33,6 +33,10 @@ database:
     dbuser: ""
     dbpass: ""
 
+    # WARNING: connecting to databases with SSL disabled is extremely unsafe!
+    # only set the following to true if you really need it
+    disableSSL: false
+
 # if the bot should require users to be verified
 # to verify, users should type /drs verify in the chat
 # if DRS whitelist is enabled, they will be given the code when they try to join
