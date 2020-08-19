@@ -18,7 +18,7 @@ public class JDAUtils {
     public static void reactAndDelete(String reaction, Message message, FileConfiguration configs) {
         message.addReaction(reaction).queue();
 
-        if (configs.getBoolean("deleteCommands")) {
+        if (message.getChannelType() == ChannelType.TEXT && configs.getBoolean("deleteCommands")) {
             message.delete().queueAfter(configs.getInt("deleteAfter"), TimeUnit.SECONDS);
         }
     }
