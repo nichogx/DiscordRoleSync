@@ -102,7 +102,6 @@ public class SyncBot extends ListenerAdapter {
             ch.info(argv, event);
         } else if (argv[0].equalsIgnoreCase("link")) {
             ch.link(argv, event);
-            checkMemberRoles(event.getMember());
         } else if (argv[0].equalsIgnoreCase("unlink")) {
             ch.unlink(argv, event);
         }
@@ -373,6 +372,7 @@ public class SyncBot extends ListenerAdapter {
                 db.linkUser(event.getAuthor().getId(), uuid);
                 if (!plugin.getConfig().getBoolean("requireVerification")) giveRoleAndNickname(Objects.requireNonNull(event.getMember()), result.name);
                 JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onSuccess"), event.getMessage(), plugin.getConfig());
+                checkMemberRoles(event.getMember());
             } catch (SQLException | IOException e) {
                 JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onBotError"), event.getMessage(), plugin.getConfig());
                 plugin.getLogger().severe("An error occurred while trying to check link the user. " +
