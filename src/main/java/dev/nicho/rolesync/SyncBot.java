@@ -273,6 +273,7 @@ public class SyncBot extends ListenerAdapter {
 
             if (argv.length < 2) {
                 JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig());
+                return;
             }
 
             try {
@@ -336,6 +337,7 @@ public class SyncBot extends ListenerAdapter {
         void link(String[] argv, MessageReceivedEvent event) {
             if (argv.length < 2) {
                 JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig());
+                return;
             }
 
             try {
@@ -387,6 +389,7 @@ public class SyncBot extends ListenerAdapter {
 
             if (argv.length < 2) {
                 JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig());
+                return;
             }
 
             try {
