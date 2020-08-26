@@ -172,19 +172,17 @@ public class SyncBot extends ListenerAdapter {
 
             if (plugin.getConfig().getBoolean("requireVerification") && !userInfo.verified) {
                 setPermissions(userInfo.uuid, null);
-                return; // not verified
-            }
-
-            List<String> permsToHave = new ArrayList<>();
-            for (String perm : perms.getKeys(true)) {
-                if (perms.getStringList(perm).isEmpty()) continue;
-                final boolean hasRole = JDAUtils.hasRoleFromList(member, perms.getStringList(perm));
-                if (hasRole) {
-                    permsToHave.add(perm);
+            } else {
+                List<String> permsToHave = new ArrayList<>();
+                for (String perm : perms.getKeys(true)) {
+                    if (perms.getStringList(perm).isEmpty()) continue;
+                    final boolean hasRole = JDAUtils.hasRoleFromList(member, perms.getStringList(perm));
+                    if (hasRole) {
+                        permsToHave.add(perm);
+                    }
                 }
+                setPermissions(userInfo.uuid, permsToHave);
             }
-            setPermissions(userInfo.uuid, permsToHave);
-
 
             if (plugin.getConfig().getBoolean("manageWhitelist")) {
                 if (JDAUtils.hasRoleFromList(member, plugin.getConfig().getStringList("whitelistRoles"))) {
@@ -461,7 +459,7 @@ public class SyncBot extends ListenerAdapter {
                         }
 
                         giveRoleAndNickname(member, mcUser);
-                        checkMemberRoles(member, userInfo);
+                        checkMemberRoles(member);
 
                         JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onSuccess"), event.getMessage(), plugin.getConfig());
                     }, err -> { });
