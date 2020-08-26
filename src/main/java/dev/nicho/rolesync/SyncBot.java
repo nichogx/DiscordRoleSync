@@ -102,6 +102,7 @@ public class SyncBot extends ListenerAdapter {
             ch.info(argv, event);
         } else if (argv[0].equalsIgnoreCase("link")) {
             ch.link(argv, event);
+            checkMemberRoles(event.getMember());
         } else if (argv[0].equalsIgnoreCase("unlink")) {
             ch.unlink(argv, event);
         }
@@ -369,9 +370,7 @@ public class SyncBot extends ListenerAdapter {
                     return;
                 }
 
-                db.linkUser(event.getAuthor().getId(), uuid, () -> {
-                    checkMemberRoles(event.getMember());
-                });
+                db.linkUser(event.getAuthor().getId(), uuid);
                 if (!plugin.getConfig().getBoolean("requireVerification")) giveRoleAndNickname(Objects.requireNonNull(event.getMember()), result.name);
                 JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onSuccess"), event.getMessage(), plugin.getConfig());
             } catch (SQLException | IOException e) {

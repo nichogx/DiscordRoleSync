@@ -103,7 +103,7 @@ public abstract class DatabaseHandler {
      * @param minecraftUUID the Minecraft UUID of the user
      * @throws SQLException if an SQL error occurs
      */
-    public void linkUser(String discordID, String minecraftUUID, Runnable callback) throws SQLException {
+    public void linkUser(String discordID, String minecraftUUID) throws SQLException {
         checkAsync();
 
         Connection c = this.getConnection();
@@ -122,8 +122,6 @@ public abstract class DatabaseHandler {
         ps.execute();
 
         this.closeConnection(c);
-
-        callback.run();
     }
 
     /**
