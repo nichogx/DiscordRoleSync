@@ -102,6 +102,8 @@ public class SyncBot extends ListenerAdapter {
             ch.info(argv, event);
         } else if (argv[0].equalsIgnoreCase("link")) {
             ch.link(argv, event);
+        } else if (argv[0].equalsIgnoreCase("admlink")) {
+            ch.admlink(argv, event);
         } else if (argv[0].equalsIgnoreCase("unlink")) {
             ch.unlink(argv, event);
         }
@@ -341,38 +343,7 @@ public class SyncBot extends ListenerAdapter {
             }
 
             try {
-                DatabaseHandler.LinkedUserInfo userInfo = db.getLinkedUserInfo(event.getAuthor().getId());
-                if (userInfo != null) {
-                    JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig());
-                    event.getAuthor().openPrivateChannel().queue(
-                            channel -> channel.sendMessage(lang.getString("discordAlreadyLinked"))
-                                    .queue(null, err -> { }));
-
-                    return;
-                }
-
-                MojangAPI.MojangSearchResult result = mojang.nameToUUID(argv[1]);
-                String uuid = result.uuid;
-                if (uuid == null) {
-                    JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig());
-
-                    return;
-                }
-
-                userInfo = db.getLinkedUserInfo(uuid);
-                if (userInfo != null) {
-                    JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig());
-                    event.getAuthor().openPrivateChannel().queue(
-                            channel -> channel.sendMessage(lang.getString("minecraftAlreadyLinked"))
-                                    .queue(null, err -> { }));
-
-                    return;
-                }
-
-                db.linkUser(event.getAuthor().getId(), uuid);
-                if (!plugin.getConfig().getBoolean("requireVerification")) giveRoleAndNickname(Objects.requireNonNull(event.getMember()), result.name);
-                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onSuccess"), event.getMessage(), plugin.getConfig());
-                checkMemberRoles(event.getMember());
+                this.linkUser(event.getAuthor().getId(), argv[1], event);
             } catch (SQLException | IOException e) {
                 JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onBotError"), event.getMessage(), plugin.getConfig());
                 plugin.getLogger().severe("An error occurred while trying to check link the user. " +
@@ -418,6 +389,27 @@ public class SyncBot extends ListenerAdapter {
 
                 guild.retrieveMemberById(userInfo.discordId).queue(SyncBot.this::removeRoleAndNickname, err -> { });
                 JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onSuccess"), event.getMessage(), plugin.getConfig());
+            } catch (SQLException | IOException e) {
+                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onBotError"), event.getMessage(), plugin.getConfig());
+                plugin.getLogger().severe("An error occurred while getting info for the user. " +
+                        "Please check the stack trace below and contact the developer.");
+                e.printStackTrace();
+            }
+        }
+
+        void admlink(String[] argv, MessageReceivedEvent event) {
+            if (!JDAUtils.hasRoleFromList(event.getMember(), plugin.getConfig().getStringList("adminCommandRoles"))) {
+                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onPermissionError"), event.getMessage(), plugin.getConfig());
+                return;
+            }
+
+            if (argv.length < 3) {
+                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig());
+                return;
+            }
+
+            try {
+                this.linkUser(argv[1], argv[2], event);
             } catch (SQLException | IOException e) {
                 JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onBotError"), event.getMessage(), plugin.getConfig());
                 plugin.getLogger().severe("An error occurred while getting info for the user. " +
@@ -475,6 +467,48 @@ public class SyncBot extends ListenerAdapter {
                         "Please check the stack trace below and contact the developer.");
                 e.printStackTrace();
             }
+        }
+
+        private void linkUser(String discordId, String mcUsername, MessageReceivedEvent event) throws IOException, SQLException {
+            DatabaseHandler.LinkedUserInfo userInfo = db.getLinkedUserInfo(discordId);
+            if (userInfo != null) {
+                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig());
+                event.getAuthor().openPrivateChannel().queue(
+                        channel -> channel.sendMessage(lang.getString("discordAlreadyLinked"))
+                                .queue(null, err -> { }));
+
+                return;
+            }
+
+            MojangAPI.MojangSearchResult result = mojang.nameToUUID(mcUsername);
+            String uuid = result.uuid;
+            if (uuid == null) {
+                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig());
+
+                return;
+            }
+
+            userInfo = db.getLinkedUserInfo(uuid);
+            if (userInfo != null) {
+                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig());
+                event.getAuthor().openPrivateChannel().queue(
+                        channel -> channel.sendMessage(lang.getString("minecraftAlreadyLinked"))
+                                .queue(null, err -> { }));
+
+                return;
+            }
+
+            db.linkUser(discordId, uuid);
+            Objects.requireNonNull(bot.getGuildById(plugin.getConfig().getString("botInfo.server")))
+                    .retrieveMemberById(discordId).queue(member -> {
+                        if (member != null) {
+                            if (!plugin.getConfig().getBoolean("requireVerification")) {
+                                giveRoleAndNickname(member, result.name);
+                            }
+                            checkMemberRoles(member);
+                        }
+                    }, error -> { });
+            JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onSuccess"), event.getMessage(), plugin.getConfig());
         }
     }
 
