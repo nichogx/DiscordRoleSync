@@ -97,17 +97,18 @@ groups:
 # emojis to use for reaction
 # to use a custom emoji, you can put its ID instead of the actual
 # unicode emoji
+# emoji unicode codepoints (U+1F6D1 is a codepoint) can be found at https://emojipedia.org/
 react:
   # if the command was successful
-  onSuccess: "✅"
+  onSuccess: "U+2705"
   # if the user made an error (account already linked, Minecraft user does not exist, etc.)
-  onUserError: "❌"
+  onUserError: "U+274C"
   # if something went wrong with the bot (this should never happen. If it does, either something is wrong
   # with the config or the bot. If you need help, contact the developer).
-  onBotError: "⚠"
+  onBotError: "U+26A0"
   # if the user does not have permission for that command
-  onPermissionError: "🛑"
-
+  onPermissionError: "U+1F6D1"
+  
 # other server to use instead of Mojang API
 # leave blank to use default Mojang one
 alternativeServer: ""
