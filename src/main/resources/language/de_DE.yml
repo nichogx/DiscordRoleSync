@@ -1,0 +1,29 @@
+linkedTo: "Verbunden zu"
+unknownUser: "Unbekannter Benutzer"
+discordAlreadyLinked: "Dein Discord Account ist bereits mit einem Minecraft Account verbunden"
+minecraftAlreadyLinked: "Dein Minecraft Account ist bereits mit einem Minecraft Account verbunden"
+
+noPermissionError: "Du hast keine Berechtigung für diesen Befehl"
+commandError: "Fehler beim ausführen des Befehls. Bitte überprüfe die Konsole."
+
+usage: "Nutzung:"
+drsReloadDescription: "Lade config und language Dateien neu"
+
+drsBotRestartDescription: "Startet den Bot neu"
+botRestarted: "Bot ist neugestartet."
+
+drsVerifyDescription: "Verifiziere deinen Discord Account"
+alreadyVerified: "Du bist bereits verifiziert"
+verificationInstructions: "Bitte antworte mit diesem Code auf die Privatnachricht des Discord Bots:"
+
+pleaseLink: "Bitte verbinde deinen Account auf unserem Discord Server:"
+
+whitelistErrorKickMsg: "Es ist ein Fehler beim überprüfen der Whitelist aufgetreten. Bitte kontaktiere einen Server Administrator"
+whitelistNotVerifiedKickMsg: "Du bist nicht verifiziert. Bitte antworte mit diesem Code auf die Privatnachricht des Discord Bots:"
+notWhitelistedKickMsg: "Du bist auf dem Server nicht gewhitelisted"
+
+notLatestVersion: "Veraltete Version von DiscordRoleSync."
+latest: "Neuste:"
+current: "Aktuelle:"
+
+reloadComplete: "Neuladen abgeschlossen"
