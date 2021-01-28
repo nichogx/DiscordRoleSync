@@ -42,16 +42,6 @@ public abstract class DatabaseHandler {
     protected abstract void closeConnection(Connection c) throws SQLException;
 
     /**
-     * Checks if a table has a column
-     *
-     * @param table name of the table
-     * @param column name of the column
-     * @return true if it exists, false otherwise
-     * @throws SQLException if an SQL error occurs
-     */
-    protected abstract boolean hasColumn(String table, String column) throws SQLException;
-
-    /**
      * Initializes the database, creating tables if needed.
      *
      * @throws SQLException if an SQL error occurs
@@ -312,48 +302,6 @@ public abstract class DatabaseHandler {
         closeConnection(c);
 
         return true;
-    }
-
-    /**
-     * Migrates the database if needed.
-     *
-     * @return true if something was migrated. False if nothing was done.
-     * @throws SQLException if an SQL error occurs
-     */
-    public boolean migrate() throws SQLException {
-        boolean migrated = false;
-
-        // <= 1.0.0-BETA.11 to 1.0.0-BETA.12
-        if (!this.hasColumn(plugin.getConfig().getString("database.tablePrefix") + "_discordmcusers", "verified")) {
-            // not upgraded yet
-            Connection c = this.getConnection();
-            PreparedStatement ps = c.prepareStatement("ALTER TABLE "
-                    + plugin.getConfig().getString("database.tablePrefix") + "_discordmcusers "
-                    + "ADD `verification_code` INT NOT NULL DEFAULT 0");
-
-            ps.execute();
-            ps.close();
-
-            ps = c.prepareStatement("ALTER TABLE "
-                    + plugin.getConfig().getString("database.tablePrefix") + "_discordmcusers "
-                    + "ADD `verified` BOOLEAN NOT NULL DEFAULT false");
-
-            ps.execute();
-            ps.close();
-
-            ps = c.prepareStatement("ALTER TABLE "
-                    + plugin.getConfig().getString("database.tablePrefix") + "_discordmcusers "
-                    + "ADD `username_when_linked` TEXT NULL");
-
-            ps.execute();
-            ps.close();
-
-            migrated = true;
-
-            closeConnection(c);
-        }
-
-        return migrated;
     }
 
     private final void checkAsync() {

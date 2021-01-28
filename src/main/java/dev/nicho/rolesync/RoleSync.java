@@ -115,11 +115,6 @@ public class RoleSync extends JavaPlugin {
                 this.db = new SQLiteHandler(this, new File(getDataFolder(), "database.db"));
             }
 
-            // migrations
-            if (this.db.migrate()) {
-                getLogger().info("Database migrated.");
-            }
-
             // get all managed groups
             ConfigurationSection perms = getConfig().getConfigurationSection("groups");
             List<String> managedGroups = new ArrayList<>();

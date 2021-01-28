@@ -43,25 +43,4 @@ public class SQLiteHandler extends DatabaseHandler {
     protected void closeConnection(Connection c) {
         // do nothing. SQLite connection will be kept open forever
     }
-
-    @Override
-    protected boolean hasColumn(String table, String column) throws SQLException {
-        Connection c = this.getConnection();
-
-        PreparedStatement ps = c.prepareStatement("SELECT * FROM pragma_table_info(?) WHERE name=?");
-
-        ps.setString(1, table);
-        ps.setString(2, column);
-
-        ResultSet res = ps.executeQuery();
-
-        boolean ret = false;
-        if (res.next() && res.getString(2).equalsIgnoreCase(column)) {
-            ret = true;
-        }
-
-        closeConnection(c);
-
-        return ret;
-    }
 }
