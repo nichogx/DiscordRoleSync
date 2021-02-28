@@ -1,7 +1,10 @@
 package dev.nicho.rolesync.listeners;
 
 import dev.nicho.rolesync.db.DatabaseHandler;
+
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -25,6 +28,10 @@ public class WhitelistLoginListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerLogin(AsyncPlayerPreLoginEvent event) {
+    	OfflinePlayer p = Bukkit.getOfflinePlayer(event.getUniqueId());
+    	if (p.isWhitelisted()){
+    		return;
+    	}
         DatabaseHandler.LinkedUserInfo usrInfo;
         try {
             usrInfo = db.getLinkedUserInfo(event.getUniqueId().toString());

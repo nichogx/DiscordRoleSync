@@ -104,6 +104,8 @@ public class SyncBot extends ListenerAdapter {
             ch.link(argv, event);
         } else if (argv[0].equalsIgnoreCase("admlink")) {
             ch.admlink(argv, event);
+        } else if (argv[0].equalsIgnoreCase("admforcelink")) {
+            ch.admforcelink(argv, event);
         } else if (argv[0].equalsIgnoreCase("unlink")) {
             ch.unlink(argv, event);
         }
@@ -395,6 +397,67 @@ public class SyncBot extends ListenerAdapter {
                         "Please check the stack trace below and contact the developer.");
                 e.printStackTrace();
             }
+        }
+        
+        void admforcelink(String[] argv, MessageReceivedEvent event) {
+        	if (!JDAUtils.hasRoleFromList(event.getMember(), plugin.getConfig().getStringList("adminCommandRoles"))) {
+                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onPermissionError"), event.getMessage(), plugin.getConfig());
+                return;
+            }
+
+            if (argv.length < 3) {
+                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig());
+                return;
+            }
+        	
+        	String discordId = argv[1];
+        	String uuid = argv[2];
+        	DatabaseHandler.LinkedUserInfo userInfo;
+			try {
+				userInfo = db.getLinkedUserInfo(discordId);
+				if (userInfo != null) {
+	                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig());
+	                event.getAuthor().openPrivateChannel().queue(
+	                        channel -> channel.sendMessage(lang.getString("discordAlreadyLinked"))
+	                                .queue(null, err -> { }));
+
+	                return;
+	            }
+			} catch (SQLException e1) {
+				JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onBotError"), event.getMessage(), plugin.getConfig());
+                plugin.getLogger().severe("An error occurred while getting info for the user. " +
+                        "Please check the stack trace below and contact the developer.");
+                e1.printStackTrace();
+			}
+            
+            
+        	try {
+        		userInfo = db.getLinkedUserInfo(uuid);
+                if (userInfo != null) {
+                    JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig());
+                    event.getAuthor().openPrivateChannel().queue(
+                            channel -> channel.sendMessage(lang.getString("minecraftAlreadyLinked"))
+                                    .queue(null, err -> { }));
+
+                    return;
+                }
+				db.linkUser(argv[1], argv[2]);
+				Objects.requireNonNull(bot.getGuildById(plugin.getConfig().getString("botInfo.server")))
+                .retrieveMemberById(discordId).queue(member -> {
+                    if (member != null) {
+                        if (!plugin.getConfig().getBoolean("requireVerification")) {
+                            giveRoleAndNickname(member, null);
+                        }
+                        checkMemberRoles(member);
+                    }
+                }, error -> { });
+			} catch (SQLException e) {
+				JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onBotError"), event.getMessage(), plugin.getConfig());
+                plugin.getLogger().severe("An error occurred while getting info for the user. " +
+                        "Please check the stack trace below and contact the developer.");
+                e.printStackTrace();
+			}
+        	JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onSuccess"), event.getMessage(), plugin.getConfig());
         }
 
         void admlink(String[] argv, MessageReceivedEvent event) {
