@@ -1,29 +1,29 @@
-linkedTo: "Привязано"
+linkedTo: "Привязано к"
 unknownUser: "неизвестный пользователь"
-discordAlreadyLinked: "Ваш Discord аккаунт уже привязан к игровому аккаунту" #checked
-minecraftAlreadyLinked: "Ваш игровой аккаунт уже привязан к аккаунту Discord" #checked
+discordAlreadyLinked: "Ваш Discord аккаунт уже привязан к игровому аккаунту"
+minecraftAlreadyLinked: "Ваш игровой аккаунт уже привязан к аккаунту Discord"
 
-noPermissionError: "У Вас нет прав для использования этой команды." #checked
+noPermissionError: "У Вас нет прав для использования этой команды."
 commandError: "Ошибка во время выполнения команды. Обратитесь к консоли."
 
-usage: "Использование команд:" #checked
-drsReloadDescription: "Перезагрузить настройки и языковые файлы плагина" #checked
+usage: "Использование команд:"
+drsReloadDescription: "Перезагрузить настройки и языковые файлы плагина"
 
-drsBotRestartDescription: "Перезагрузить бота" #checked
-botRestarted: "Бот перезагружен" #checked
+drsBotRestartDescription: "Перезагрузить бота"
+botRestarted: "Бот перезагружен"
 
-drsVerifyDescription: "Подтвердить Discord аккаунт" #checked
-alreadyVerified: "Ваш аккаунт уже подтвержден" #checked
-verificationInstructions: "Отправьте следующий код Discord боту в личные сообщения:" #checked
+drsVerifyDescription: "Подтвердить Discord аккаунт"
+alreadyVerified: "Ваш аккаунт уже подтвержден"
+verificationInstructions: "Отправьте следующий код Discord боту в личные сообщения:"
 
-pleaseLink: "Привяжите Ваш аккаунт на нашем Discord сервере:" #checked
+pleaseLink: "Привяжите Ваш аккаунт на нашем Discord сервере:"
 
 whitelistErrorKickMsg: "Возникла ошибка во время проверки whitelist. Обратитесь к администратору"
-whitelistNotVerifiedKickMsg: "Вы не верифицированы. Отправьте следующий код Discord боту в личные сообщения:" #checked
+whitelistNotVerifiedKickMsg: "Вы не верифицированы. Отправьте следующий код Discord боту в личные сообщения:"
 notWhitelistedKickMsg: "Вас нет в whitelist'е этого сервера"
 
-notLatestVersion: "Вы запускаете неактуальную версию плагина DiscordRoleSync."
-latest: "Актуальная:"
+notLatestVersion: "Установлена старая версия плагина DiscordRoleSync."
+latest: "Новая:"
 current: "Текущая:"
 
-reloadComplete: "Перезагрузка завершена" #checked
+reloadComplete: "Перезагрузка завершена"
