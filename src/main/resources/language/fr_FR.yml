@@ -27,3 +27,5 @@ latest: "Derniere version:"
 current: "Version utilisée:"
 
 reloadComplete: "Redémarrage completé!"
+
+playersOnline: "%d/%d players"

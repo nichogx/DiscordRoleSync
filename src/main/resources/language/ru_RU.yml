@@ -27,3 +27,5 @@ latest: "Новая:"
 current: "Текущая:"
 
 reloadComplete: "Перезагрузка завершена"
+
+playersOnline: "%d/%d players"

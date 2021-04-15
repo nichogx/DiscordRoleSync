@@ -27,3 +27,5 @@ latest: "En son:"
 current: "Şu anki:"
 
 reloadComplete: "Yeniden yükleme tamamlandı."
+
+playersOnline: "%d/%d players"

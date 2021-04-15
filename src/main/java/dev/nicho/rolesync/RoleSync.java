@@ -5,6 +5,7 @@ import dev.nicho.rolesync.listeners.WhitelistLoginListener;
 import dev.nicho.rolesync.util.APIException;
 import dev.nicho.rolesync.util.Util;
 import dev.nicho.rolesync.util.VaultAPI;
+import net.dv8tion.jda.api.entities.Activity;
 import org.bstats.bukkit.Metrics;
 import dev.nicho.dependencymanager.DependencyManager;
 import dev.nicho.rolesync.db.DatabaseHandler;
@@ -355,6 +356,22 @@ public class RoleSync extends JavaPlugin {
 
                 builder.addEventListeners(listener);
                 this.jda = builder.build();
+
+                if (getConfig().getBoolean("showPlayers")) {
+                    RoleSync that = this;
+                    this.getServer().getScheduler().runTaskTimerAsynchronously(this, new Runnable() {
+                        @Override
+                        public void run() {
+                            String template = language.getString("playersOnline");
+                            if (template == null) {
+                                template = "%d/%d players";
+                            }
+
+                            String msg = String.format(template, that.getServer().getOnlinePlayers().size(), that.getServer().getMaxPlayers());
+                            that.jda.getPresence().setActivity(Activity.playing(msg));
+                        }
+                    }, 0L, 36000L); // run every 30 minutes
+                }
             } catch (LoginException e) {
                 getLogger().log(Level.SEVERE, "Error logging in. Did you set your token in config.yml?", e);
 

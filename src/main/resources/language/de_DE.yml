@@ -27,3 +27,5 @@ latest: "Neuste:"
 current: "Aktuelle:"
 
 reloadComplete: "Neuladen abgeschlossen"
+
+playersOnline: "%d/%d players"

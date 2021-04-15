@@ -118,3 +118,7 @@ alternativeServer: ""
 # if you want the plugin to run in ONLINE mode even if the server
 # is in offline mode.
 alwaysOnlineMode: false
+
+# whether or not the bot should show the number of players online
+# as its "playing" status
+showPlayers: false
