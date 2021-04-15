@@ -160,6 +160,9 @@ public class RoleSync extends JavaPlugin {
         metrics.addCustomChart(new Metrics.SimplePie("linked_role",
                 () -> String.valueOf(getConfig().getBoolean("giveLinkedRole"))));
 
+        metrics.addCustomChart(new Metrics.SimplePie("show_players_online",
+                () -> String.valueOf(getConfig().getBoolean("showPlayers"))));
+
         metrics.addCustomChart(new Metrics.SimplePie("require_verification",
                 () -> String.valueOf(getConfig().getBoolean("requireVerification"))));
 
