@@ -1,0 +1,31 @@
+linkedTo: "リンク先"
+unknownUser: "不明なユーザ"
+discordAlreadyLinked: "あなたのDiscordアカウントは既にMinecraftアカウントとリンクしています"
+minecraftAlreadyLinked: "あなたのMinecraftアカウントは既にDiscordアカウントとリンクしています"
+
+noPermissionError: "このコマンドを実行する権限はありません。"
+commandError: "コマンド実行中にエラーが発生しました、コンソールを確認してください。"
+
+usage: "使い方:"
+drsReloadDescription: "設定ファイルと言語ファイルの再読み込み"
+
+drsBotRestartDescription: "ボットを再起動"
+botRestarted: "ボットを再起動しました。"
+
+drsVerifyDescription: "Discordアカウントのリンク"
+alreadyVerified: "あなたはすでにリンクされています"
+verificationInstructions: "このコードをDiscordボットのダイレクトメッセージに送信してください:"
+
+pleaseLink: "Discordサーバーでアカウントをリンクしてください:"
+
+whitelistErrorKickMsg: "ホワイトリストに登録されているかどうかの確認中にエラーが発生しました。サーバー管理者にお問い合わせください。"
+whitelistNotVerifiedKickMsg: "あなたはリンクされていません。このコードをDiscordボットのダイレクトメッセージに送ってください:"
+notWhitelistedKickMsg: "あなたはこのサーバーでホワイトリストに登録されていません"
+
+notLatestVersion: "DiscordRoleSyncの最新バージョンを使用していません"
+latest: "最新:"
+current: "現在:"
+
+reloadComplete: "再読み込み完了"
+
+playersOnline: "%d/%d players"
