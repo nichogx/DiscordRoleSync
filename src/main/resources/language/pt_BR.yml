@@ -2,9 +2,16 @@ linkedTo: "Linkado a"
 unknownUser: "usuário desconhecido"
 discordAlreadyLinked: "Sua conta do Discord já está linkada a uma conta do Minecraft"
 minecraftAlreadyLinked: "Sua conta do Minecraft já está linkada a uma conta do Discord"
+successLink: "You have successfully linked your accounts"
+successUnlink: "You have successfully unlinked the accounts"
+successVerify: "You have successfully verified this account"
+
+userNotLinked: "This user is not linked"
+incorrectVerificationCode: "Incorrect verification code. Please try verifying again"
 
 noPermissionError: "Você não tem permissão para rodar esse comando."
 commandError: "Erro ao rodar esse comando. Por favor veja o console."
+incorrectCommandFormat: "The command is formatted incorrectly."
 
 usage: "Uso:"
 drsReloadDescription: "Dar reload nos arquivos de config e línguas"

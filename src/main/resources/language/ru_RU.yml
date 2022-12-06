@@ -2,9 +2,16 @@ linkedTo: "Привязано к"
 unknownUser: "неизвестный пользователь"
 discordAlreadyLinked: "Ваш Discord аккаунт уже привязан к игровому аккаунту"
 minecraftAlreadyLinked: "Ваш игровой аккаунт уже привязан к аккаунту Discord"
+successLink: "You have successfully linked your accounts"
+successUnlink: "You have successfully unlinked the accounts"
+successVerify: "You have successfully verified this account"
+
+userNotLinked: "This user is not linked"
+incorrectVerificationCode: "Incorrect verification code. Please try verifying again"
 
 noPermissionError: "У Вас нет прав для использования этой команды."
 commandError: "Ошибка во время выполнения команды. Обратитесь к консоли."
+incorrectCommandFormat: "The command is formatted incorrectly."
 
 usage: "Использование команд:"
 drsReloadDescription: "Перезагрузить настройки и языковые файлы плагина"

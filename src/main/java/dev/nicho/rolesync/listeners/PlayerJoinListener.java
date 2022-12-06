@@ -15,9 +15,13 @@ public class PlayerJoinListener implements Listener {
     private final YamlConfiguration lang;
     private final JavaPlugin plugin;
 
+    private final String chatPrefix;
+
     public PlayerJoinListener(YamlConfiguration lang, JavaPlugin plugin) {
         this.lang = lang;
         this.plugin = plugin;
+
+        this.chatPrefix = plugin.getConfig().getString("chatPrefix.text", "[DRS]") + " ";
     }
 
     @EventHandler
@@ -36,9 +40,9 @@ public class PlayerJoinListener implements Listener {
                 }
 
                 if (!latestVersion.equalsIgnoreCase(version)) {
-                    String message = ChatColor.BLUE + "[DRS] " + ChatColor.AQUA + lang.getString("notLatestVersion") + "\n" +
-                            ChatColor.BLUE + "[DRS] " + ChatColor.AQUA + lang.getString("current") + " " + ChatColor.RED + version + ChatColor.AQUA + "\n" +
-                            ChatColor.BLUE + "[DRS] " + ChatColor.AQUA + lang.getString("latest") + " " + ChatColor.GREEN + latestVersion;
+                    String message = ChatColor.BLUE + this.chatPrefix + ChatColor.AQUA + lang.getString("notLatestVersion") + "\n" +
+                            ChatColor.BLUE + this.chatPrefix + ChatColor.AQUA + lang.getString("current") + " " + ChatColor.RED + version + ChatColor.AQUA + "\n" +
+                            ChatColor.BLUE + this.chatPrefix + ChatColor.AQUA + lang.getString("latest") + " " + ChatColor.GREEN + latestVersion;
 
                     event.getPlayer().sendMessage(message);
                 }

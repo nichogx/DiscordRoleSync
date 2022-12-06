@@ -14,12 +14,22 @@ public class JDAUtils {
      * @param reaction the reaction to add
      * @param message the message to react to
      * @param configs the configuration file
+     * @param feedbackMessage the message to send to the channel, if enabled in the config
      */
-    public static void reactAndDelete(String reaction, Message message, FileConfiguration configs) {
+    public static void reactAndDelete(String reaction, Message message, FileConfiguration configs, String feedbackMessage) {
         message.addReaction(reaction).queue();
 
-        if (message.getChannelType() == ChannelType.TEXT && configs.getBoolean("deleteCommands")) {
-            message.delete().queueAfter(configs.getInt("deleteAfter"), TimeUnit.SECONDS);
+        if (message.getChannelType() == ChannelType.TEXT) {
+            if (configs.getBoolean("messageFeedback", false) && feedbackMessage != null) {
+                message.getTextChannel().sendMessage(feedbackMessage).queue(msg -> {
+                    if (configs.getBoolean("deleteCommands"))
+                        msg.delete().queueAfter(configs.getInt("deleteAfter"), TimeUnit.SECONDS);
+                }, err -> { });
+            }
+
+            if (configs.getBoolean("deleteCommands")) {
+                message.delete().queueAfter(configs.getInt("deleteAfter"), TimeUnit.SECONDS);
+            }
         }
     }
 

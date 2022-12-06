@@ -98,13 +98,13 @@ public class SyncBot extends ListenerAdapter {
         String[] argv = message.split(" ");
         argv[0] = argv[0].substring(prefix.length()); // remove prefix
 
-        if (argv[0].equalsIgnoreCase("info")) {
+        if (argv[0].equalsIgnoreCase(this.plugin.getConfig().getString("commandNames.info", "info"))) {
             ch.info(argv, event);
-        } else if (argv[0].equalsIgnoreCase("link")) {
+        } else if (argv[0].equalsIgnoreCase(this.plugin.getConfig().getString("commandNames.link", "link"))) {
             ch.link(argv, event);
-        } else if (argv[0].equalsIgnoreCase("admlink")) {
+        } else if (argv[0].equalsIgnoreCase(this.plugin.getConfig().getString("commandNames.admLink", "admLink"))) {
             ch.admlink(argv, event);
-        } else if (argv[0].equalsIgnoreCase("unlink")) {
+        } else if (argv[0].equalsIgnoreCase(this.plugin.getConfig().getString("commandNames.unlink", "unlink"))) {
             ch.unlink(argv, event);
         }
 
@@ -269,23 +269,21 @@ public class SyncBot extends ListenerAdapter {
 
         void info(String[] argv, MessageReceivedEvent event) {
             if (!JDAUtils.hasRoleFromList(event.getMember(), plugin.getConfig().getStringList("adminCommandRoles"))) {
-                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onPermissionError"), event.getMessage(), plugin.getConfig());
+                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onPermissionError"), event.getMessage(), plugin.getConfig(), lang.getString("noPermissionError"));
                 return;
             }
 
             if (argv.length < 2) {
-                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig());
+                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig(), lang.getString("incorrectCommandFormat"));
                 return;
             }
 
             try {
                 if (argv[1].length() > 16 && StringUtils.isNumeric(argv[1])) { // looks like Discord ID
-
-
                     DatabaseHandler.LinkedUserInfo userInfo = db.getLinkedUserInfo(argv[1]);
 
                     if (userInfo == null) {
-                        JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig());
+                        JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig(), lang.getString("userNotLinked"));
                         return;
                     }
 
@@ -298,7 +296,7 @@ public class SyncBot extends ListenerAdapter {
                         msgToSend = lang.getString("linkedTo") + " " + userInfo.username + " (" + userInfo.uuid + ")";
                     }
 
-                    JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onSuccess"), event.getMessage(), plugin.getConfig());
+                    JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onSuccess"), event.getMessage(), plugin.getConfig(), null);
                     event.getChannel().sendMessage(msgToSend)
                             .queue(msg -> {
                                 if (plugin.getConfig().getBoolean("deleteCommands"))
@@ -310,7 +308,7 @@ public class SyncBot extends ListenerAdapter {
                     DatabaseHandler.LinkedUserInfo userInfo = db.getLinkedUserInfo(uuid);
 
                     if (userInfo == null) {
-                        JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig());
+                        JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig(), lang.getString("userNotLinked"));
                         return;
                     }
 
@@ -320,7 +318,7 @@ public class SyncBot extends ListenerAdapter {
                             name = usr.getAsTag();
                         }
 
-                        JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onSuccess"), event.getMessage(), plugin.getConfig());
+                        JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onSuccess"), event.getMessage(), plugin.getConfig(), null);
                         event.getChannel().sendMessage(lang.getString("linkedTo") + " " + name + " (" + userInfo.discordId + ")" )
                                 .queue(msg -> {
                                     if (plugin.getConfig().getBoolean("deleteCommands"))
@@ -329,7 +327,7 @@ public class SyncBot extends ListenerAdapter {
                     }, error -> { });
                 }
             } catch (SQLException | IOException e) {
-                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onBotError"), event.getMessage(), plugin.getConfig());
+                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onBotError"), event.getMessage(), plugin.getConfig(), lang.getString("commandError"));
                 plugin.getLogger().severe("An error occurred while getting info for the user. " +
                         "Please check the stack trace below and contact the developer.");
                 e.printStackTrace();
@@ -338,14 +336,14 @@ public class SyncBot extends ListenerAdapter {
 
         void link(String[] argv, MessageReceivedEvent event) {
             if (argv.length < 2) {
-                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig());
+                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig(), lang.getString("incorrectCommandFormat"));
                 return;
             }
 
             try {
                 this.linkUser(event.getAuthor().getId(), argv[1], event);
             } catch (SQLException | IOException e) {
-                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onBotError"), event.getMessage(), plugin.getConfig());
+                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onBotError"), event.getMessage(), plugin.getConfig(), lang.getString("commandError"));
                 plugin.getLogger().severe("An error occurred while trying to check link the user. " +
                         "Please check the stack trace below and contact the developer.");
                 e.printStackTrace();
@@ -354,12 +352,12 @@ public class SyncBot extends ListenerAdapter {
 
         void unlink(String[] argv, MessageReceivedEvent event) {
             if (!JDAUtils.hasRoleFromList(event.getMember(), plugin.getConfig().getStringList("adminCommandRoles"))) {
-                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onPermissionError"), event.getMessage(), plugin.getConfig());
+                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onPermissionError"), event.getMessage(), plugin.getConfig(), lang.getString("noPermissionError"));
                 return;
             }
 
             if (argv.length < 2) {
-                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig());
+                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig(), lang.getString("incorrectCommandFormat"));
                 return;
             }
 
@@ -374,7 +372,7 @@ public class SyncBot extends ListenerAdapter {
                 }
 
                 if (userInfo == null) {
-                    JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig());
+                    JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig(), lang.getString("userNotLinked"));
                     return;
                 }
 
@@ -388,9 +386,9 @@ public class SyncBot extends ListenerAdapter {
                 }
 
                 guild.retrieveMemberById(userInfo.discordId).queue(SyncBot.this::removeRoleAndNickname, err -> { });
-                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onSuccess"), event.getMessage(), plugin.getConfig());
+                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onSuccess"), event.getMessage(), plugin.getConfig(), lang.getString("successUnlink"));
             } catch (SQLException | IOException e) {
-                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onBotError"), event.getMessage(), plugin.getConfig());
+                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onBotError"), event.getMessage(), plugin.getConfig(), lang.getString("commandError"));
                 plugin.getLogger().severe("An error occurred while getting info for the user. " +
                         "Please check the stack trace below and contact the developer.");
                 e.printStackTrace();
@@ -399,19 +397,19 @@ public class SyncBot extends ListenerAdapter {
 
         void admlink(String[] argv, MessageReceivedEvent event) {
             if (!JDAUtils.hasRoleFromList(event.getMember(), plugin.getConfig().getStringList("adminCommandRoles"))) {
-                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onPermissionError"), event.getMessage(), plugin.getConfig());
+                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onPermissionError"), event.getMessage(), plugin.getConfig(), lang.getString("noPermissionError"));
                 return;
             }
 
             if (argv.length < 3) {
-                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig());
+                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig(), lang.getString("incorrectCommandFormat"));
                 return;
             }
 
             try {
                 this.linkUser(argv[1], argv[2], event);
             } catch (SQLException | IOException e) {
-                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onBotError"), event.getMessage(), plugin.getConfig());
+                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onBotError"), event.getMessage(), plugin.getConfig(), lang.getString("commandError"));
                 plugin.getLogger().severe("An error occurred while getting info for the user. " +
                         "Please check the stack trace below and contact the developer.");
                 e.printStackTrace();
@@ -436,7 +434,7 @@ public class SyncBot extends ListenerAdapter {
             try {
                 DatabaseHandler.LinkedUserInfo userInfo = db.getLinkedUserInfo(event.getAuthor().getId());
                 if (userInfo == null) {
-                    JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig());
+                    JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig(), lang.getString("userNotLinked"));
                     event.getChannel().sendMessage(lang.getString("pleaseLink")).queue(null, err -> { });
                 } else if (db.verify(event.getAuthor().getId(), code)) {
                     Guild guild = bot.getGuildById(plugin.getConfig().getString("botInfo.server"));
@@ -456,13 +454,13 @@ public class SyncBot extends ListenerAdapter {
                         giveRoleAndNickname(member, mcUser);
                         checkMemberRoles(member);
 
-                        JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onSuccess"), event.getMessage(), plugin.getConfig());
+                        JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onSuccess"), event.getMessage(), plugin.getConfig(), lang.getString("successVerify"));
                     }, err -> { });
                 } else {
-                    JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig());
+                    JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig(), lang.getString("incorrectVerificationCode"));
                 }
             } catch (SQLException e) {
-                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onBotError"), event.getMessage(), plugin.getConfig());
+                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onBotError"), event.getMessage(), plugin.getConfig(), lang.getString("commandError"));
                 plugin.getLogger().severe("An error occurred while getting info for the user. " +
                         "Please check the stack trace below and contact the developer.");
                 e.printStackTrace();
@@ -472,7 +470,7 @@ public class SyncBot extends ListenerAdapter {
         private void linkUser(String discordId, String mcUsername, MessageReceivedEvent event) throws IOException, SQLException {
             DatabaseHandler.LinkedUserInfo userInfo = db.getLinkedUserInfo(discordId);
             if (userInfo != null) {
-                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig());
+                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig(), lang.getString("discordAlreadyLinked"));
                 event.getAuthor().openPrivateChannel().queue(
                         channel -> channel.sendMessage(lang.getString("discordAlreadyLinked"))
                                 .queue(null, err -> { }));
@@ -483,14 +481,14 @@ public class SyncBot extends ListenerAdapter {
             MojangAPI.MojangSearchResult result = mojang.nameToUUID(mcUsername);
             String uuid = result.uuid;
             if (uuid == null) {
-                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig());
+                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig(), lang.getString("unknownUser"));
 
                 return;
             }
 
             userInfo = db.getLinkedUserInfo(uuid);
             if (userInfo != null) {
-                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig());
+                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig(), lang.getString("minecraftAlreadyLinked"));
                 event.getAuthor().openPrivateChannel().queue(
                         channel -> channel.sendMessage(lang.getString("minecraftAlreadyLinked"))
                                 .queue(null, err -> { }));
@@ -508,7 +506,7 @@ public class SyncBot extends ListenerAdapter {
                             checkMemberRoles(member);
                         }
                     }, error -> { });
-            JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onSuccess"), event.getMessage(), plugin.getConfig());
+            JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onSuccess"), event.getMessage(), plugin.getConfig(), lang.getString("successLink"));
         }
     }
 

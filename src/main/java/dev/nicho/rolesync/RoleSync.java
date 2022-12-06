@@ -43,6 +43,8 @@ public class RoleSync extends JavaPlugin {
     private JDA jda = null;
     private VaultAPI vault = null;
 
+    private String chatPrefix = null;
+
     @Override
     public void onLoad() {
 
@@ -80,6 +82,8 @@ public class RoleSync extends JavaPlugin {
             e.printStackTrace();
             this.setEnabled(false);
         }
+
+        this.chatPrefix = getConfig().getString("chatPrefix.text", "[DRS]") + " ";
     }
 
     @Override
@@ -166,6 +170,9 @@ public class RoleSync extends JavaPlugin {
         metrics.addCustomChart(new Metrics.SimplePie("require_verification",
                 () -> String.valueOf(getConfig().getBoolean("requireVerification"))));
 
+        metrics.addCustomChart(new Metrics.SimplePie("message_feedback",
+                () -> String.valueOf(getConfig().getBoolean("messageFeedback"))));
+
         metrics.addCustomChart(new Metrics.SimplePie("change_nicknames", () -> {
             if (getConfig().getString("changeNicknames").equalsIgnoreCase("after")) {
                 return "After";
@@ -226,13 +233,12 @@ public class RoleSync extends JavaPlugin {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-
         // no arguments
         if (args.length < 1) { // print usage and return
-            sender.sendMessage(ChatColor.BLUE + "[DRS] " + ChatColor.RESET + language.getString("usage") + "\n" +
-                    ChatColor.BLUE + "[DRS] " + ChatColor.RESET + "/drs reload: " + language.getString("drsReloadDescription") + "\n" +
-                    ChatColor.BLUE + "[DRS] " + ChatColor.RESET + "/drs botrestart: " + language.getString("drsBotRestartDescription") + "\n" +
-                    ChatColor.BLUE + "[DRS] " + ChatColor.RESET + "/drs verify: " + language.getString("drsVerifyDescription")
+            sender.sendMessage(ChatColor.BLUE + chatPrefix + ChatColor.RESET + language.getString("usage") + "\n" +
+                    ChatColor.BLUE + chatPrefix + ChatColor.RESET + "/drs reload: " + language.getString("drsReloadDescription") + "\n" +
+                    ChatColor.BLUE + chatPrefix + ChatColor.RESET + "/drs botrestart: " + language.getString("drsBotRestartDescription") + "\n" +
+                    ChatColor.BLUE + chatPrefix + ChatColor.RESET + "/drs verify: " + language.getString("drsVerifyDescription")
             );
 
             return true;
@@ -240,7 +246,7 @@ public class RoleSync extends JavaPlugin {
 
         if (args[0].equalsIgnoreCase("reload")) {
             if (!sender.hasPermission("discordrolesync.reload")) {
-                sender.sendMessage(ChatColor.BLUE + "[DRS] " + ChatColor.RED + language.getString("noPermissionError"));
+                sender.sendMessage(ChatColor.BLUE + chatPrefix + ChatColor.RED + language.getString("noPermissionError"));
 
                 return false;
             }
@@ -249,17 +255,17 @@ public class RoleSync extends JavaPlugin {
                 reloadConfig();
                 loadLang();
 
-                sender.sendMessage(ChatColor.BLUE + "[DRS] " + ChatColor.GREEN + language.getString("reloadComplete"));
+                sender.sendMessage(ChatColor.BLUE + chatPrefix + ChatColor.GREEN + language.getString("reloadComplete"));
 
                 return true;
             } catch (InvalidConfigurationException e) {
-                sender.sendMessage(ChatColor.BLUE + "[DRS] " + ChatColor.RED + language.getString("commandError"));
+                sender.sendMessage(ChatColor.BLUE + chatPrefix + ChatColor.RED + language.getString("commandError"));
                 getLogger().severe("One of the yml files is invalid. The stack trace below might have more information.");
                 e.printStackTrace();
 
                 return false;
             } catch (IOException e) {
-                sender.sendMessage(ChatColor.BLUE + "[DRS] " + ChatColor.RED + language.getString("commandError"));
+                sender.sendMessage(ChatColor.BLUE + chatPrefix + ChatColor.RED + language.getString("commandError"));
                 getLogger().severe("An error occurred while loading the yml files. Please check the stack trace below and contact the developer.");
                 e.printStackTrace();
 
@@ -267,7 +273,7 @@ public class RoleSync extends JavaPlugin {
             }
         } else if (args[0].equalsIgnoreCase("botrestart")) {
             if (!sender.hasPermission("discordrolesync.botrestart")) {
-                sender.sendMessage(ChatColor.BLUE + "[DRS] " + ChatColor.RED + language.getString("noPermissionError"));
+                sender.sendMessage(ChatColor.BLUE + chatPrefix + ChatColor.RED + language.getString("noPermissionError"));
 
                 return false;
             }
@@ -275,7 +281,7 @@ public class RoleSync extends JavaPlugin {
             jda.shutdown();
 
             startBot();
-            sender.sendMessage(ChatColor.BLUE + "[DRS] " + ChatColor.GREEN + language.getString("botRestarted"));
+            sender.sendMessage(ChatColor.BLUE + chatPrefix + ChatColor.GREEN + language.getString("botRestarted"));
 
             return true;
         } else if (args[0].equalsIgnoreCase("verify")) {
@@ -284,13 +290,13 @@ public class RoleSync extends JavaPlugin {
                     try {
                         DatabaseHandler.LinkedUserInfo userInfo = db.getLinkedUserInfo(((Player) sender).getUniqueId().toString());
                         if (userInfo == null) {
-                            sender.sendMessage(ChatColor.BLUE + "[DRS] " + ChatColor.RESET + language.getString("pleaseLink")
+                            sender.sendMessage(ChatColor.BLUE + chatPrefix + ChatColor.RESET + language.getString("pleaseLink")
                                     + " " + getConfig().getString("discordUrl"));
                         } else if (!userInfo.verified) {
-                            sender.sendMessage(ChatColor.BLUE + "[DRS] " + ChatColor.RESET + language.getString("verificationInstructions")
+                            sender.sendMessage(ChatColor.BLUE + chatPrefix + ChatColor.RESET + language.getString("verificationInstructions")
                                     + " " + ChatColor.AQUA + userInfo.code);
                         } else {
-                            sender.sendMessage(ChatColor.BLUE + "[DRS] " + ChatColor.RESET + language.getString("alreadyVerified"));
+                            sender.sendMessage(ChatColor.BLUE + chatPrefix + ChatColor.RESET + language.getString("alreadyVerified"));
                         }
                     } catch (SQLException e) {
                         sender.sendMessage(ChatColor.RED + language.getString("commandError"));
@@ -301,7 +307,7 @@ public class RoleSync extends JavaPlugin {
 
                 return true;
             } else {
-                sender.sendMessage(ChatColor.BLUE + "[DRS] " + ChatColor.RED + "This command can only be used in game.");
+                sender.sendMessage(ChatColor.BLUE + chatPrefix + ChatColor.RED + "This command can only be used in game.");
 
                 return false;
             }

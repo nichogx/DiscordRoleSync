@@ -4,6 +4,16 @@
 #   folder and put the name of the file (without the .yml part) here.
 language: "en_US"
 
+commandNames:
+  # the Discord command that will link users
+  link: "link"
+  # the Discord command that administrators can use to get information
+  info: "info"
+  # the Discord command that administrators can use to link other users
+  admLink: "admLink"
+  # the Discord command that administrators can use to unlink users
+  unlink: "unlink"
+
 botInfo:
   # the prefix the bot should listen to (can be any length)
   prefix: "-"
@@ -108,7 +118,14 @@ react:
   onBotError: "U+26A0"
   # if the user does not have permission for that command
   onPermissionError: "U+1F6D1"
-  
+
+# reply to the discord commands with messages in the same channel instead of reacting.
+messageFeedback: false
+
+# configuration for the prefix that the bot will send with the messages ingame
+chatPrefix:
+  text: "[DRS]"
+
 # other server to use instead of Mojang API
 # leave blank to use default Mojang one
 alternativeServer: ""
