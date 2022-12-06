@@ -1,8 +1,11 @@
 package dev.nicho.rolesync.util;
 
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import org.bukkit.configuration.file.FileConfiguration;
 
+import java.awt.*;
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -21,15 +24,35 @@ public class JDAUtils {
 
         if (message.getChannelType() == ChannelType.TEXT) {
             if (configs.getBoolean("messageFeedback", false) && feedbackMessage != null) {
-                message.getTextChannel().sendMessage(feedbackMessage).queue(msg -> {
-                    if (configs.getBoolean("deleteCommands"))
-                        msg.delete().queueAfter(configs.getInt("deleteAfter"), TimeUnit.SECONDS);
-                }, err -> { });
+                sendMessageWithDelete(message.getTextChannel(), feedbackMessage, configs);
             }
 
             if (configs.getBoolean("deleteCommands")) {
                 message.delete().queueAfter(configs.getInt("deleteAfter"), TimeUnit.SECONDS);
             }
+        }
+    }
+
+    public static void sendMessageWithDelete(TextChannel channel, String msgToSend, FileConfiguration configs) {
+        if (configs.getBoolean("embed.useEmbed", false)) {
+            EmbedBuilder embed = new EmbedBuilder();
+            embed.setTitle(configs.getString("embed.title"));
+            embed.setDescription(msgToSend);
+
+            Color color = Color.WHITE;
+            try {
+                Field field = Class.forName("java.awt.Color").getField(configs.getString("embed.color"));
+                color = (Color)field.get(null);
+            } catch (Exception e) { }
+
+            embed.setColor(color);
+
+            channel.sendMessage(embed.build()).queue(null, err -> { });
+        } else {
+            channel.sendMessage(msgToSend).queue(msg -> {
+                if (configs.getBoolean("deleteCommands"))
+                    msg.delete().queueAfter(configs.getInt("deleteAfter"), TimeUnit.SECONDS);
+            });
         }
     }
 

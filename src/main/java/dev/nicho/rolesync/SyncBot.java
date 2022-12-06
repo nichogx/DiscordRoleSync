@@ -297,12 +297,7 @@ public class SyncBot extends ListenerAdapter {
                     }
 
                     JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onSuccess"), event.getMessage(), plugin.getConfig(), null);
-                    event.getChannel().sendMessage(msgToSend)
-                            .queue(msg -> {
-                                if (plugin.getConfig().getBoolean("deleteCommands"))
-                                    msg.delete().queueAfter(plugin.getConfig().getInt("deleteAfter"), TimeUnit.SECONDS);
-                            });
-
+                    JDAUtils.sendMessageWithDelete(event.getTextChannel(), msgToSend, plugin.getConfig());
                 } else { // try minecraft nick
                     String uuid = mojang.nameToUUID(argv[1]).uuid;
                     DatabaseHandler.LinkedUserInfo userInfo = db.getLinkedUserInfo(uuid);
@@ -319,11 +314,7 @@ public class SyncBot extends ListenerAdapter {
                         }
 
                         JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onSuccess"), event.getMessage(), plugin.getConfig(), null);
-                        event.getChannel().sendMessage(lang.getString("linkedTo") + " " + name + " (" + userInfo.discordId + ")" )
-                                .queue(msg -> {
-                                    if (plugin.getConfig().getBoolean("deleteCommands"))
-                                        msg.delete().queueAfter(plugin.getConfig().getInt("deleteAfter"), TimeUnit.SECONDS);
-                                });
+                        JDAUtils.sendMessageWithDelete(event.getTextChannel(), lang.getString("linkedTo") + " " + name + " (" + userInfo.discordId + ")" , plugin.getConfig());
                     }, error -> { });
                 }
             } catch (SQLException | IOException e) {
@@ -435,7 +426,7 @@ public class SyncBot extends ListenerAdapter {
                 DatabaseHandler.LinkedUserInfo userInfo = db.getLinkedUserInfo(event.getAuthor().getId());
                 if (userInfo == null) {
                     JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig(), lang.getString("userNotLinked"));
-                    event.getChannel().sendMessage(lang.getString("pleaseLink")).queue(null, err -> { });
+                    JDAUtils.sendMessageWithDelete(event.getTextChannel(), lang.getString("pleaseLink"), plugin.getConfig());
                 } else if (db.verify(event.getAuthor().getId(), code)) {
                     Guild guild = bot.getGuildById(plugin.getConfig().getString("botInfo.server"));
                     if (guild == null) {

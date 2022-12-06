@@ -139,3 +139,13 @@ alwaysOnlineMode: false
 # whether or not the bot should show the number of players online
 # as its "playing" status
 showPlayers: false
+
+# embed configurations for messages (optional)
+embed:
+  # set to true to use embeds instead of regular messages
+  useEmbed: false
+  # the title to set on the embeds
+  title: "Discord Role Sync"
+  # the color
+  # must be one of https://docs.oracle.com/javase/8/docs/api/java/awt/Color.html?is-external=true
+  color: "WHITE"
