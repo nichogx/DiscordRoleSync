@@ -47,12 +47,15 @@ public class JDAUtils {
 
             embed.setColor(color);
 
-            channel.sendMessage(embed.build()).queue(null, err -> { });
+            channel.sendMessage(embed.build()).queue(msg -> {
+                if (configs.getBoolean("deleteCommands"))
+                    msg.delete().queueAfter(configs.getInt("deleteAfter"), TimeUnit.SECONDS);
+            }, err -> { });
         } else {
             channel.sendMessage(msgToSend).queue(msg -> {
                 if (configs.getBoolean("deleteCommands"))
                     msg.delete().queueAfter(configs.getInt("deleteAfter"), TimeUnit.SECONDS);
-            });
+            }, err -> { });
         }
     }
 
