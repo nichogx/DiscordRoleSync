@@ -50,7 +50,7 @@ public abstract class DatabaseHandler {
         Connection c = this.getConnection();
         PreparedStatement ps = c.prepareStatement(
                 "CREATE TABLE IF NOT EXISTS `" + plugin.getConfig().getString("database.tablePrefix") + "_discordmcusers` ("
-                        + "`discord_id` varchar(18) NOT NULL,"
+                        + "`discord_id` varchar(24) NOT NULL,"
                         + "`minecraft_uuid` varchar(36) NOT NULL,"
                         + "`whitelisted` boolean NOT NULL DEFAULT false,"
                         + "`verification_code` INT NOT NULL DEFAULT 0,"
