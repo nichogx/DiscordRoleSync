@@ -11,7 +11,7 @@ stages:
 - publish
 
 variables:
-  PACKAGE_VERSION: "1.2.1"
+  PACKAGE_VERSION: "1.2.2"
   PACKAGE_NAME: discord_role_sync
 
 sast:
