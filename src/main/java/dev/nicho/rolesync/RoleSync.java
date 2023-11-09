@@ -6,8 +6,9 @@ import dev.nicho.rolesync.util.APIException;
 import dev.nicho.rolesync.util.Util;
 import dev.nicho.rolesync.util.VaultAPI;
 import net.dv8tion.jda.api.entities.Activity;
+
+import org.apache.commons.io.FileUtils;
 import org.bstats.bukkit.Metrics;
-import dev.nicho.dependencymanager.DependencyManager;
 import dev.nicho.rolesync.db.DatabaseHandler;
 import dev.nicho.rolesync.db.MySQLHandler;
 import dev.nicho.rolesync.db.SQLiteHandler;
@@ -39,7 +40,6 @@ public class RoleSync extends JavaPlugin {
     private YamlConfiguration language = null;
     private DatabaseHandler db = null;
     private SyncBot listener = null;
-    private DependencyManager dm = null;
     private JDA jda = null;
     private VaultAPI vault = null;
 
@@ -47,23 +47,17 @@ public class RoleSync extends JavaPlugin {
 
     @Override
     public void onLoad() {
-
-        File libFolder = new File(getDataFolder(), "lib");
-        libFolder.mkdirs();
-        dm = new DependencyManager(libFolder);
-
         try {
-            // on maven central
-            dm.addDependency(new URL("https://repo1.maven.org/maven2/org/apache/commons/commons-lang3/3.10/commons-lang3-3.10.jar"));
-            dm.addDependency(new URL("https://repo1.maven.org/maven2/org/json/json/20190722/json-20190722.jar"));
-            dm.addDependency(new URL("https://repo1.maven.org/maven2/org/xerial/sqlite-jdbc/3.31.1/sqlite-jdbc-3.31.1.jar"));
-            dm.addDependency(new URL("https://repo1.maven.org/maven2/commons-dbcp/commons-dbcp/1.4/commons-dbcp-1.4.jar"));
-            dm.addDependency(new URL("https://repo1.maven.org/maven2/commons-pool/commons-pool/1.6/commons-pool-1.6.jar"));
-
-            // jda
-            dm.addDependency(new URL("https://ci.dv8tion.net/job/JDA/146/artifact/build/libs/JDA-4.1.1_146-withDependencies-min.jar"));
-        } catch (MalformedURLException e) {
+            // Delete old libraries that were downloaded with DependencyManager
+            File libFolder = new File(getDataFolder(), "lib");
+            if (libFolder.exists() && libFolder.isDirectory()) {
+                getLogger().info("Deleting old dependencies from lib folder");
+                FileUtils.deleteDirectory(libFolder);
+            }
+        } catch (Exception e) {
+            getLogger().severe("An error occurred while removing old dependencies. Please check the stack trace below and contact the developer.");
             e.printStackTrace();
+            this.setEnabled(false);
         }
 
         try {
@@ -88,26 +82,6 @@ public class RoleSync extends JavaPlugin {
 
     @Override
     public void onEnable() {
-
-        long start = System.currentTimeMillis();
-        getLogger().info("Fetching dependencies... This might take a while if this is the first start.");
-        try {
-            int newDownloaded = dm.downloadAll();
-            if (newDownloaded == 0) {
-                getLogger().info("All dependencies were already downloaded.");
-            } else {
-                getLogger().warning("" + newDownloaded + " new dependencies downloaded. Please restart the server.");
-                setEnabled(false);
-                return;
-            }
-        } catch (Exception e) {
-            getLogger().severe("An error occurred while downloading the dependencies. Please check the stack trace below and contact the developer.");
-            e.printStackTrace();
-            setEnabled(false);
-            return;
-        }
-        getLogger().info("Fetched all dependencies! (took " + (System.currentTimeMillis() - start) + "ms)");
-
         try {
             if (getConfig().getString("database.type").equalsIgnoreCase("mysql")) {
                 this.db = new MySQLHandler(this,
