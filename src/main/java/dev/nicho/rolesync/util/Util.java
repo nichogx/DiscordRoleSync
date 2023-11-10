@@ -1,7 +1,5 @@
 package dev.nicho.rolesync.util;
 
-import org.bukkit.ChatColor;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;

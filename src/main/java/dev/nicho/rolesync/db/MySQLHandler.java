@@ -4,8 +4,6 @@ import org.apache.commons.dbcp.BasicDataSource;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class MySQLHandler extends DatabaseHandler {
