@@ -1,21 +1,31 @@
 package dev.nicho.rolesync;
 
+import dev.nicho.rolesync.db.DatabaseHandler;
+import dev.nicho.rolesync.db.MySQLHandler;
+import dev.nicho.rolesync.db.SQLiteHandler;
 import dev.nicho.rolesync.listeners.PlayerJoinListener;
 import dev.nicho.rolesync.listeners.WhitelistLoginListener;
 import dev.nicho.rolesync.util.SpigotPlugin;
 import dev.nicho.rolesync.util.vault.VaultAPI;
-import net.dv8tion.jda.api.entities.Activity;
 
+import java.io.File;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import javax.security.auth.login.LoginException;
+
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import net.milkbowl.vault.permission.Permission;
 import org.apache.commons.io.FileUtils;
 import org.bstats.bukkit.Metrics;
-import dev.nicho.rolesync.db.DatabaseHandler;
-import dev.nicho.rolesync.db.MySQLHandler;
-import dev.nicho.rolesync.db.SQLiteHandler;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.requests.GatewayIntent;
-import net.dv8tion.jda.api.utils.cache.CacheFlag;
+import org.bstats.charts.SimplePie;
+import org.bstats.charts.SingleLineChart;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -26,14 +36,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import javax.security.auth.login.LoginException;
-import java.io.File;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
 
 public class RoleSync extends JavaPlugin {
 
@@ -55,8 +57,8 @@ public class RoleSync extends JavaPlugin {
                 FileUtils.deleteDirectory(libFolder);
             }
         } catch (Exception e) {
-            getLogger().severe("An error occurred while removing old dependencies. Please check the stack trace below and contact the developer.");
-            e.printStackTrace();
+            getLogger().severe("An error occurred while removing old dependencies.\n" +
+                    e.getMessage());
             this.setEnabled(false);
         }
 
@@ -68,12 +70,12 @@ public class RoleSync extends JavaPlugin {
 
             loadLang();
         } catch (InvalidConfigurationException e) {
-            getLogger().severe("One of the yml files is invalid. The stack trace below might have more information.");
-            e.printStackTrace();
+            getLogger().severe("One of the yml files is invalid.\n" +
+                    e.getMessage());
             this.setEnabled(false);
         } catch (IOException e) {
-            getLogger().severe("An error occurred while loading the yml files. Please check the stack trace below and contact the developer.");
-            e.printStackTrace();
+            getLogger().severe("An error occurred while loading the yml files.\n" +
+                    e.getMessage());
             this.setEnabled(false);
         }
 
@@ -113,8 +115,7 @@ public class RoleSync extends JavaPlugin {
             startBot();
 
         } catch (IOException | SQLException e) {
-            getLogger().severe("Error setting up database");
-            e.printStackTrace();
+            getLogger().severe("Error setting up database.\n" + e.getMessage());
             this.setEnabled(false);
 
             return;
@@ -132,28 +133,28 @@ public class RoleSync extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(language, this), this);
 
         Metrics metrics = new Metrics(this, 7533);
-        metrics.addCustomChart(new Metrics.SimplePie("used_language",
+        metrics.addCustomChart(new SimplePie("used_language",
                 () -> getConfig().getString("language")));
 
-        metrics.addCustomChart(new Metrics.SimplePie("whitelist_enabled",
+        metrics.addCustomChart(new SimplePie("whitelist_enabled",
                 () -> String.valueOf(getConfig().getBoolean("manageWhitelist"))));
 
-        metrics.addCustomChart(new Metrics.SimplePie("delete_commands",
+        metrics.addCustomChart(new SimplePie("delete_commands",
                 () -> String.valueOf(getConfig().getBoolean("deleteCommands"))));
 
-        metrics.addCustomChart(new Metrics.SimplePie("linked_role",
+        metrics.addCustomChart(new SimplePie("linked_role",
                 () -> String.valueOf(getConfig().getBoolean("giveLinkedRole"))));
 
-        metrics.addCustomChart(new Metrics.SimplePie("show_players_online",
+        metrics.addCustomChart(new SimplePie("show_players_online",
                 () -> String.valueOf(getConfig().getBoolean("showPlayers"))));
 
-        metrics.addCustomChart(new Metrics.SimplePie("require_verification",
+        metrics.addCustomChart(new SimplePie("require_verification",
                 () -> String.valueOf(getConfig().getBoolean("requireVerification"))));
 
-        metrics.addCustomChart(new Metrics.SimplePie("message_feedback",
+        metrics.addCustomChart(new SimplePie("message_feedback",
                 () -> String.valueOf(getConfig().getBoolean("messageFeedback"))));
 
-        metrics.addCustomChart(new Metrics.SimplePie("change_nicknames", () -> {
+        metrics.addCustomChart(new SimplePie("change_nicknames", () -> {
             if (getConfig().getString("changeNicknames").equalsIgnoreCase("after")) {
                 return "After";
             } else if (getConfig().getString("changeNicknames").equalsIgnoreCase("replace")) {
@@ -163,7 +164,7 @@ public class RoleSync extends JavaPlugin {
             return "No"; // default is no
         }));
 
-        metrics.addCustomChart(new Metrics.SimplePie("database_type", () -> {
+        metrics.addCustomChart(new SimplePie("database_type", () -> {
             if (getConfig().getString("database.type").equalsIgnoreCase("mysql")) {
                 return "MySQL";
             }
@@ -171,7 +172,7 @@ public class RoleSync extends JavaPlugin {
             return "SQLite"; // default is sqlite
         }));
 
-        metrics.addCustomChart(new Metrics.SimplePie("changed_alternative_server", () -> {
+        metrics.addCustomChart(new SimplePie("changed_alternative_server", () -> {
             if (getConfig().getString("alternativeServer").isEmpty()) {
                 return "Not changed";
             }
@@ -179,14 +180,14 @@ public class RoleSync extends JavaPlugin {
             return "Changed";
         }));
 
-        metrics.addCustomChart(new Metrics.SimplePie("permissions_plugin", () -> {
+        metrics.addCustomChart(new SimplePie("permissions_plugin", () -> {
             String permPlugin = vault.getPermPluginName();
 
             if (permPlugin != null && !permPlugin.isEmpty()) return permPlugin;
             return "unknown/other";
         }));
 
-        metrics.addCustomChart(new Metrics.SingleLineChart("linked_users",
+        metrics.addCustomChart(new SingleLineChart("linked_users",
                 () -> db.getLinkedUserCount()));
 
         // version check
@@ -195,7 +196,7 @@ public class RoleSync extends JavaPlugin {
         try {
             latestVersion = SpigotPlugin.getLatestVersion();
         } catch (IOException e) {
-            e.printStackTrace();
+            getLogger().warning("Error while checking for latest version." + e.getMessage());
 
             return;
         }
@@ -240,14 +241,12 @@ public class RoleSync extends JavaPlugin {
                 return true;
             } catch (InvalidConfigurationException e) {
                 sender.sendMessage(ChatColor.BLUE + chatPrefix + ChatColor.RED + language.getString("commandError"));
-                getLogger().severe("One of the yml files is invalid. The stack trace below might have more information.");
-                e.printStackTrace();
+                getLogger().severe("One of the yml files is invalid.\n" + e.getMessage());
 
                 return false;
             } catch (IOException e) {
                 sender.sendMessage(ChatColor.BLUE + chatPrefix + ChatColor.RED + language.getString("commandError"));
-                getLogger().severe("An error occurred while loading the yml files. Please check the stack trace below and contact the developer.");
-                e.printStackTrace();
+                getLogger().severe("An error occurred while loading the yml files.\n" + e.getMessage());
 
                 return false;
             }
@@ -280,8 +279,7 @@ public class RoleSync extends JavaPlugin {
                         }
                     } catch (SQLException e) {
                         sender.sendMessage(ChatColor.RED + language.getString("commandError"));
-                        getLogger().severe("An error occurred while getting linked user info. Please check the stack trace below and contact the developer.");
-                        e.printStackTrace();
+                        getLogger().severe("An error occurred while getting linked user info.\n" + e.getMessage());
                     }
                 });
 

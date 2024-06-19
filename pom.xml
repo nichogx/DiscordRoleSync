@@ -99,12 +99,6 @@
             <url>https://jcenter.bintray.com</url>
         </repository>
 
-        <!-- TODO: remove this repository after upgrading bstats to 3.0.0+ -->
-        <repository>
-            <id>CodeMC</id>
-            <url>https://repo.codemc.org/repository/maven-public</url>
-        </repository>
-
         <!-- For VaultAPI -->
         <repository>
             <id>jitpack.io</id>
@@ -142,7 +136,12 @@
         <dependency>
             <groupId>org.bstats</groupId>
             <artifactId>bstats-bukkit</artifactId>
-            <version>1.7</version>
+            <version>3.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bstats</groupId>
+            <artifactId>bstats-base</artifactId>
+            <version>3.0.2</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
