@@ -31,17 +31,13 @@ Don't forget to put all roles in the configs. You should put the role IDs, not t
 ## How it Works
 It's pretty simple: all your users should use the -link command in Discord to link their Minecraft account:
 
-```
--link myMCusername
-```
+`-link myMCusername`
 
 As soon as they do this, their roles will keep synchronized while they are in the server. When your users get the Discord role, they will automatically get the permission plugin group. Updates are instant.
 
 Staff can also use the `-admlink` command to force link a user:
 
-```
--admlink discordID mcUsername
-```
+`-admlink discordID mcUsername`
 
 The Discord ID of the user is a 17 to 20 digit number.
 
@@ -67,7 +63,7 @@ If you want to add your language, you can copy the en_US.yml file and edit it to
 ## Permission Plugins
 This plugin should work with every permission plugin that supports Vault.
 
-Tested and confirmed working: 
+Tested and confirmed working:
 - [LuckPerms](https://www.spigotmc.org/resources/luckperms.28140/) (recommended)
 - [Ultra Permissions](https://www.spigotmc.org/resources/ultra-permissions.42678/)
 - [PermissionsEX](https://github.com/PEXPlugins/PermissionsEx/releases) (deprecated)
