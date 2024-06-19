@@ -43,7 +43,7 @@ public class JDAUtils {
             try {
                 Field field = Class.forName("java.awt.Color").getField(configs.getString("embed.color"));
                 color = (Color)field.get(null);
-            } catch (Exception e) { }
+            } catch (Exception ignored) { }
 
             embed.setColor(color);
 

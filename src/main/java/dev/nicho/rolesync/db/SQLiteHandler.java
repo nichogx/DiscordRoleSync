@@ -15,7 +15,9 @@ public class SQLiteHandler extends DatabaseHandler {
         super(plugin);
 
         if (!db.exists()) {
-            db.createNewFile();
+            if (!db.createNewFile()) {
+                throw new IllegalStateException("Unable to create new SQLite database.");
+            }
         }
 
         this.db = db;
@@ -23,7 +25,8 @@ public class SQLiteHandler extends DatabaseHandler {
         try {
             Class.forName("org.sqlite.JDBC");
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            throw new IllegalStateException("Unable to load SQLite JBDC driver. This is probably a bug with the plugin and should be reported.\n" +
+                    e.getMessage());
         }
 
         this.initialize();

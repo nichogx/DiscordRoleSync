@@ -304,7 +304,7 @@ public abstract class DatabaseHandler {
         return true;
     }
 
-    private final void checkAsync() {
+    private void checkAsync() {
         if (Bukkit.isPrimaryThread()) {
             throw new IllegalStateException("Attempted to execute a database operation from the server thread!");
         }

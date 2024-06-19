@@ -12,6 +12,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
+
+        <!-- When built in CI, this will be overridden with -Dpackage_version=x.x.x -->
+        <package_version>develop</package_version>
     </properties>
 
     <build>

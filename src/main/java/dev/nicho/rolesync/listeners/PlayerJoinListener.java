@@ -34,7 +34,7 @@ public class PlayerJoinListener implements Listener {
                 try {
                     latestVersion = SpigotPlugin.getLatestVersion();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    plugin.getLogger().warning("Error while checking for latest version." + e.getMessage());
 
                     return;
                 }

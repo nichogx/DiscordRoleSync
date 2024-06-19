@@ -30,8 +30,8 @@ public class WhitelistLoginListener implements Listener {
             usrInfo = db.getLinkedUserInfo(event.getUniqueId().toString());
         } catch (SQLException e) {
             event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST, lang.getString("whitelistErrorKickMsg"));
-            plugin.getLogger().severe("Error while checking if a user is whitelisted. Please check the stack trace below and contact the developer if needed.");
-            e.printStackTrace();
+            plugin.getLogger().severe("Error while checking if a user is whitelisted.\n" +
+                    e.getMessage());
 
             return;
         }
