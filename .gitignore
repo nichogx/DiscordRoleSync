@@ -1,5 +1,4 @@
-lib
 .idea
-*.iml
 target
 .DS_Store
+discord_role_sync.iml

@@ -2,11 +2,11 @@ package dev.nicho.rolesync;
 
 import dev.nicho.rolesync.listeners.PlayerJoinListener;
 import dev.nicho.rolesync.listeners.WhitelistLoginListener;
-import dev.nicho.rolesync.util.APIException;
-import dev.nicho.rolesync.util.Util;
-import dev.nicho.rolesync.util.VaultAPI;
+import dev.nicho.rolesync.util.SpigotPlugin;
+import dev.nicho.rolesync.util.vault.VaultAPI;
 import net.dv8tion.jda.api.entities.Activity;
 
+import net.milkbowl.vault.permission.Permission;
 import org.apache.commons.io.FileUtils;
 import org.bstats.bukkit.Metrics;
 import dev.nicho.rolesync.db.DatabaseHandler;
@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -23,6 +24,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.security.auth.login.LoginException;
@@ -100,7 +102,13 @@ public class RoleSync extends JavaPlugin {
                 managedGroups.add(perm);
             }
 
-            this.vault = new VaultAPI(managedGroups);
+            // get permissions provider (vault)
+            RegisteredServiceProvider<Permission> rsp = Bukkit.getServicesManager().getRegistration(Permission.class);
+            if (rsp == null) {
+                throw new IllegalStateException("Vault is not loaded.");
+            }
+
+            this.vault = new VaultAPI(rsp.getProvider(), managedGroups);
             listener = new SyncBot(this, language, this.db, this.vault);
             startBot();
 
@@ -110,8 +118,8 @@ public class RoleSync extends JavaPlugin {
             this.setEnabled(false);
 
             return;
-        } catch (APIException e) {
-            getLogger().severe("Vault is not installed. Please install vault.");
+        } catch (IllegalStateException e) {
+            getLogger().severe("Vault is not installed/loaded. Please install vault.");
             this.setEnabled(false);
 
             return;
@@ -185,7 +193,7 @@ public class RoleSync extends JavaPlugin {
         String version = getDescription().getVersion();
         String latestVersion;
         try {
-            latestVersion = Util.getLatestVersion();
+            latestVersion = SpigotPlugin.getLatestVersion();
         } catch (IOException e) {
             e.printStackTrace();
 

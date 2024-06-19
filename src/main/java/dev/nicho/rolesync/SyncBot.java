@@ -1,9 +1,9 @@
 package dev.nicho.rolesync;
 
 import dev.nicho.rolesync.db.DatabaseHandler;
-import dev.nicho.rolesync.util.VaultAPI;
+import dev.nicho.rolesync.util.vault.VaultAPI;
 import dev.nicho.rolesync.util.JDAUtils;
-import dev.nicho.rolesync.util.MojangAPI;
+import dev.nicho.rolesync.util.mojang.MojangAPI;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.ReadyEvent;
@@ -71,9 +71,8 @@ public class SyncBot extends ListenerAdapter {
                                 }
                             }, error -> { }));
         } catch (SQLException e) {
-            plugin.getLogger().severe("An error occurred while checking all users. " +
-                    "Please check the stack trace below and contact the developer.");
-            e.printStackTrace();
+            plugin.getLogger().severe("An error occurred while checking all users.\n" +
+                    e.getMessage());
         }
     }
 
@@ -132,9 +131,8 @@ public class SyncBot extends ListenerAdapter {
                 }
             }
         } catch (SQLException | IOException e) {
-            plugin.getLogger().severe("An error occurred while checking if a new member is linked. " +
-                    "Please check the stack trace below and contact the developer.");
-            e.printStackTrace();
+            plugin.getLogger().severe("An error occurred while checking if a new member is linked.\n" +
+                    e.getMessage());
         }
     }
 
@@ -148,9 +146,8 @@ public class SyncBot extends ListenerAdapter {
                 setPermissions(userInfo.uuid, null);
             }
         } catch (SQLException | NullPointerException e) {
-            plugin.getLogger().severe("An error occurred while removing kicked/banned/left member from whitelist. " +
-                    "Please check the stack trace below and contact the developer.");
-            e.printStackTrace();
+            plugin.getLogger().severe("An error occurred while removing kicked/banned/left member from whitelist.\n" +
+                    e.getMessage());
         }
     }
 
@@ -158,9 +155,8 @@ public class SyncBot extends ListenerAdapter {
         try {
             checkMemberRoles(member, db.getLinkedUserInfo(member.getId()));
         } catch (SQLException e) {
-            plugin.getLogger().severe("An error occurred while looking for the UUID of a user. " +
-                    "Please check the stack trace below and contact the developer.");
-            e.printStackTrace();
+            plugin.getLogger().severe("An error occurred while looking for the UUID of a user.\n" +
+                    e.getMessage());
         }
     }
 
@@ -193,9 +189,8 @@ public class SyncBot extends ListenerAdapter {
                 }
             }
         } catch (SQLException e) {
-            plugin.getLogger().severe("An error occurred while trying to check roles for the user. " +
-                    "Please check the stack trace below and contact the developer.");
-            e.printStackTrace();
+            plugin.getLogger().severe("An error occurred while trying to check roles for the user.\n" +
+                    e.getMessage());
         }
     }
 
@@ -318,9 +313,8 @@ public class SyncBot extends ListenerAdapter {
                 }
             } catch (SQLException | IOException e) {
                 JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onBotError"), event.getMessage(), plugin.getConfig(), lang.getString("commandError"));
-                plugin.getLogger().severe("An error occurred while getting info for the user. " +
-                        "Please check the stack trace below and contact the developer.");
-                e.printStackTrace();
+                plugin.getLogger().severe("An error occurred while getting info for the user.\n" +
+                        e.getMessage());
             }
         }
 
@@ -334,9 +328,8 @@ public class SyncBot extends ListenerAdapter {
                 this.linkUser(event.getAuthor().getId(), argv[1], event);
             } catch (SQLException | IOException e) {
                 JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onBotError"), event.getMessage(), plugin.getConfig(), lang.getString("commandError"));
-                plugin.getLogger().severe("An error occurred while trying to check link the user. " +
-                        "Please check the stack trace below and contact the developer.");
-                e.printStackTrace();
+                plugin.getLogger().severe("An error occurred while trying to check link the user.\n" +
+                        e.getMessage());
             }
         }
 
@@ -379,9 +372,8 @@ public class SyncBot extends ListenerAdapter {
                 JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onSuccess"), event.getMessage(), plugin.getConfig(), lang.getString("successUnlink"));
             } catch (SQLException | IOException e) {
                 JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onBotError"), event.getMessage(), plugin.getConfig(), lang.getString("commandError"));
-                plugin.getLogger().severe("An error occurred while getting info for the user. " +
-                        "Please check the stack trace below and contact the developer.");
-                e.printStackTrace();
+                plugin.getLogger().severe("An error occurred while getting info for the user." +
+                        e.getMessage());
             }
         }
 
@@ -400,9 +392,8 @@ public class SyncBot extends ListenerAdapter {
                 this.linkUser(argv[1], argv[2], event);
             } catch (SQLException | IOException e) {
                 JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onBotError"), event.getMessage(), plugin.getConfig(), lang.getString("commandError"));
-                plugin.getLogger().severe("An error occurred while getting info for the user. " +
-                        "Please check the stack trace below and contact the developer.");
-                e.printStackTrace();
+                plugin.getLogger().severe("An error occurred while getting info for the user.\n" +
+                        e.getMessage());
             }
         }
 
@@ -416,8 +407,7 @@ public class SyncBot extends ListenerAdapter {
 
                 code = Integer.parseInt(received);
             } catch (NumberFormatException e) {
-                // TODO not a verification code
-
+                JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig(), lang.getString("incorrectVerificationCode"));
                 return;
             }
 
@@ -451,9 +441,8 @@ public class SyncBot extends ListenerAdapter {
                 }
             } catch (SQLException e) {
                 JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onBotError"), event.getMessage(), plugin.getConfig(), lang.getString("commandError"));
-                plugin.getLogger().severe("An error occurred while getting info for the user. " +
-                        "Please check the stack trace below and contact the developer.");
-                e.printStackTrace();
+                plugin.getLogger().severe("An error occurred while getting info for the user.\n" +
+                        e.getMessage());
             }
         }
 

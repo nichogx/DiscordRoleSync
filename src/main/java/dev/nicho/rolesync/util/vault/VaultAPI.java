@@ -1,9 +1,8 @@
-package dev.nicho.rolesync.util;
+package dev.nicho.rolesync.util.vault;
 
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.plugin.RegisteredServiceProvider;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -18,17 +17,10 @@ public class VaultAPI {
      * Creates a VaultAPI that will manage the groups in the list.
      *
      * @param managedGroups the list of groups to manage
-     * @throws APIException if Vault is not loaded.
+     * @throws IllegalStateException if Vault is not loaded.
      */
-    public VaultAPI(List<String> managedGroups) throws APIException {
-        RegisteredServiceProvider<Permission> rsp = Bukkit.getServicesManager().getRegistration(Permission.class);
-
-        if (rsp == null) {
-            throw new APIException("Vault is not loaded.");
-        } else {
-            permProvider = rsp.getProvider();
-        }
-
+    public VaultAPI(Permission permProvider, List<String> managedGroups) throws IllegalStateException {
+        this.permProvider = permProvider;
         this.managedGroups = managedGroups;
     }
 

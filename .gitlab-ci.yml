@@ -7,11 +7,12 @@
 # See https://docs.gitlab.com/ee/ci/variables/#cicd-variable-precedence
 stages:
 - lint
+- test
 - build
 - publish
 
 variables:
-  PACKAGE_VERSION: "1.3.0"
+  PACKAGE_VERSION: "1.3.1-SNAPSHOT"
   PACKAGE_NAME: discord_role_sync
 
 sast:
@@ -20,10 +21,24 @@ sast:
 include:
 - template: Security/SAST.gitlab-ci.yml
 
+maven-test:
+  stage: test
+
+  image: maven:3-eclipse-temurin-22
+  script:
+    - mvn test -Dpackage_version=${PACKAGE_VERSION}
+
+  artifacts:
+    expire_in: 30 days
+    paths:
+      - target/surefire-reports/
+    reports:
+      junit: target/surefire-reports/*.xml
+
 maven-package:
   stage: build
 
-  image: maven:3.6-jdk-11
+  image: maven:3-eclipse-temurin-22
   script:
     - mvn package -Dpackage_version=${PACKAGE_VERSION}
 

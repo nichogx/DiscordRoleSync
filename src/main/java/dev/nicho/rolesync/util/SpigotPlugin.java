@@ -6,7 +6,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Scanner;
 
-public class Util {
+public class SpigotPlugin {
 
     /**
      * Gets the latest version number from Spigot
@@ -15,8 +15,7 @@ public class Util {
      * @throws IOException if an error occurs while connecting to the API
      */
     public static String getLatestVersion() throws IOException {
-        URL reqUrl;
-        reqUrl = new URL("https://api.spigotmc.org/legacy/update.php?resource=78829");
+        URL reqUrl = new URL("https://api.spigotmc.org/legacy/update.php?resource=78829");
 
         HttpURLConnection c = (HttpURLConnection) reqUrl.openConnection();
         c.setRequestMethod("GET");
