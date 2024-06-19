@@ -1,4 +1,14 @@
-.idea
-target
+*.jar
+*.class
+
+# Intellij
+.idea/
+*.iml
+*.iws
+
+# Mac
 .DS_Store
-discord_role_sync.iml
+
+# Maven
+log/
+target/
