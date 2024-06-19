@@ -2,6 +2,12 @@
 
 View this plugin on [SpigotMC](https://www.spigotmc.org/resources/discord-role-sync.78829/)
 
+DiscordRoleSync is a Minecraft plugin for syncing Discord roles and Minecraft permissions. This syncs Discord to Minecraft only, it is not both ways.
+
+A list of managed Discord roles can be configured and linked o Minecraft groups. If a Discord user gets a role added, they will get added to the Minecraft group. If the user gets the role removed, they will be removed from the Minecraft group.
+
+This can use both SQLite (automatically created, no setup needed) or MySQL. MySQL is recommended for stability on large servers.
+
 ## Contributing
 As I don't really have time to work on this and add new features, I've made it open source. I will warn you this was written a while ago and it's not the best code. Merge requests are welcome :)
 
