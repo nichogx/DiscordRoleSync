@@ -99,7 +99,7 @@
             <url>https://repo.papermc.io/repository/maven-public/</url>
         </repository>
 
-        <!-- TODO: remove this repository after upgrading JDA to 5.0.0 -->
+        <!-- TODO(#2): remove this repository after upgrading JDA to 5.0.0 -->
         <repository>
             <id>jcenter</id>
             <name>jcenter-bintray</name>

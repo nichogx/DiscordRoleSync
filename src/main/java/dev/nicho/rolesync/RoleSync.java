@@ -66,7 +66,7 @@ public class RoleSync extends JavaPlugin {
             getLogger().info("Reading config.yml");
             saveDefaultConfig();
 
-            // TODO validate config
+            // TODO(#3) validate config
 
             loadLang();
         } catch (InvalidConfigurationException e) {
