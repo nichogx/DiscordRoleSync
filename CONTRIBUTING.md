@@ -6,7 +6,7 @@ Want to take a stab at something, but not sure what to work on? Feel free to tak
 
 ## Refactors
 
-This code was written a while ago, in a time where I was not that familiar with Java. There is a lot of room for improvement. Refactors are very very welcome, especially if it makes the code more testable (with unit tests).
+This code was written a while ago, in a time when I was not that familiar with Java. There is a lot of room for improvement. Refactors are very, very welcome, especially if it makes the code more testable (with unit tests).
 
 ## Getting a Review
 
