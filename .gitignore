@@ -1,10 +1,13 @@
 *.jar
 *.class
+*.bb
+*.bbcode
 
 # Intellij
 .idea/
 *.iml
 *.iws
+venv/
 
 # Mac
 .DS_Store

@@ -6,20 +6,29 @@
 # Note that environment variables can be set in several places
 # See https://docs.gitlab.com/ee/ci/variables/#cicd-variable-precedence
 stages:
-- lint
-- test
-- build
-- publish
+  - lint
+  - test
+  - build
+  - publish
+
+## Project configuration
+###
 
 variables:
   PACKAGE_VERSION: "1.3.1-SNAPSHOT"
   PACKAGE_NAME: discord_role_sync
 
+## SAST -- default linter
+###
+
 sast:
   stage: lint
 
 include:
-- template: Security/SAST.gitlab-ci.yml
+  - template: Security/SAST.gitlab-ci.yml
+
+## Main CI -- maven tests and packaging/publishing
+###
 
 maven-test:
   stage: test
@@ -59,3 +68,38 @@ publish-package:
         --header "JOB-TOKEN: ${CI_JOB_TOKEN}" \
         --upload-file target/${PACKAGE_NAME}-${PACKAGE_VERSION}.jar \
         ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${PACKAGE_NAME}/${PACKAGE_VERSION}/${PACKAGE_NAME}-${PACKAGE_VERSION}.jar
+
+## Python infra tests
+###
+python-infra-test:
+  stage: test
+
+  image: python:3.12-alpine
+  before_script:
+    - cd spigot_page
+    - pip install -r requirements.txt
+  script:
+    - pytest --junitxml=report.xml
+  artifacts:
+    expire_in: 30 days
+    paths:
+      - spigot_page/report.xml
+    reports:
+      junit: spigot_page/report.xml
+
+## Generate Spigot page description
+###
+
+generate-spigot-description:
+  stage: build
+
+  image: python:3.12-alpine
+  before_script:
+    - cd spigot_page
+    - pip install -r requirements.txt
+  script:
+    - python markdown_to_bbcode.py ../README.md --out ./spigot_page.bb
+  artifacts:
+    expire_in: 30 days
+    paths:
+      - spigot_page/spigot_page.bb
