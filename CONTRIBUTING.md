@@ -17,3 +17,5 @@ Please make sure you practice good code higiene. Make a descriptive merge reques
 Please follow semantic versioning: https://semver.org/
 
 TL;DR: Increment major if it breaks backwards compatibility, minor if adding new features, patch if small refactors and fixes.
+
+Please add `-SNAPSHOT` to the version during development. I'll remove it when publishing to Spigot.
