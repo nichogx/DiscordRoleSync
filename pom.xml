@@ -13,7 +13,11 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
 
-        <!-- When built in CI, this will be overridden with -Dpackage_version=x.x.x -->
+        <!--
+            When built locally, we set the version to 'develop'.
+            When built in CI, this will be overridden by the runner with -Dpackage_version=x.x.x
+            For production builds, this should be changed in .gitlab-ci.yml variables.PACKAGE_VERSION.
+        -->
         <package_version>develop</package_version>
     </properties>
 
