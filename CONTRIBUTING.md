@@ -11,3 +11,9 @@ This code was written a while ago, in a time when I was not that familiar with J
 ## Getting a Review
 
 Please make sure you practice good code higiene. Make a descriptive merge request and please describe what you have done to test your changes.
+
+## Versioning
+
+Please follow semantic versioning: https://semver.org/
+
+TL;DR: Increment major if it breaks backwards compatibility, minor if adding new features, patch if small refactors and fixes.
