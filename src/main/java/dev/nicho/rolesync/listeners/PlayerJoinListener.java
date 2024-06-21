@@ -8,7 +8,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -43,15 +42,13 @@ public class PlayerJoinListener implements Listener {
                 String username = event.getPlayer().getName();
                 if (usrInfo != null && !username.equals(usrInfo.username)) {
                     plugin.getLogger().info(
-                        String.format("User with UUID %s has changed names from '%s' to '%s', updating in the database...", uuid, usrInfo.username, username)
+                            String.format("User with UUID %s has changed names from '%s' to '%s', updating in the database...", uuid, usrInfo.username, username)
                     );
                     db.updateUsername(uuid, username);
                 }
             } catch (SQLException e) {
                 plugin.getLogger().severe("Error while checking/update newly joined user's username.\n" +
                         e.getMessage());
-
-                return;
             }
         });
 

@@ -89,7 +89,7 @@ public abstract class DatabaseHandler {
     /**
      * Links a user.
      *
-     * @param discordID the Discord ID of the user
+     * @param discordID     the Discord ID of the user
      * @param minecraftUUID the Minecraft UUID of the user
      * @throws SQLException if an SQL error occurs
      */
@@ -117,9 +117,9 @@ public abstract class DatabaseHandler {
     /**
      * Updates a user's Minecraft username on the table
      *
-     * @param identifier the Discord ID or Minecraft UUID of the user
+     * @param identifier        the Discord ID or Minecraft UUID of the user
      * @param minecraftUsername the Minecraft username of the user
-     * @throws SQLException
+     * @throws SQLException if an SQL error occurs
      */
     public void updateUsername(String identifier, String minecraftUsername) throws SQLException {
         checkAsync();
@@ -300,7 +300,7 @@ public abstract class DatabaseHandler {
     /**
      * Tries to verify a user.
      *
-     * @param identifier the UUID or Discord ID of the user
+     * @param identifier       the UUID or Discord ID of the user
      * @param verificationCode the code the user entered
      * @return true if the verification was successful or false otherwise (user not linked or code incorrect)
      * @throws SQLException if an SQL error occurs
@@ -353,12 +353,12 @@ public abstract class DatabaseHandler {
         /**
          * Constructor
          *
-         * @param discordId of the user
-         * @param uuid of the user
+         * @param discordId   of the user
+         * @param uuid        of the user
          * @param whitelisted if the user is whitelisted
-         * @param verified if the user is verified
-         * @param code the verification code for that user
-         * @param username the username of that user
+         * @param verified    if the user is verified
+         * @param code        the verification code for that user
+         * @param username    the username of that user
          */
         LinkedUserInfo(String discordId, String uuid, boolean whitelisted, boolean verified, int code, String username) {
             this.code = code;

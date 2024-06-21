@@ -44,6 +44,6 @@ public class SQLiteHandler extends DatabaseHandler {
 
     @Override
     protected void closeConnection(Connection c) {
-        // do nothing. SQLite connection will be kept open forever
+        // do nothing. SQLite's connection will be kept open forever
     }
 }

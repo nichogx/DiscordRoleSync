@@ -29,12 +29,12 @@ Just copy the .jar to the plugins folder and run the server once to generate the
 4. Click "add bot" and confirm
 5. In this page, you can change your bot's picture and username.
 6. Turn on "Server Members Intent" and "Message Content Intent" - it won't work without this as the bot needs to work with the member list and listen to commands
-7. Click copy token and paste it in the config file. Anyone with your token can login as your bot so you should keep it secret as if it were a password.
+7. Click copy token and paste it in the config file. Anyone with your token can log in as your bot, so you should keep it secret as if it were a password.
 8. Go back to the Discord developer website and on the left sidebar, click "OAuth2"
 9. Select "bot" as a scope then copy the link
 10. Go to the link you just copied to add the bot to your server
 
-Don't forget to put all roles in the configs. You should put the role IDs, not the role names. To get the ID you should enable developer mode in Discord, then right click the role and copy ID (it's a number of approximately 18 digits). The same thing applies for the server ID and channel IDs.
+Don't forget to put all roles in the configs. You should put the role IDs, not the role names. To get the ID you should enable developer mode in Discord, then right-click the role and copy ID (it's a number of approximately 18 digits). The same thing applies for the server ID and channel IDs.
 
 ## How it Works
 It's pretty simple: all your users should use the -link command in Discord to link their Minecraft account:
@@ -47,7 +47,7 @@ Staff can also use the `-admlink` command to force link a user:
 
 `-admlink discordID mcUsername`
 
-The Discord ID of the user is a 17 to 20 digit number.
+The Discord ID of the user is a 17 to 20-digit number.
 
 The `-info` and `-unlink` commands are available for staff use. Both accept Discord IDs or Minecraft usernames.
 The users need to remain in the Discord server to keep their roles. If they leave the server or are unlinked with the -unlink command, they are removed from the whitelist and every role is removed from them.
@@ -83,7 +83,7 @@ This plugin is made with primarily online servers in mind. It works with offline
 
 Please node that in offline mode servers, linking usernames is case-sensitive.
 
-If you swap between offline and online (or vice-versa), you'll need do delete the database. If you are using SQLite, just delete the database.db file. If you are using MySQL, execute `DROP TABLE syncbot_discordmcusers;`, replacing `syncbot` with the prefix in your config.yml file if you have changed it.
+If you swap between offline and online (or vice-versa), you'll need to delete the database. If you are using SQLite, just delete the database.db file. If you are using MySQL, execute `DROP TABLE syncbot_discordmcusers;`, replacing `syncbot` with the prefix in your config.yml file if you have changed it.
 
 ## Permission Nodes
 

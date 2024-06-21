@@ -52,11 +52,11 @@ database:
 # if DRS whitelist is enabled, they will be given the code when they try to join
 requireVerification: false
 
-# the URL of an invite for your Discord server (will be sent to unlinked users when
+# the URL of an invitation for your Discord server (will be sent to unlinked users when
 # they try to verify their account)
 discordUrl: ""
 
-# whether or not to delete the user commands after
+# whether to delete the user commands after
 # reacting and a few seconds pass
 deleteCommands: false
 
@@ -67,7 +67,7 @@ deleteAfter: 10
 # how the bot should change the Discord nicknames when the user is linked
 # possible values are:
 # - no: the bot will not touch the Discord nicknames
-# - after: the bot will put the Minecraft user in parenthesis: discord name (mc user)
+# - after: the bot will put the Minecraft user in parentheses: discord name (mc user)
 # - replace: the bot will replace the user's Discord nickname with the Minecraft user
 # IF YOU SET THIS TO ANYTHING OTHER THAN "no" YOU NEED TO GIVE THE BOT A DISCORD ROLE
 # HIGHER THAN ANY OTHER ROLES. Nickname editing will also not work with server owners :(
@@ -105,8 +105,7 @@ groups:
     - "000000000000000000" # irl friends or something
 
 # emojis to use for reaction
-# to use a custom emoji, you can put its ID instead of the actual
-# unicode emoji
+# to use a custom emoji, you can put its ID instead of the actual unicode emoji.
 # emoji unicode codepoints (U+1F6D1 is a codepoint) can be found at https://emojipedia.org/
 react:
   # if the command was successful
@@ -136,7 +135,7 @@ alternativeServer: ""
 # is in offline mode.
 alwaysOnlineMode: false
 
-# whether or not the bot should show the number of players online
+# whether the bot should show the number of players online
 # as its "playing" status
 showPlayers: false
 

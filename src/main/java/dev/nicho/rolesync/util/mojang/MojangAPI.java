@@ -2,7 +2,6 @@ package dev.nicho.rolesync.util.mojang;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -103,20 +102,10 @@ public class MojangAPI {
      * @param uuid the UUID without dashes
      * @return the UUID with dashes
      */
-    public static String uuidAddDashes(String uuid) {
+    private static String uuidAddDashes(String uuid) {
         return UUID.fromString(uuid.replaceFirst(
                 "(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)", "$1-$2-$3-$4-$5"
         )).toString();
-    }
-
-    /**
-     * Removes dashes from a UUID
-     *
-     * @param uuid the UUID with dashes
-     * @return the UUID without dashes
-     */
-    public static String uuidRemoveDashes(String uuid) {
-        return uuid.replace("-", "");
     }
 
     /**
