@@ -130,7 +130,7 @@ public class RoleSync extends JavaPlugin {
         if (getConfig().getBoolean("manageWhitelist")) {
             getServer().getPluginManager().registerEvents(new WhitelistLoginListener(db, language, this), this);
         }
-        getServer().getPluginManager().registerEvents(new PlayerJoinListener(language, this), this);
+        getServer().getPluginManager().registerEvents(new PlayerJoinListener(db, language, this), this);
 
         Metrics metrics = new Metrics(this, 7533);
         metrics.addCustomChart(new SimplePie("used_language",

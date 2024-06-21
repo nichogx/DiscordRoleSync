@@ -1,12 +1,19 @@
 name: DiscordRoleSync
-version: %package_version%
+version: "%package_version%"
 author: Nicho
 description: Sync Discord roles with the server's whitelist and permission plugins.
 main: dev.nicho.rolesync.RoleSync
+
+# Set API version to 1.13 to make it stop showing a warning when loading in later versions.
+# This plugin has been tested in 1.12-1.21 and is confirmed working, though.
+# TODO(#5): According to bstats some people have even used it in 1.8.8, though I have not tested it.
+api-version: 1.13
+
 depend:
   - Vault
 loadbefore: # Minecord uses an older API version. The methods from their version have been deprecated but not removed.
   - Minecord
+
 commands:
   discordrolesync:
     description: Commands to manage the DiscordRoleSync plugin.

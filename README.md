@@ -77,11 +77,11 @@ Tested and confirmed working:
 A note on PermissionsEX: I do not recommend using PermissionsEX as it is deprecated and does not support asynchronous permission adding. Performance might be worse when using it in large servers.
 
 ## Online and Offline Server Mode
-This plugin has limited support for offline servers. Some limitations include:
+This plugin is made with primarily online servers in mind. It works with offline servers, however it might conflict with "login plugins" that change a user's UUID after they join. Usage with these plugins is not supported.
 
-- In offline mode servers, linking usernames is case-sensitive
-- In offline mode servers, the `-info` command will NOT return the username, only the UUID of the linked Minecraft account.
-- If you swap between offline and online (or vice-versa), you'll need do delete the database. If you are using SQLite, just delete the database.db file. If you are using MySQL, execute `DROP TABLE syncbot_discordmcusers;`, replacing `syncbot` with the prefix in your config.yml file if you have changed it.
+Please node that in offline mode servers, linking usernames is case-sensitive.
+
+If you swap between offline and online (or vice-versa), you'll need do delete the database. If you are using SQLite, just delete the database.db file. If you are using MySQL, execute `DROP TABLE syncbot_discordmcusers;`, replacing `syncbot` with the prefix in your config.yml file if you have changed it.
 
 ## Permission Nodes
 

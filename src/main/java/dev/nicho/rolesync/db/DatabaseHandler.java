@@ -115,6 +115,31 @@ public abstract class DatabaseHandler {
     }
 
     /**
+     * Updates a user's Minecraft username on the table
+     *
+     * @param identifier the Discord ID or Minecraft UUID of the user
+     * @param minecraftUsername the Minecraft username of the user
+     * @throws SQLException
+     */
+    public void updateUsername(String identifier, String minecraftUsername) throws SQLException {
+        checkAsync();
+
+        Connection c = this.getConnection();
+        PreparedStatement ps = c.prepareStatement("UPDATE "
+                + plugin.getConfig().getString("database.tablePrefix") + "_discordmcusers "
+                + "SET username_when_linked = ? WHERE discord_id = ? OR minecraft_uuid = ?"
+        );
+
+        ps.setString(1, minecraftUsername);
+        ps.setString(2, identifier);
+        ps.setString(3, identifier);
+
+        ps.execute();
+
+        this.closeConnection(c);
+    }
+
+    /**
      * Sets a user as being whitelisted.
      *
      * @param uuid the UUID of the user to whitelist.
@@ -321,7 +346,7 @@ public abstract class DatabaseHandler {
         public final String uuid;
 
         /**
-         * The username the player had WHEN THEY LINKED
+         * The username the player had last time they were linked
          */
         public final String username;
 

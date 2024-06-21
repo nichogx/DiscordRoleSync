@@ -61,35 +61,6 @@ public class MojangAPI {
     }
 
     /**
-     * Checks Mojang's servers for the username of an online UUID
-     *
-     * @param uuid the UUID of the user (with dashes)
-     * @return a search result with the username and the UUID (with dashes) - all properties will be null if not found
-     * @throws IOException if an error occurs while looking for the user
-     */
-    public MojangSearchResult onlineUuidToName(String uuid) throws IOException {
-        URL reqUrl = new URL(this.url, "user/profiles/" + uuidRemoveDashes(uuid) + "/names");
-        HttpURLConnection c = (HttpURLConnection) reqUrl.openConnection();
-        c.setRequestMethod("GET");
-        InputStream response = c.getInputStream();
-        c.connect();
-        if (c.getResponseCode() == 200) {
-            Scanner scanner = new Scanner(response);
-
-            JSONArray json = new JSONArray(scanner.useDelimiter("\\A").next());
-            scanner.close();
-            response.close();
-            return new MojangSearchResult(
-                    json.getJSONObject(json.length() - 1).getString("name"),
-                    uuidAddDashes(uuid)
-            );
-        }
-
-
-        return new MojangSearchResult();
-    }
-
-    /**
      * Converts a username to a UUID - online or offline, depending on server mode
      *
      * @param name the username

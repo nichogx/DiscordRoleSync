@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -27,6 +28,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 public class SyncBot extends ListenerAdapter {
 
@@ -124,13 +126,10 @@ public class SyncBot extends ListenerAdapter {
             DatabaseHandler.LinkedUserInfo userInfo = db.getLinkedUserInfo(event.getMember().getId());
             if (userInfo != null) {
                 if (!plugin.getConfig().getBoolean("requireVerification") || userInfo.verified) {
-                    if (Bukkit.getOnlineMode() || plugin.getConfig().getBoolean("alwaysOnlineMode"))
-                        giveRoleAndNickname(event.getMember(), mojang.onlineUuidToName(userInfo.uuid).name);
-                    else
-                        giveRoleAndNickname(event.getMember(), userInfo.username);
+                    giveRoleAndNickname(event.getMember(), userInfo.username);
                 }
             }
-        } catch (SQLException | IOException e) {
+        } catch (SQLException e) {
             plugin.getLogger().severe("An error occurred while checking if a new member is linked.\n" +
                     e.getMessage());
         }
@@ -281,14 +280,7 @@ public class SyncBot extends ListenerAdapter {
                         return;
                     }
 
-                    String name;
-                    String msgToSend;
-                    if (Bukkit.getOnlineMode() || plugin.getConfig().getBoolean("alwaysOnlineMode")) {
-                        name = mojang.onlineUuidToName(userInfo.uuid).name;
-                        msgToSend = lang.getString("linkedTo") + " " + name + " (" + userInfo.uuid + ")";
-                    } else {
-                        msgToSend = lang.getString("linkedTo") + " " + userInfo.username + " (" + userInfo.uuid + ")";
-                    }
+                    String msgToSend = lang.getString("linkedTo") + " " + userInfo.username + " (" + userInfo.uuid + ")";
 
                     JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onSuccess"), event.getMessage(), plugin.getConfig(), null);
                     JDAUtils.sendMessageWithDelete(event.getTextChannel(), msgToSend, plugin.getConfig());
@@ -425,12 +417,6 @@ public class SyncBot extends ListenerAdapter {
 
                     guild.retrieveMemberById(event.getAuthor().getId()).queue(member -> {
                         String mcUser = userInfo.username;
-                        if (Bukkit.getOnlineMode() || plugin.getConfig().getBoolean("alwaysOnlineMode")) {
-                            try {
-                                mcUser = mojang.onlineUuidToName(userInfo.uuid).name;
-                            } catch (IOException ignored) { }
-                        }
-
                         giveRoleAndNickname(member, mcUser);
                         checkMemberRoles(member);
 
@@ -476,6 +462,12 @@ public class SyncBot extends ListenerAdapter {
             }
 
             db.linkUser(discordId, uuid);
+
+            OfflinePlayer player = Bukkit.getOfflinePlayer(UUID.fromString(uuid));
+            if (player != null) {
+                db.updateUsername(discordId, player.getName());
+            }
+
             Objects.requireNonNull(bot.getGuildById(plugin.getConfig().getString("botInfo.server")))
                     .retrieveMemberById(discordId).queue(member -> {
                         if (member != null) {
