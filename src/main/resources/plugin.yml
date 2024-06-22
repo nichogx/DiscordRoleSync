@@ -5,8 +5,7 @@ description: Sync Discord roles with the server's whitelist and permission plugi
 main: dev.nicho.rolesync.RoleSync
 
 # Set API version to 1.13 to make it stop showing a warning when loading in later versions.
-# This plugin has been tested in 1.12-1.21 and is confirmed working, though.
-# TODO(#5): According to bstats some people have even used it in 1.8.8, though I have not tested it.
+# This plugin has been tested in 1.8.8-1.21 and is confirmed working, though.
 api-version: 1.13
 
 depend:
