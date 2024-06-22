@@ -345,15 +345,14 @@ public class RoleSync extends JavaPlugin {
                 this.jda = builder.build();
 
                 if (getConfig().getBoolean("showPlayers")) {
-                    RoleSync that = this;
                     this.getServer().getScheduler().runTaskTimerAsynchronously(this, () -> {
                         String template = language.getString("playersOnline");
                         if (template == null) {
                             template = "%d/%d players";
                         }
 
-                        String msg = String.format(template, that.getServer().getOnlinePlayers().size(), that.getServer().getMaxPlayers());
-                        that.jda.getPresence().setActivity(Activity.playing(msg));
+                        String msg = String.format(template, this.getServer().getOnlinePlayers().size(), this.getServer().getMaxPlayers());
+                        this.jda.getPresence().setActivity(Activity.playing(msg));
                     }, 0L, 36000L); // run every 30 minutes
                 }
             } catch (LoginException e) {
