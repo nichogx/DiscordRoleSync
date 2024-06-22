@@ -11,13 +11,6 @@ stages:
   - build
   - publish
 
-## Project configuration
-###
-
-variables:
-  PACKAGE_VERSION: "1.3.1"
-  PACKAGE_NAME: discord_role_sync
-
 ## SAST -- default linter
 ###
 
@@ -35,7 +28,7 @@ maven-test:
 
   image: maven:3-eclipse-temurin-22
   script:
-    - mvn test -Dpackage_version=${PACKAGE_VERSION}
+    - mvn test -Dpackage_version=ci-test
 
   artifacts:
     expire_in: 30 days
@@ -49,6 +42,14 @@ maven-package:
 
   image: maven:3-eclipse-temurin-22
   script:
+    - |
+      if [[ -n "$CI_COMMIT_TAG" ]]; then
+        PACKAGE_VERSION=${CI_COMMIT_TAG}
+      elif [[ "$CI_COMMIT_REF_NAME" == "master" ]]; then
+        PACKAGE_VERSION=master-${CI_COMMIT_SHORT_SHA}
+      else
+        PACKAGE_VERSION=branch-${CI_COMMIT_SHORT_SHA}
+      fi
     - mvn package -Dpackage_version=${PACKAGE_VERSION}
 
   artifacts:
@@ -66,8 +67,8 @@ publish-package:
     - |
       curl \
         --header "JOB-TOKEN: ${CI_JOB_TOKEN}" \
-        --upload-file target/${PACKAGE_NAME}-${PACKAGE_VERSION}.jar \
-        ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${PACKAGE_NAME}/${PACKAGE_VERSION}/${PACKAGE_NAME}-${PACKAGE_VERSION}.jar
+        --upload-file target/discord_role_sync-${CI_COMMIT_TAG}.jar \
+        ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/discord_role_sync/${CI_COMMIT_TAG}/discord_role_sync-${CI_COMMIT_TAG}.jar
 
 ## Python infra tests
 ###

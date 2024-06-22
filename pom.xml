@@ -15,8 +15,7 @@
 
         <!--
             When built locally, we set the version to 'develop'.
-            When built in CI, this will be overridden by the runner with -Dpackage_version=x.x.x
-            For production builds, this should be changed in .gitlab-ci.yml variables.PACKAGE_VERSION.
+            Versions will be automatically set by CI. See CONTRIBUTING.md for more information.
         -->
         <package_version>develop</package_version>
     </properties>

@@ -14,8 +14,9 @@ Please make sure you practice good code higiene. Make a descriptive merge reques
 
 ## Versioning
 
-Please follow semantic versioning: https://semver.org/
+Versions are automatically defined by CI.
 
-TL;DR: Increment major if it breaks backwards compatibility, minor if adding new features, patch if small refactors and fixes.
-
-Please add `-SNAPSHOT` to the version during development. I'll remove it when publishing to Spigot.
+- When tagged, the tag will be the version. This is how production releases are built and versions defined.
+- When built from master, the version will be `master-<sha>`. This is not meant for distribution.
+- When built from a branch, the version will be `branch-<sha>`. This is not meant for distribution.
+- When built locally, the version will be `develop`. This is not meant for distribution.
