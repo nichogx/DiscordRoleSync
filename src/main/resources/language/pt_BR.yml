@@ -36,3 +36,13 @@ current: "Atual:"
 reloadComplete: "Reload Completo"
 
 playersOnline: "%d/%d jogadores"
+
+# Translation needed! Everything below this line was added after this translation
+# was written. Please make a merge request or contact me to update these to your language!
+##
+
+nonReleaseVersion:
+  running:
+    UNKNOWN: "Você está em uma versão de desenvolvimento do DiscordRoleSync. Nenhum suporte é fornecido. Por favor, atualize para a versão suportada mais recente, a menos que saiba o que está fazendo."
+    DEVELOPMENT_PREVIEW: "Você está em uma versão de preview de desenvolvimento do DiscordRoleSync. Suporte não é fornecido, e você pode encontrar bugs. Por favor, atualize para a versão suportada mais recente, a menos que saiba o que está fazendo."
+    RELEASE_CANDIDATE: "Você está em uma versão beta/candidata para release do DiscordRoleSync. Você pode encontrar bugs. Por favor, reporte qualquer problemas encontrados ao desenvolvedor via GitLab ou Discord, para que possam ser resolvidos para a versão final."

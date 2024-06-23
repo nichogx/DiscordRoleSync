@@ -5,7 +5,7 @@ import dev.nicho.rolesync.db.MySQLHandler;
 import dev.nicho.rolesync.db.SQLiteHandler;
 import dev.nicho.rolesync.listeners.PlayerJoinListener;
 import dev.nicho.rolesync.listeners.WhitelistLoginListener;
-import dev.nicho.rolesync.util.SpigotPlugin;
+import dev.nicho.rolesync.util.plugin_meta.PluginVersion;
 import dev.nicho.rolesync.util.vault.VaultAPI;
 
 import java.io.*;
@@ -194,25 +194,38 @@ public class RoleSync extends JavaPlugin {
         metrics.addCustomChart(new SingleLineChart("linked_users",
                 () -> db.getLinkedUserCount()));
 
-        // version check
-        String version = getDescription().getVersion();
-        String latestVersion;
         try {
-            latestVersion = SpigotPlugin.getLatestVersion();
+            checkLatestVersion();
         } catch (IOException e) {
-            getLogger().warning("Error while checking for latest version." + e.getMessage());
+            getLogger().warning("Unable to run checks on the installed plugin version.\n" + e.getMessage());
+        }
+    }
 
+    /**
+     * Checks the installed version against the latest available, and logs
+     * appropriate messages if the user is running either old or unsupported versions.
+     *
+     * @throws IOException if we need to and can't contact Spigot.
+     */
+    private void checkLatestVersion() throws IOException {
+        String installedVersion = getDescription().getVersion();
+        PluginVersion.VersionType versionType = PluginVersion.getVersionType(installedVersion);
+        if (versionType != PluginVersion.VersionType.RELEASE) {
+            // Server is running an unsupported version. Alert the user.
+            getLogger().warning(language.getString("nonReleaseVersion.running." + versionType.toString()));
             return;
         }
 
-        if (!latestVersion.equalsIgnoreCase(version)) {
-            String message = ChatColor.AQUA + "You are not running the latest version of DiscordRoleSync. " +
-                    "Current: " + ChatColor.RED + version + ChatColor.AQUA + " " +
-                    "Latest: " + ChatColor.GREEN + latestVersion;
-
-            getLogger().info(message);
-        } else {
-            getLogger().info("You are running the latest version of DiscordRoleSync.");
+        // Server is running a release version. Check for updates and send if available.
+        PluginVersion v = new PluginVersion();
+        String latestVersion = v.getLatestVersion();
+        if (v.isOldRelease(installedVersion)) {
+            getLogger().warning(String.format(
+                    "%s %s %s, %s %s",
+                    language.getString("notLatestVersion"),
+                    language.getString("current"), installedVersion,
+                    language.getString("latest"), latestVersion
+            ));
         }
     }
 

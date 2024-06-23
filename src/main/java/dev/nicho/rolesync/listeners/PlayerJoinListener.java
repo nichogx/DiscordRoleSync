@@ -2,7 +2,7 @@ package dev.nicho.rolesync.listeners;
 
 import dev.nicho.rolesync.db.DatabaseHandler;
 import dev.nicho.rolesync.db.DatabaseHandler.LinkedUserInfo;
-import dev.nicho.rolesync.util.SpigotPlugin;
+import dev.nicho.rolesync.util.plugin_meta.PluginVersion;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -54,22 +54,35 @@ public class PlayerJoinListener implements Listener {
 
         if (event.getPlayer().hasPermission("discordrolesync.notifyupdates")) {
             plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
-                // check for updates and send if available
-                String version = plugin.getDescription().getVersion();
-                String latestVersion;
-                try {
-                    latestVersion = SpigotPlugin.getLatestVersion();
-                } catch (IOException e) {
-                    plugin.getLogger().warning("Error while checking for latest version." + e.getMessage());
+                String installedVersion = plugin.getDescription().getVersion();
 
+                PluginVersion.VersionType versionType = PluginVersion.getVersionType(installedVersion);
+                if (versionType != PluginVersion.VersionType.RELEASE) {
+                    // Server is running an unsupported version. Alert the user.
+                    String message = ChatColor.BLUE + this.chatPrefix + ChatColor.RED
+                            + lang.getString("nonReleaseVersion.running." + versionType.toString());
+
+                    event.getPlayer().sendMessage(message);
                     return;
                 }
 
-                if (!latestVersion.equalsIgnoreCase(version)) {
+                // Server is running a release version. Check for updates and send if available.
+                PluginVersion v = new PluginVersion();
+                boolean isOldVersion;
+                String latestVersion;
+                try {
+                    isOldVersion = v.isOldRelease(installedVersion);
+                    latestVersion = v.getLatestVersion();
+                } catch (IOException e) {
+                    plugin.getLogger().warning("Error while checking for latest version." + e.getMessage());
+                    return;
+                }
+
+                if (isOldVersion) {
                     String message = ChatColor.BLUE + this.chatPrefix + ChatColor.AQUA
                             + lang.getString("notLatestVersion") + "\n" +
                             ChatColor.BLUE + this.chatPrefix + ChatColor.AQUA + lang.getString("current") + " "
-                            + ChatColor.RED + version + ChatColor.AQUA + "\n" +
+                            + ChatColor.RED + installedVersion + ChatColor.AQUA + "\n" +
                             ChatColor.BLUE + this.chatPrefix + ChatColor.AQUA + lang.getString("latest") + " "
                             + ChatColor.GREEN + latestVersion;
 
