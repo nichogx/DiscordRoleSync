@@ -1,12 +1,16 @@
 # Contributing
 
+This is a side project in maintenance mode, and I do not have too much time to add new features.
+
 Contributions are very welcome, as long as the changes are relevant for the plugin and high quality. Please ask me (open an issue or ask on Discord) first, if you're not sure if the feature you want to implement will be accepted.
 
 Want to take a stab at something, but not sure what to work on? Feel free to take an [open issue](https://gitlab.com/nichogx/DiscordRoleSync/-/issues)! I do my best to keep them shovel-ready.
 
 ## Refactors
 
-This code was written a while ago, in a time when I was not that familiar with Java. There is a lot of room for improvement. Refactors are very, very welcome, especially if it makes the code more testable (with unit tests).
+I've recently picked up support for this plugin again, and am in the process of cleaning up the code. I'm not a Java expert, so feel free to make clean-up, opinionated contributions if you'd like.
+
+There is a lot of room for improvement. Refactors are very, very welcome, especially if it makes the code more testable (with unit tests).
 
 ## Getting a Review
 

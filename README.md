@@ -11,12 +11,12 @@ This can use both SQLite (automatically created, no setup needed) or MySQL. MySQ
 This plugin has been tested on Minecraft versions 1.8.8 to 1.21.
 
 ## Contributing
-As I don't really have time to work on this and add new features, I've made it open source. I will warn you this was written a while ago and it's not the best code. Merge requests are welcome :)
+This is a side project in maintenance mode, and I do not have too much time to add new features. As such, I've made it open source and welcome contributions.
+I've recently picked up support for this plugin again, and am in the process of cleaning up the code. I'm not a Java expert, so feel free to make clean-up, opinionated contributions if you'd like.
 
 The source code can be found on [GitLab](https://gitlab.com/nichogx/DiscordRoleSync). Please see [CONTRIBUTING.md](https://gitlab.com/nichogx/DiscordRoleSync/-/blob/master/CONTRIBUTING.md) for more information.
 
-I consider this plugin done, and no new features are planned.
-If needed, you can reach me via GitLab or [Discord](https://discord.com/invite/JBNejsW).
+If needed, you can reach me via GitLab or [Discord](https://discord.com/invite/JBNejsW). Those are also the places to report bugs!
 
 ## Installation
 You should first install [Vault](https://www.spigotmc.org/resources/vault.34315/) as this plugin will not work without it.
