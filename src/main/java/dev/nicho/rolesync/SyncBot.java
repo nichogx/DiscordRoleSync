@@ -195,7 +195,9 @@ public class SyncBot extends ListenerAdapter {
 
     void setPermissions(String uuid, List<String> permsToHave) {
         VaultSetGroupsTask vgt = new VaultSetGroupsTask(uuid, permsToHave);
-        if (plugin.getServer().getPluginManager().getPlugin("PermissionsEx") != null) { // using PEX, do it synchronously
+
+        // PEX does not support running tasks asynchronously
+        if (plugin.getServer().getPluginManager().getPlugin("PermissionsEx") != null) {
             vgt.runTask(plugin);
         } else {
             vgt.runTaskAsynchronously(plugin);

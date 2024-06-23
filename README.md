@@ -74,10 +74,10 @@ This plugin should work with every permission plugin that supports Vault.
 Tested and confirmed working:
 - [LuckPerms](https://www.spigotmc.org/resources/luckperms.28140/) (recommended)
 - [Ultra Permissions](https://www.spigotmc.org/resources/ultra-permissions.42678/)
-- [PermissionsEX](https://github.com/PEXPlugins/PermissionsEx/releases) (deprecated)
+- [PermissionsEx](https://github.com/PEXPlugins/PermissionsEx/releases) (deprecated)
 - [PowerRanks](https://www.spigotmc.org/resources/powerranks.64696/)
 
-A note on PermissionsEX: I do not recommend using PermissionsEX as it is deprecated and does not support asynchronous permission adding. Performance might be worse when using it in large servers.
+A note on PermissionsEx: I do not recommend using PermissionsEx as it is deprecated and does not support asynchronous permission adding. Performance might be worse when using it in large servers.
 
 ## Online and Offline Server Mode
 This plugin is made with primarily online servers in mind. It works with offline servers, however it might conflict with "login plugins" that change a user's UUID after they join. Usage with these plugins is not supported.
