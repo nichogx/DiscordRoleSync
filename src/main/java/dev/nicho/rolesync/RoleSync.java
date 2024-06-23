@@ -8,11 +8,13 @@ import dev.nicho.rolesync.listeners.WhitelistLoginListener;
 import dev.nicho.rolesync.util.SpigotPlugin;
 import dev.nicho.rolesync.util.vault.VaultAPI;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import javax.security.auth.login.LoginException;
 
@@ -38,6 +40,8 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class RoleSync extends JavaPlugin {
+
+    private static final String defaultLanguage = "en_US";
 
     private YamlConfiguration language = null;
     private DatabaseHandler db = null;
@@ -295,6 +299,11 @@ public class RoleSync extends JavaPlugin {
     }
 
     private void loadLang() throws IOException, InvalidConfigurationException {
+        getLogger().info("Updating language files");
+
+        int updated = updateLangFiles();
+        getLogger().info(String.format("Updated %d language file%s", updated, updated == 1 ? "" : "s"));
+
         getLogger().info("Reading language file");
         File langFile = loadLangFile(getConfig().getString("language"));
         getLogger().info("Loaded " + langFile.getName());
@@ -304,24 +313,103 @@ public class RoleSync extends JavaPlugin {
         language.load(langFile);
     }
 
+    /**
+     * Updates all language files in the data folder to add potentially missing
+     * keys, using the .jar's en_US as source of truth.
+     * If any keys are missing, they will be added from the same language.yml in
+     * the .jar, and from en_US as a fallback.
+     *
+     * @return how many files were updated
+     */
+    private int updateLangFiles() {
+        // Get all keys that are supposed to exist, from en_US in the .jar
+        InputStream stream = getResource(String.format("language/%s.yml", defaultLanguage));
+        YamlConfiguration english;
+        try (Reader reader = new InputStreamReader(stream)) {
+            english = YamlConfiguration.loadConfiguration(reader);
+        } catch (IOException e) {
+            throw new RuntimeException("Default language file not found in the .jar.");
+        }
+
+        Set<String> keys = english.getKeys(true);
+
+        int updated = 0;
+
+        File languageFolder = new File(getDataFolder(), "language");
+        if (!languageFolder.isDirectory()) {
+            // If the language folder does not exist, then there are no
+            // language files to update.
+            return 0;
+        }
+
+        // Go through all existing language files, checking if each needs to be updated
+        Iterator<File> dir = FileUtils.iterateFiles(languageFolder, new String[]{"yml"}, false);
+        while (dir.hasNext()) {
+            File file = dir.next();
+            String language = file.getName();
+
+            YamlConfiguration loaded = YamlConfiguration.loadConfiguration(file);
+            ArrayList<String> missingKeys = new ArrayList<>();
+            for (String key : keys) {
+                if (!loaded.contains(key)) {
+                    missingKeys.add(key);
+                }
+            }
+
+            // No keys are missing from this file, move on!
+            if (missingKeys.isEmpty()) continue;
+            getLogger().info(String.format("Language file %s is missing keys, updating...", language));
+
+            YamlConfiguration readFrom;
+            try (Reader reader = new InputStreamReader(getResource(String.format("language/%s", language)))) {
+                readFrom = YamlConfiguration.loadConfiguration(reader);
+            } catch (Exception e) {
+                readFrom = english;
+            }
+
+            for (String key : missingKeys) {
+                loaded.set(key, readFrom.get(key));
+            }
+
+            try {
+                loaded.save(Paths.get(getDataFolder().getPath(), "language", language).toString());
+            } catch (IOException e) {
+                getLogger().severe("Failed to update language file." + e.getMessage());
+                continue;
+            }
+
+            updated++;
+        }
+
+        return updated;
+    }
+
+    /**
+     * Loads the requested language file.
+     * If the language file does not exist, will default to en_US.
+     *
+     * @param language the language filename to use (without the extension).
+     * @return the found or newly created file (extracted from the .jar)
+     */
     private File loadLangFile(String language) {
         File langFile = new File(getDataFolder(), String.format("language/%s.yml", language));
 
-        if (!langFile.exists()) {
-            getLogger().info(String.format("Language file %s.yml does not exist, extracting from jar", language));
-            try {
-                saveResource(String.format("language/%s.yml", language), false);
-            } catch (IllegalArgumentException e) {
-                getLogger().warning(
-                        String.format("Language file %s.yml does not exist in jar. Is it supported?" +
-                                " Defaulting to en_US.", language));
-                return loadLangFile("en_US");
-            }
-
-            langFile = loadLangFile(getConfig().getString("language"));
+        if (langFile.exists()) {
+            return langFile;
         }
 
-        return langFile;
+        getLogger().info(String.format("Language file %s.yml does not exist, extracting from jar", language));
+
+        try {
+            saveResource(String.format("language/%s.yml", language), false);
+        } catch (IllegalArgumentException e) {
+            getLogger().warning(
+                    String.format("Language file %s.yml does not exist in jar. Is it supported?" +
+                            " Defaulting to %s.", language, defaultLanguage));
+            return loadLangFile(defaultLanguage);
+        }
+
+        return loadLangFile(getConfig().getString("language"));
     }
 
     private void startBot() {

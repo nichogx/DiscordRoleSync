@@ -1,7 +1,7 @@
 # the language the plugin and bot should run in
 # check the Spigot page for supported languages.
 #   you can add your own language files inside the language
-#   folder and put the name of the file (without the .yml part) here.
+#   folder and put the name of the file (without the extension) here.
 language: "en_US"
 
 commandNames:

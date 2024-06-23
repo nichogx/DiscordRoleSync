@@ -20,6 +20,19 @@ sast:
 include:
   - template: Security/SAST.gitlab-ci.yml
 
+## Linting
+###
+
+language-linter:
+  stage: lint
+
+  image: python:3.12-alpine
+  before_script:
+    - cd src/test/language_validator
+    - pip install -r requirements.txt
+  script:
+    - python validate.py en_US.yml ../../main/resources/language
+
 ## Main CI -- maven tests and packaging/publishing
 ###
 
