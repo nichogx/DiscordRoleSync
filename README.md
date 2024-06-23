@@ -75,6 +75,7 @@ Tested and confirmed working:
 - [LuckPerms](https://www.spigotmc.org/resources/luckperms.28140/) (recommended)
 - [Ultra Permissions](https://www.spigotmc.org/resources/ultra-permissions.42678/)
 - [PermissionsEX](https://github.com/PEXPlugins/PermissionsEx/releases) (deprecated)
+- [PowerRanks](https://www.spigotmc.org/resources/powerranks.64696/)
 
 A note on PermissionsEX: I do not recommend using PermissionsEX as it is deprecated and does not support asynchronous permission adding. Performance might be worse when using it in large servers.
 
