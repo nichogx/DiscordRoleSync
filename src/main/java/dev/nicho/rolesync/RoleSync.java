@@ -336,10 +336,11 @@ public class RoleSync extends JavaPlugin {
      */
     private int updateLangFiles() {
         // Get all keys that are supposed to exist, from en_US in the .jar
-        InputStream stream = getResource(String.format("language/%s.yml", defaultLanguage));
         YamlConfiguration english;
-        try (Reader reader = new InputStreamReader(stream)) {
-            english = YamlConfiguration.loadConfiguration(reader);
+        try (InputStream stream = getResource(String.format("language/%s.yml", defaultLanguage))) {
+            try (Reader reader = new InputStreamReader(stream)) {
+                english = YamlConfiguration.loadConfiguration(reader);
+            }
         } catch (IOException e) {
             throw new RuntimeException("Default language file not found in the .jar.");
         }
@@ -374,8 +375,10 @@ public class RoleSync extends JavaPlugin {
             getLogger().info(String.format("Language file %s is missing keys, updating...", language));
 
             YamlConfiguration readFrom;
-            try (Reader reader = new InputStreamReader(getResource(String.format("language/%s", language)))) {
-                readFrom = YamlConfiguration.loadConfiguration(reader);
+            try (InputStream resourceStream = getResource(String.format("language/%s", language))) {
+                try (Reader reader = new InputStreamReader(resourceStream)) {
+                    readFrom = YamlConfiguration.loadConfiguration(reader);
+                }
             } catch (Exception e) {
                 readFrom = english;
             }
