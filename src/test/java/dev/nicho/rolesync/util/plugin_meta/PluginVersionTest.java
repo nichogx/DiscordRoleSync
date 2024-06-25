@@ -1,8 +1,6 @@
 package dev.nicho.rolesync.util.plugin_meta;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 
 import java.io.IOException;
 

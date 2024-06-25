@@ -98,7 +98,10 @@
             <url>https://repo.papermc.io/repository/maven-public/</url>
         </repository>
 
-        <!-- TODO(#2): remove this repository after upgrading JDA to 5.0.0 -->
+        <!--
+        TODO(#2): remove this repository after upgrading JDA to 5.0.0. Newer JDA versions
+            are available on maven central or JDA's repo.
+        -->
         <repository>
             <id>jcenter</id>
             <name>jcenter-bintray</name>
@@ -185,6 +188,21 @@
             <groupId>commons-dbcp</groupId>
             <artifactId>commons-dbcp</artifactId>
             <version>1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>com.networknt</groupId>
+            <artifactId>json-schema-validator</artifactId>
+            <version>1.4.2</version>
+        </dependency>
+        <!--
+        TODO(#2): Remove this once JDA is updated. json-schema-validator requires a newer version
+            than the one included in JDA. This forces JDA to use 2.17.1 instead of pulling 2.10 as
+            a dependency. JDA 5.0.0 uses 2.17 so does not require this.
+         -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.17.1</version>
         </dependency>
 
         <!-- On server -->

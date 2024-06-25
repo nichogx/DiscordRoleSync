@@ -1,6 +1,5 @@
 package dev.nicho.rolesync.util.plugin_meta;
 
-import org.bukkit.ChatColor;
 import org.jetbrains.annotations.TestOnly;
 
 import java.io.IOException;
@@ -8,8 +7,6 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Scanner;
-import java.util.concurrent.Callable;
-import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

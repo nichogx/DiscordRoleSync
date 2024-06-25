@@ -1,20 +1,22 @@
 package dev.nicho.rolesync;
 
+import com.networknt.schema.JsonSchema;
+import com.networknt.schema.JsonSchemaFactory;
+import com.networknt.schema.SpecVersion;
+import com.networknt.schema.ValidationMessage;
 import dev.nicho.rolesync.db.DatabaseHandler;
 import dev.nicho.rolesync.db.MySQLHandler;
 import dev.nicho.rolesync.db.SQLiteHandler;
 import dev.nicho.rolesync.listeners.PlayerJoinListener;
 import dev.nicho.rolesync.listeners.WhitelistLoginListener;
+import dev.nicho.rolesync.util.config.ConfigValidator;
 import dev.nicho.rolesync.util.plugin_meta.PluginVersion;
 import dev.nicho.rolesync.util.vault.VaultAPI;
 
 import java.io.*;
 import java.nio.file.Paths;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import javax.security.auth.login.LoginException;
 
@@ -44,6 +46,8 @@ public class RoleSync extends JavaPlugin {
     private static final String defaultLanguage = "en_US";
 
     private YamlConfiguration language = null;
+    private boolean configLoaded = false;
+
     private DatabaseHandler db = null;
     private SyncBot listener = null;
     private JDA jda = null;
@@ -70,24 +74,47 @@ public class RoleSync extends JavaPlugin {
             getLogger().info("Reading config.yml");
             saveDefaultConfig();
 
-            // TODO(#3) validate config
+            ConfigValidator validator;
+            try (InputStream schemaStream = getResource("config_schema.json")) {
+                JsonSchemaFactory schemaFactory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V7);
+                JsonSchema schema = schemaFactory.getSchema(schemaStream);
+                validator = new ConfigValidator(schema);
+            }
+
+            String config = getConfig().saveToString();
+            Set<ValidationMessage> configErrors = validator.validateYaml(config);
+            if (configErrors != null) {
+                throw new InvalidConfigurationException("config.yaml failed to validate: " + configErrors);
+            }
 
             loadLang();
         } catch (InvalidConfigurationException e) {
             getLogger().severe("One of the yml files is invalid.\n" +
                     e.getMessage());
             this.setEnabled(false);
+            return;
         } catch (IOException e) {
             getLogger().severe("An error occurred while loading the yml files.\n" +
                     e.getMessage());
             this.setEnabled(false);
+            return;
         }
 
         this.chatPrefix = getConfig().getString("chatPrefix.text", "[DRS]") + " ";
+
+        this.configLoaded = true;
     }
 
     @Override
     public void onEnable() {
+        if (!this.configLoaded) {
+            getLogger().severe("Not enabling DiscordRoleSync since the config files failed to load. " +
+                    "Make sure no errors are shown when loading the config and language files.");
+            this.setEnabled(false);
+
+            return;
+        }
+
         try {
             if (getConfig().getString("database.type").equalsIgnoreCase("mysql")) {
                 this.db = new MySQLHandler(this,

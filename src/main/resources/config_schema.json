@@ -1,0 +1,295 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "config.yaml schema for DiscordRoleSync",
+  "type": "object",
+  "definitions": {
+    "discordId": {
+      "type": "string",
+      "pattern": "^\\d{16,}$"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "language": {
+      "type": "string"
+    },
+    "commandNames": {
+      "type": "object",
+      "properties": {
+        "link": {
+          "type": "string"
+        },
+        "info": {
+          "type": "string"
+        },
+        "admLink": {
+          "type": "string"
+        },
+        "unlink": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "link",
+        "info",
+        "admLink",
+        "unlink"
+      ]
+    },
+    "botInfo": {
+      "type": "object",
+      "properties": {
+        "prefix": {
+          "type": "string"
+        },
+        "token": {
+          "type": "string",
+          "minLength": 1
+        },
+        "channelsToListen": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/discordId"
+          },
+          "minItems": 1
+        },
+        "server": {
+          "$ref": "#/definitions/discordId"
+        }
+      },
+      "required": [
+        "prefix",
+        "token",
+        "channelsToListen",
+        "server"
+      ]
+    },
+    "database": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "sqlite",
+            "mysql"
+          ]
+        },
+        "tablePrefix": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mysql": {
+          "type": "object",
+          "properties": {
+            "dbhost": {
+              "type": "string"
+            },
+            "dbport": {
+              "type": "number"
+            },
+            "dbname": {
+              "type": "string"
+            },
+            "dbuser": {
+              "type": "string"
+            },
+            "dbpass": {
+              "type": "string"
+            },
+            "disableSSL": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "dbhost",
+            "dbport",
+            "dbname",
+            "dbuser",
+            "dbpass",
+            "disableSSL"
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "tablePrefix",
+        "mysql"
+      ]
+    },
+    "requireVerification": {
+      "type": "boolean"
+    },
+    "discordUrl": {
+      "type": "string"
+    },
+    "deleteCommands": {
+      "type": "boolean"
+    },
+    "deleteAfter": {
+      "type": "number"
+    },
+    "changeNicknames": {
+      "type": "string",
+      "enum": [
+        "no",
+        "after",
+        "replace"
+      ]
+    },
+    "manageWhitelist": {
+      "type": "boolean"
+    },
+    "whitelistRoles": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/discordId"
+      }
+    },
+    "giveLinkedRole": {
+      "type": "boolean"
+    },
+    "linkedRole": {
+      "$ref": "#/definitions/discordId"
+    },
+    "adminCommandRoles": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/discordId"
+      }
+    },
+    "groups": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/discordId"
+        }
+      }
+    },
+    "react": {
+      "type": "object",
+      "properties": {
+        "onSuccess": {
+          "type": "string"
+        },
+        "onUserError": {
+          "type": "string"
+        },
+        "onBotError": {
+          "type": "string"
+        },
+        "onPermissionError": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "onSuccess",
+        "onUserError",
+        "onBotError",
+        "onPermissionError"
+      ]
+    },
+    "messageFeedback": {
+      "type": "boolean"
+    },
+    "chatPrefix": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "text"
+      ]
+    },
+    "alternativeServer": {
+      "type": "string"
+    },
+    "alwaysOnlineMode": {
+      "type": "boolean"
+    },
+    "showPlayers": {
+      "type": "boolean"
+    },
+    "embed": {
+      "oneOf": [
+        {
+          "title": "Enabled",
+          "type": "object",
+          "properties": {
+            "useEmbed": {
+              "enum": [
+                false
+              ]
+            }
+          },
+          "required": [
+            "useEmbed"
+          ]
+        },
+        {
+          "title": "Disabled",
+          "type": "object",
+          "properties": {
+            "useEmbed": {
+              "enum": [
+                true
+              ]
+            },
+            "title": {
+              "type": "string"
+            },
+            "color": {
+              "type": "string",
+              "enum": [
+                "BLACK",
+                "BLUE",
+                "CYAN",
+                "DARK_GRAY",
+                "GRAY",
+                "GREEN",
+                "LIGHT_GRAY",
+                "MAGENTA",
+                "ORANGE",
+                "PINK",
+                "RED",
+                "WHITE",
+                "YELLOW"
+              ]
+            }
+          },
+          "required": [
+            "useEmbed",
+            "title",
+            "color"
+          ]
+        }
+      ]
+    }
+  },
+  "required": [
+    "language",
+    "commandNames",
+    "botInfo",
+    "database",
+    "requireVerification",
+    "discordUrl",
+    "deleteCommands",
+    "deleteAfter",
+    "changeNicknames",
+    "manageWhitelist",
+    "whitelistRoles",
+    "giveLinkedRole",
+    "linkedRole",
+    "adminCommandRoles",
+    "groups",
+    "react",
+    "messageFeedback",
+    "chatPrefix",
+    "alternativeServer",
+    "alwaysOnlineMode",
+    "showPlayers",
+    "embed"
+  ]
+}
