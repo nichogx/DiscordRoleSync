@@ -233,7 +233,8 @@ public class RoleSync extends JavaPlugin {
     public void onDisable() {
         // Cleanup bot
         synchronized (this) {
-            this.jda.shutdown();
+            if (this.jda != null)
+                this.jda.shutdown();
         }
     }
 
