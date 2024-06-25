@@ -7,6 +7,7 @@ import dev.nicho.rolesync.util.mojang.MojangAPI;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.ReadyEvent;
+import net.dv8tion.jda.api.events.ShutdownEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent;
@@ -17,10 +18,12 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.Server;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
@@ -40,6 +43,8 @@ public class SyncBot extends ListenerAdapter {
     private JDA bot = null;
     private final MojangAPI mojang;
 
+    private BukkitTask presenceTimer;
+
     public SyncBot(@Nonnull JavaPlugin plugin, YamlConfiguration language, DatabaseHandler db, VaultAPI vault) {
         super();
         this.plugin = plugin;
@@ -54,10 +59,33 @@ public class SyncBot extends ListenerAdapter {
 
     @Override
     public void onReady(@Nonnull ReadyEvent event) {
-        this.bot = event.getJDA();
-        this.ch = new CommandHandler();
+        synchronized (this) {
+            this.bot = event.getJDA();
+            this.ch = new CommandHandler();
+        }
+
+        // Stop all existing timers before re-setting them
+        // Will lock `this`.
+        stopTimers();
 
         plugin.getLogger().info("Logged in: " + event.getJDA().getSelfUser().getName());
+
+        if (this.plugin.getConfig().getBoolean("showPlayers")) {
+            Server server = this.plugin.getServer();
+
+            // Lock to update the timers
+            synchronized (this) {
+                this.presenceTimer = server.getScheduler().runTaskTimerAsynchronously(this.plugin, () -> {
+                    String template = this.lang.getString("playersOnline");
+                    if (template == null) {
+                        template = "%d/%d players";
+                    }
+
+                    String msg = String.format(template, server.getOnlinePlayers().size(), server.getMaxPlayers());
+                    this.bot.getPresence().setActivity(Activity.playing(msg));
+                }, 0L, 3600L); // run every 3 minutes
+            }
+        }
 
         try {
             db.forAllLinkedUsers((userInfo) ->
@@ -71,11 +99,18 @@ public class SyncBot extends ListenerAdapter {
                                     }
                                     checkMemberRoles(member, userInfo);
                                 }
-                            }, error -> { }));
+                            }, error -> {
+                            }));
         } catch (SQLException e) {
             plugin.getLogger().severe("An error occurred while checking all users.\n" +
                     e.getMessage());
         }
+    }
+
+    @Override
+    public void onShutdown(@Nonnull ShutdownEvent event) {
+        // Will lock `this`
+        this.stopTimers();
     }
 
     @Override
@@ -147,6 +182,15 @@ public class SyncBot extends ListenerAdapter {
         } catch (SQLException | NullPointerException e) {
             plugin.getLogger().severe("An error occurred while removing kicked/banned/left member from whitelist.\n" +
                     e.getMessage());
+        }
+    }
+
+    public void stopTimers() {
+        synchronized (this) {
+            if (this.presenceTimer != null) {
+                this.presenceTimer.cancel();
+                this.presenceTimer = null;
+            }
         }
     }
 
@@ -224,7 +268,8 @@ public class SyncBot extends ListenerAdapter {
         try {
             // reset nickname
             if (plugin.getConfig().getString("changeNicknames").equalsIgnoreCase("after")) {
-                member.modifyNickname(null).queue(null, error -> { });
+                member.modifyNickname(null).queue(null, error -> {
+                });
             }
         } catch (PermissionException e) {
             plugin.getLogger().warning("Bot has no permissions to reset nickname of a user.");
@@ -235,9 +280,11 @@ public class SyncBot extends ListenerAdapter {
         try {
             if (mcUser != null) {
                 if (plugin.getConfig().getString("changeNicknames").equalsIgnoreCase("after")) {
-                    member.modifyNickname(member.getUser().getName() + " (" + mcUser + ")").queue(null, error -> { });
+                    member.modifyNickname(member.getUser().getName() + " (" + mcUser + ")").queue(null, error -> {
+                    });
                 } else if (plugin.getConfig().getString("changeNicknames").equalsIgnoreCase("replace")) {
-                    member.modifyNickname(mcUser).queue(null, error -> { });
+                    member.modifyNickname(mcUser).queue(null, error -> {
+                    });
                 }
             }
         } catch (PermissionException e) {
@@ -302,8 +349,9 @@ public class SyncBot extends ListenerAdapter {
                         }
 
                         JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onSuccess"), event.getMessage(), plugin.getConfig(), null);
-                        JDAUtils.sendMessageWithDelete(event.getTextChannel(), lang.getString("linkedTo") + " " + name + " (" + userInfo.discordId + ")" , plugin.getConfig());
-                    }, error -> { });
+                        JDAUtils.sendMessageWithDelete(event.getTextChannel(), lang.getString("linkedTo") + " " + name + " (" + userInfo.discordId + ")", plugin.getConfig());
+                    }, error -> {
+                    });
                 }
             } catch (SQLException | IOException e) {
                 JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onBotError"), event.getMessage(), plugin.getConfig(), lang.getString("commandError"));
@@ -362,7 +410,8 @@ public class SyncBot extends ListenerAdapter {
                     return;
                 }
 
-                guild.retrieveMemberById(userInfo.discordId).queue(SyncBot.this::removeRoleAndNickname, err -> { });
+                guild.retrieveMemberById(userInfo.discordId).queue(SyncBot.this::removeRoleAndNickname, err -> {
+                });
                 JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onSuccess"), event.getMessage(), plugin.getConfig(), lang.getString("successUnlink"));
             } catch (SQLException | IOException e) {
                 JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onBotError"), event.getMessage(), plugin.getConfig(), lang.getString("commandError"));
@@ -423,7 +472,8 @@ public class SyncBot extends ListenerAdapter {
                         checkMemberRoles(member);
 
                         JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onSuccess"), event.getMessage(), plugin.getConfig(), lang.getString("successVerify"));
-                    }, err -> { });
+                    }, err -> {
+                    });
                 } else {
                     JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig(), lang.getString("incorrectVerificationCode"));
                 }
@@ -440,7 +490,8 @@ public class SyncBot extends ListenerAdapter {
                 JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig(), lang.getString("discordAlreadyLinked"));
                 event.getAuthor().openPrivateChannel().queue(
                         channel -> channel.sendMessage(lang.getString("discordAlreadyLinked"))
-                                .queue(null, err -> { }));
+                                .queue(null, err -> {
+                                }));
 
                 return;
             }
@@ -458,7 +509,8 @@ public class SyncBot extends ListenerAdapter {
                 JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onUserError"), event.getMessage(), plugin.getConfig(), lang.getString("minecraftAlreadyLinked"));
                 event.getAuthor().openPrivateChannel().queue(
                         channel -> channel.sendMessage(lang.getString("minecraftAlreadyLinked"))
-                                .queue(null, err -> { }));
+                                .queue(null, err -> {
+                                }));
 
                 return;
             }
@@ -478,7 +530,8 @@ public class SyncBot extends ListenerAdapter {
                             }
                             checkMemberRoles(member);
                         }
-                    }, error -> { });
+                    }, error -> {
+                    });
             JDAUtils.reactAndDelete(plugin.getConfig().getString("react.onSuccess"), event.getMessage(), plugin.getConfig(), lang.getString("successLink"));
         }
     }

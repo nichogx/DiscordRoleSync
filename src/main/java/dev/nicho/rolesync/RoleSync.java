@@ -40,6 +40,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
 
 public class RoleSync extends JavaPlugin {
 
@@ -49,7 +50,7 @@ public class RoleSync extends JavaPlugin {
     private boolean configLoaded = false;
 
     private DatabaseHandler db = null;
-    private SyncBot listener = null;
+    private SyncBot syncBot = null;
     private JDA jda = null;
     private VaultAPI vault = null;
 
@@ -142,7 +143,7 @@ public class RoleSync extends JavaPlugin {
             }
 
             this.vault = new VaultAPI(rsp.getProvider(), managedGroups);
-            listener = new SyncBot(this, language, this.db, this.vault);
+            this.syncBot = new SyncBot(this, language, this.db, this.vault);
             startBot();
 
         } catch (IOException | SQLException e) {
@@ -228,6 +229,14 @@ public class RoleSync extends JavaPlugin {
         }
     }
 
+    @Override
+    public void onDisable() {
+        // Cleanup bot
+        synchronized (this) {
+            this.jda.shutdown();
+        }
+    }
+
     /**
      * Checks the installed version against the latest available, and logs
      * appropriate messages if the user is running either old or unsupported versions.
@@ -301,7 +310,10 @@ public class RoleSync extends JavaPlugin {
                 return false;
             }
 
-            jda.shutdown();
+            syncBot.stopTimers();
+            synchronized (this) {
+                jda.shutdown();
+            }
 
             startBot();
             sender.sendMessage(ChatColor.BLUE + chatPrefix + ChatColor.GREEN + language.getString("botRestarted"));
@@ -474,19 +486,10 @@ public class RoleSync extends JavaPlugin {
                                 CacheFlag.CLIENT_STATUS
                         );
 
-                builder.addEventListeners(listener);
-                this.jda = builder.build();
+                builder.addEventListeners(this.syncBot);
 
-                if (getConfig().getBoolean("showPlayers")) {
-                    this.getServer().getScheduler().runTaskTimerAsynchronously(this, () -> {
-                        String template = language.getString("playersOnline");
-                        if (template == null) {
-                            template = "%d/%d players";
-                        }
-
-                        String msg = String.format(template, this.getServer().getOnlinePlayers().size(), this.getServer().getMaxPlayers());
-                        this.jda.getPresence().setActivity(Activity.playing(msg));
-                    }, 0L, 36000L); // run every 30 minutes
+                synchronized (this) {
+                    this.jda = builder.build();
                 }
             } catch (LoginException e) {
                 getLogger().log(Level.SEVERE, "Error logging in. Did you set your token in config.yml?", e);

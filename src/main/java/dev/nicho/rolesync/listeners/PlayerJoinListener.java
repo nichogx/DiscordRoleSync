@@ -32,14 +32,13 @@ public class PlayerJoinListener implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        String uuid = player.getUniqueId().toString();
+        String username = player.getName();
+
         plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
             try {
-                Player player = event.getPlayer();
-                String uuid = player.getUniqueId().toString();
-
                 LinkedUserInfo usrInfo = db.getLinkedUserInfo(uuid);
-
-                String username = event.getPlayer().getName();
                 if (usrInfo != null && !username.equals(usrInfo.username)) {
                     plugin.getLogger().info(
                             String.format("User with UUID %s has changed names from '%s' to '%s', updating in the database...", uuid, usrInfo.username, username)
@@ -52,20 +51,20 @@ public class PlayerJoinListener implements Listener {
             }
         });
 
-        if (event.getPlayer().hasPermission("discordrolesync.notifyupdates")) {
+        if (player.hasPermission("discordrolesync.notifyupdates")) {
+            String installedVersion = plugin.getDescription().getVersion();
+            PluginVersion.VersionType versionType = PluginVersion.getVersionType(installedVersion);
+
+            if (versionType != PluginVersion.VersionType.RELEASE) {
+                // Server is running an unsupported version. Alert the user.
+                String message = ChatColor.BLUE + this.chatPrefix + ChatColor.RED
+                        + lang.getString("nonReleaseVersion.running." + versionType.toString());
+
+                event.getPlayer().sendMessage(message);
+                return;
+            }
+
             plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
-                String installedVersion = plugin.getDescription().getVersion();
-
-                PluginVersion.VersionType versionType = PluginVersion.getVersionType(installedVersion);
-                if (versionType != PluginVersion.VersionType.RELEASE) {
-                    // Server is running an unsupported version. Alert the user.
-                    String message = ChatColor.BLUE + this.chatPrefix + ChatColor.RED
-                            + lang.getString("nonReleaseVersion.running." + versionType.toString());
-
-                    event.getPlayer().sendMessage(message);
-                    return;
-                }
-
                 // Server is running a release version. Check for updates and send if available.
                 PluginVersion v = new PluginVersion();
                 boolean isOldVersion;
