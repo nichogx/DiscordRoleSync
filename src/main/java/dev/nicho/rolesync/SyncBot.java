@@ -517,10 +517,7 @@ public class SyncBot extends ListenerAdapter {
 
             db.linkUser(discordId, uuid);
 
-            OfflinePlayer player = Bukkit.getOfflinePlayer(UUID.fromString(uuid));
-            if (player != null) {
-                db.updateUsername(discordId, player.getName());
-            }
+            db.updateUsername(discordId, result.name);
 
             Objects.requireNonNull(bot.getGuildById(plugin.getConfig().getString("botInfo.server")))
                     .retrieveMemberById(discordId).queue(member -> {

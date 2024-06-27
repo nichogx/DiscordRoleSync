@@ -9,6 +9,7 @@ import dev.nicho.rolesync.db.MySQLHandler;
 import dev.nicho.rolesync.db.SQLiteHandler;
 import dev.nicho.rolesync.listeners.PlayerJoinListener;
 import dev.nicho.rolesync.listeners.WhitelistLoginListener;
+import dev.nicho.rolesync.metrics.MetricCacher;
 import dev.nicho.rolesync.util.config.ConfigValidator;
 import dev.nicho.rolesync.util.plugin_meta.PluginVersion;
 import dev.nicho.rolesync.util.vault.VaultAPI;
@@ -22,7 +23,6 @@ import javax.security.auth.login.LoginException;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import net.milkbowl.vault.permission.Permission;
@@ -40,7 +40,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitTask;
 
 public class RoleSync extends JavaPlugin {
 
@@ -164,7 +163,36 @@ public class RoleSync extends JavaPlugin {
         }
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(db, language, this), this);
 
+        // bstats metrics
+        registerMetrics();
+
+        try {
+            checkLatestVersion();
+        } catch (IOException e) {
+            getLogger().warning("Unable to run checks on the installed plugin version.\n" + e.getMessage());
+        }
+    }
+
+    @Override
+    public void onDisable() {
+        // Cleanup bot
+        synchronized (this) {
+            if (this.jda != null)
+                this.jda.shutdown();
+
+            for (MetricCacher<?> cacher : metricCaches.values()) {
+                cacher.stop();
+            }
+        }
+    }
+
+    private final Map<String, MetricCacher<?>> metricCaches = new HashMap<>();
+
+    public void registerMetrics() {
         Metrics metrics = new Metrics(this, 7533);
+
+        // Simple metrics, no caching required.
+
         metrics.addCustomChart(new SimplePie("used_language",
                 () -> getConfig().getString("language")));
 
@@ -219,23 +247,17 @@ public class RoleSync extends JavaPlugin {
             return "unknown/other";
         }));
 
-        metrics.addCustomChart(new SingleLineChart("linked_users",
-                () -> db.getLinkedUserCount()));
+        // Expensive metrics, or metrics that shouldn't run on the main thread.
 
-        try {
-            checkLatestVersion();
-        } catch (IOException e) {
-            getLogger().warning("Unable to run checks on the installed plugin version.\n" + e.getMessage());
-        }
-    }
+        String linkedUsersChartId = "linked_users";
+        MetricCacher<Integer> linkedUsersCache = new MetricCacher<>(this, () -> db.getLinkedUserCount(), 36000L);
+        this.metricCaches.put(linkedUsersChartId, linkedUsersCache);
 
-    @Override
-    public void onDisable() {
-        // Cleanup bot
-        synchronized (this) {
-            if (this.jda != null)
-                this.jda.shutdown();
-        }
+        // All metrics are added a few seconds after initializing them, so that the caches have
+        // time to populate.
+        this.getServer().getScheduler().runTaskLater(this, () -> {
+            metrics.addCustomChart(new SingleLineChart(linkedUsersChartId, linkedUsersCache::getValue));
+        }, 200L); // 10 seconds
     }
 
     /**

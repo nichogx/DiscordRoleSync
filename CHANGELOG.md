@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A potential memory leak when starting the server
 - Improves thread-safety on a few features, including fixing a race condition when the bot is started and stopped in quick succession.
 - Correctly cleans up async bot tasks when shutting down or restarting the Discord bot.
+- Fixes a bstats metric that had been broken since the beta (linked users)
 
 ## [1.3.1](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/1.3.1) - 2024-06-21
 
