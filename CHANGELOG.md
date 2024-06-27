@@ -16,10 +16,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The player count on the bot's activity is now updated every 3 minutes, instead of every 30 minutes.
 
 ### Fixed
-- A potential memory leak when starting the server
+- Fixes a potential memory leak when starting the server
 - Improves thread-safety on a few features, including fixing a race condition when the bot is started and stopped in quick succession.
 - Correctly cleans up async bot tasks when shutting down or restarting the Discord bot.
 - Fixes a bstats metric that had been broken since the beta (linked users)
+- Fixes a bug where the linked user's name would be "null" if they hadn't joined the server before linking.
 
 ## [1.3.1](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/1.3.1) - 2024-06-21
 
