@@ -253,9 +253,10 @@ public class RoleSync extends JavaPlugin {
         MetricCacher<Integer> linkedUsersCache = new MetricCacher<>(this, () -> db.getLinkedUserCount(), 36000L);
         this.metricCaches.put(linkedUsersChartId, linkedUsersCache);
 
-        // All metrics are added a few seconds after initializing them, so that the caches have
-        // time to populate.
         this.getServer().getScheduler().runTaskLater(this, () -> {
+            // All metrics are added a few seconds after initializing them, so that the caches have
+            // time to populate.
+            
             metrics.addCustomChart(new SingleLineChart(linkedUsersChartId, linkedUsersCache::getValue));
         }, 200L); // 10 seconds
     }
