@@ -37,10 +37,6 @@ reloadComplete: "Reload Completo"
 
 playersOnline: "%d/%d jogadores"
 
-# Translation needed! Everything below this line was added after this translation
-# was written. Please make a merge request or contact me to update these to your language!
-##
-
 nonReleaseVersion:
   running:
     UNKNOWN: "Você está em uma versão de desenvolvimento do DiscordRoleSync. Nenhum suporte é fornecido. Por favor, atualize para a versão suportada mais recente, a menos que saiba o que está fazendo."

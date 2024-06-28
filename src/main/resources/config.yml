@@ -1,40 +1,57 @@
-# the language the plugin and bot should run in
-# check the Spigot page for supported languages.
-#   you can add your own language files inside the language
+# The language the plugin and bot should run in.
+# Check the Spigot page for supported languages.
+#   You can add your own language files inside the language
 #   folder and put the name of the file (without the extension) here.
 language: "en_US"
 
 commandNames:
-  # the Discord command that will link users
+  # The Discord command that will link users
   link: "link"
-  # the Discord command that administrators can use to get information
+  # The Discord command that administrators can use to get information
   info: "info"
-  # the Discord command that administrators can use to link other users
+  # The Discord command that administrators can use to link other users
   admLink: "admLink"
-  # the Discord command that administrators can use to unlink users
+  # The Discord command that administrators can use to unlink users
   unlink: "unlink"
 
 botInfo:
-  # the prefix the bot should listen to (can be any length)
-  prefix: "-"
-  # token - you should keep this a secret
-  # get one from the Discord developer portal
+  # Token -- you should keep this a secret. Get one from the Discord developer portal.
   token: ""
-  # the bot will listen for commands from regular users on these chats
-  # it will always reply to commands from who has the roles in adminCommandRoles
-  channelsToListen:
-    - "000000000000000000" # general
-  # server where the bot will look for roles
+
+  # Server where the bot will look for roles
   server: "000000000000000000"
 
+  # ==== LEGACY BOT OPTIONS ====
+
+  # These are from before the bot was updated to use Discord slash commands.
+  # Chat commands are a deprecated behavior and will be removed in a future release.
+
+  # If this is set to false, legacy chat commands (commands that you send
+  # as a message instead of using /command) will be enabled in addition to
+  # slash commands. You shouldn't need this, unless you want to preserve
+  # pre-1.4.0 behavior.
+  disableChatCommands: true
+  # The prefix the bot should listen to (can be any length).
+  # Only relevant for chat commands. Will be ignored when using slash commands.
+  prefix: "-"
+  # The bot will listen for commands from regular users on these chats.
+  # It will always reply to commands from who has the roles in adminCommandRoles.
+  # Only relevant for chat commands. Will be ignored when using slash commands.
+  channelsToListen:
+    - "000000000000000000" # general
+
+  # ==== END LEGACY BOT OPTIONS ====
+
 database:
-  # which database to use. Options are sqlite (file) or mysql
-  # for mysql you need to set the mysql configs below
+  # Which database to use. Options are sqlite (file) or mysql.
+  # For mysql you need to set the mysql configs below
   type: "sqlite"
-  # prefix for the tables that will be created in the databases
+
+  # Prefix for the tables that will be created in the databases
   # (do not include the _)
   tablePrefix: "syncbot"
-  # info for connecting to the MySQL database, ignored unless
+
+  # Info for connecting to the MySQL database, ignored unless
   # database.type is "mysql"
   mysql:
     dbhost: ""
@@ -47,25 +64,24 @@ database:
     # only set the following to true if you really need it
     disableSSL: false
 
-# if the bot should require users to be verified
-# to verify, users should type /drs verify in the chat
-# if DRS whitelist is enabled, they will be given the code when they try to join
+# If the bot should require users to be verified.
+# To verify, users should type /drs verify in the Minecraft chat.
+# If DRS whitelist is enabled, they will be given the code when they try to join.
 requireVerification: false
 
-# the URL of an invitation for your Discord server (will be sent to unlinked users when
+# The URL of an invitation for your Discord server (will be sent to unlinked users when
 # they try to verify their account)
 discordUrl: ""
 
-# whether to delete the user commands after
-# reacting and a few seconds pass
+# Whether to delete the user commands after reacting and a few seconds pass
 deleteCommands: false
 
-# time, in seconds, to wait before deleting a command
-# this is ignored if deleteCommands is false, but is necessary
+# Time, in seconds, to wait before deleting a command. This is ignored if
+# deleteCommands is false, but is necessary otherwise.
 deleteAfter: 10
 
-# how the bot should change the Discord nicknames when the user is linked
-# possible values are:
+# How the bot should change the Discord nicknames when the user is linked.
+# Possible values are:
 # - no: the bot will not touch the Discord nicknames
 # - after: the bot will put the Minecraft user in parentheses: discord name (mc user)
 # - replace: the bot will replace the user's Discord nickname with the Minecraft user
@@ -73,19 +89,19 @@ deleteAfter: 10
 # HIGHER THAN ANY OTHER ROLES. Nickname editing will also not work with server owners :(
 changeNicknames: "no"
 
-# should the bot manage a whitelist?
-# it will kick those that don't have the whitelist role if enabled.
-# please disable the default whitelist with /whitelist off if you are using this.
+# Should the bot manage a whitelist?
+# It will kick those that don't have the whitelist role if enabled.
+# Please disable the default whitelist with /whitelist off if you are using this.
 manageWhitelist: false
 
 # IDs of the roles that should have their members in the whitelist.json file
 whitelistRoles:
   - "000000000000000000" # whitelisted
 
-# if the bot should give the linked players a role (which will be removed if they are unlinked)
+# If the bot should give the linked players a role (which will be removed if they are unlinked)
 giveLinkedRole: false
 
-# the role that should be given to linked users. Ignored if giveLinkedRole is false
+# The role that should be given to linked users. Ignored if giveLinkedRole is false
 linkedRole: "000000000000000000" # linked
 
 # IDs of the roles that should be allowed to use admin commands such as unlink and info
@@ -93,8 +109,8 @@ adminCommandRoles:
   - "000000000000000000" # administrator
   - "000000000000000000" # moderator
 
-# permission groups to add to users with one of the roles in the list
-# follow the example and remove or add more as needed
+# Permission groups to add to users with one of the roles in the list.
+# Follow the example and remove or add more as needed.
 groups:
   admin:
     - "000000000000000000" # administrator
@@ -104,47 +120,49 @@ groups:
     - "000000000000000000" # twitch subs
     - "000000000000000000" # irl friends or something
 
-# emojis to use for reaction
-# to use a custom emoji, you can put its ID instead of the actual unicode emoji.
-# emoji unicode codepoints (U+1F6D1 is a codepoint) can be found at https://emojipedia.org/
+# Emojis to use for reaction.
+# To use a custom emoji, you can put its ID instead of the actual unicode emoji.
+# Emoji unicode codepoints (U+1F6D1 is a codepoint) can be found at https://emojipedia.org/
 react:
-  # if the command was successful
+  # If the command was successful
   onSuccess: "U+2705"
-  # if the user made an error (account already linked, Minecraft user does not exist, etc.)
+  # If the user made an error (account already linked, Minecraft user does not exist, etc.)
   onUserError: "U+274C"
-  # if something went wrong with the bot (this should never happen. If it does, either something is wrong
+  # If something went wrong with the bot (this should never happen. If it does, either something is wrong
   # with the config or the bot. If you need help, contact the developer).
   onBotError: "U+26A0"
-  # if the user does not have permission for that command
+  # If the user does not have permission for that command
   onPermissionError: "U+1F6D1"
 
-# reply to the discord commands with messages in the same channel instead of reacting.
+# Reply to the discord commands with messages in the same channel instead of reacting.
 messageFeedback: false
 
-# configuration for the prefix that the bot will send with the messages ingame
+# Configuration for the prefix that the bot will send with the messages in-game
 chatPrefix:
   text: "[DRS]"
 
-# other server to use instead of Mojang API
-# leave blank to use default Mojang one
+# Other server to use instead of the Mojang API.
+# This is necessary if you use a shared IP with other servers and are
+# getting rate-limited (errors that mention "429") by Mojang's default server.
+# Leave blank to use default Mojang one.
 alternativeServer: ""
 
-# bungeecord servers run in offline mode but need the plugin to
+# BungeeCord servers run in offline mode but need the plugin to
 # run in online mode (this was a request). Put the following to true
 # if you want the plugin to run in ONLINE mode even if the server
 # is in offline mode.
 alwaysOnlineMode: false
 
-# whether the bot should show the number of players online
+# Whether the bot should show the number of players online
 # as its "playing" status
 showPlayers: false
 
-# embed configurations for messages (optional)
+# Embed configurations for messages (optional)
 embed:
-  # set to true to use embeds instead of regular messages
+  # Set to true to use embeds instead of regular messages
   useEmbed: false
-  # the title to set on the embeds
+  # The title to set on the embeds
   title: "Discord Role Sync"
-  # the color
-  # must be one of https://docs.oracle.com/javase/8/docs/api/java/awt/Color.html?is-external=true
+  # The color.
+  # Must be one of https://docs.oracle.com/javase/8/docs/api/java/awt/Color.html?is-external=true
   color: "WHITE"

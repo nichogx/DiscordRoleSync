@@ -11,6 +11,8 @@ import dev.nicho.rolesync.listeners.PlayerJoinListener;
 import dev.nicho.rolesync.listeners.WhitelistLoginListener;
 import dev.nicho.rolesync.metrics.MetricCacher;
 import dev.nicho.rolesync.util.config.ConfigValidator;
+import dev.nicho.rolesync.util.config.migrations.ConfigMigration;
+import dev.nicho.rolesync.util.config.migrations.ConfigMigrator;
 import dev.nicho.rolesync.util.plugin_meta.PluginVersion;
 import dev.nicho.rolesync.util.vault.VaultAPI;
 
@@ -36,6 +38,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -73,6 +76,19 @@ public class RoleSync extends JavaPlugin {
         try {
             getLogger().info("Reading config.yml");
             saveDefaultConfig();
+
+            getLogger().info("Attempting to migrate config.yml");
+            ConfigMigrator migrator = new ConfigMigrator(this);
+            FileConfiguration updatedConfig = migrator.run(getConfig());
+            if (updatedConfig != null) {
+                getLogger().info("Config file has been migrated. Saving and reloading.");
+                updatedConfig.save(Paths.get(getDataFolder().getPath(), "config.yml").toString());
+
+                reloadConfig();
+                getLogger().info("Done migrating configs!");
+            } else {
+                getLogger().info("No configs to migrate.");
+            }
 
             ConfigValidator validator;
             try (InputStream schemaStream = getResource("config_schema.json")) {
@@ -256,7 +272,7 @@ public class RoleSync extends JavaPlugin {
         this.getServer().getScheduler().runTaskLater(this, () -> {
             // All metrics are added a few seconds after initializing them, so that the caches have
             // time to populate.
-            
+
             metrics.addCustomChart(new SingleLineChart(linkedUsersChartId, linkedUsersCache::getValue));
         }, 200L); // 10 seconds
     }
@@ -438,22 +454,19 @@ public class RoleSync extends JavaPlugin {
             if (missingKeys.isEmpty()) continue;
             getLogger().info(String.format("Language file %s is missing keys, updating...", language));
 
-            YamlConfiguration readFrom;
-            try (
-                    InputStream resourceStream = getResource(String.format("language/%s", language));
-                    Reader reader = new InputStreamReader(resourceStream)
-            ) {
-                readFrom = YamlConfiguration.loadConfiguration(reader);
+            String languageResource = String.format("language/%s", language);
+            try (InputStream resourceStream = getResource(languageResource)) {
+                if (resourceStream == null)
+                    languageResource = "language/en_US.yml";
             } catch (Exception e) {
-                readFrom = english;
+                languageResource = "language/en_US.yml";
             }
 
-            for (String key : missingKeys) {
-                loaded.set(key, readFrom.get(key));
-            }
+            ConfigMigration migration = new ConfigMigration(languageResource);
+            FileConfiguration newConfig = migration.run(loaded);
 
             try {
-                loaded.save(Paths.get(getDataFolder().getPath(), "language", language).toString());
+                newConfig.save(Paths.get(getDataFolder().getPath(), "language", language).toString());
             } catch (IOException e) {
                 getLogger().severe("Failed to update language file." + e.getMessage());
                 continue;

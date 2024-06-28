@@ -10,6 +10,9 @@
   },
   "additionalProperties": false,
   "properties": {
+    "configVersion": {
+      "type": "integer"
+    },
     "language": {
       "type": "string"
     },
@@ -39,6 +42,9 @@
     "botInfo": {
       "type": "object",
       "properties": {
+        "disableChatCommands": {
+          "type": "boolean"
+        },
         "prefix": {
           "type": "string"
         },
@@ -58,9 +64,7 @@
         }
       },
       "required": [
-        "prefix",
         "token",
-        "channelsToListen",
         "server"
       ]
     },
