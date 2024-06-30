@@ -1,4 +1,4 @@
-package dev.nicho.rolesync.util.mojang;
+package dev.nicho.rolesync.bot.mojang;
 
 import dev.nicho.rolesync.RoleSync;
 import org.bukkit.configuration.file.FileConfiguration;

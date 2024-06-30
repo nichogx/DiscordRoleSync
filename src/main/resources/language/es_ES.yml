@@ -7,7 +7,6 @@ successUnlink: "You have successfully unlinked the accounts"
 successVerify: "You have successfully verified this account"
 
 userNotLinked: "This user is not linked"
-incorrectVerificationCode: "Incorrect verification code. Please try verifying again"
 
 noPermissionError: "No tienes permisos para ejecutar este comando."
 commandError: "Ha surgido un error mientras se ejecutaba el comando. Por favor, revisa la consola."
@@ -20,8 +19,6 @@ drsBotRestartDescription: "Reinicia el bot"
 botRestarted: "El bot ha sido reiniciado correctamente."
 
 drsVerifyDescription: "Verifica tu cuenta de Discord"
-alreadyVerified: "Ya estás verificado"
-verificationInstructions: "Por favor, envía este código por mensaje privado al bot de Discord: "
 
 pleaseLink: "Por favor, conecta tu cuenta en nuestro servidor de Discord:"
 
@@ -46,3 +43,31 @@ nonReleaseVersion:
     UNKNOWN: "You are running a development build of DiscordRoleSync. No support is provided. Please update to the latest supported version unless you know what you are doing."
     DEVELOPMENT_PREVIEW: "You are running a development preview version of DiscordRoleSync. This is unsupported and might contain bugs. Please update to the latest supported version unless you know what you are doing."
     RELEASE_CANDIDATE: "You are running a beta/release candidate version of DiscordRoleSync. You might encounter bugs. Please report any issues to the developer via GitLab or Discord, so they can be fixed for the release."
+
+commandDescriptions:
+  link: "Links your Discord account to a Minecraft username"
+  verify: "Verifies your Minecraft account as being owned by your Discord account"
+  unlink: "Unlinks a user's Discord account or Minecraft username"
+  admlink: "Force-links a user's Discord account to a Minecraft username"
+  info: "Gets link information about a Discord account or a Minecraft username"
+
+commandArguments:
+  minecraftUsername:
+    link: "The Minecraft username to link to"
+    unlink: "The Minecraft username to unlink"
+    info: "The Minecraft username to get info for"
+    admlink: "The Minecraft username to link"
+  discordUser:
+    unlink: "The Discord user to unlink"
+    info: "The Discord user to get info for"
+    admlink: "The Discord user to link"
+  verificationCode: "The verification code obtained in Minecraft"
+
+fullLinkedTo: "Discord user %discord_user% is linked to Minecraft user %minecraft_user%"
+
+verification:
+  instructions: "Please verify your account using /%verify_command_name% on Discord. Your verification code is: %verification_code%"
+  alreadyVerified: "Ya estás verificado"
+  wrongDigits: "Verification code must be %d digits long."
+  wrongCode: "Incorrect verification code. Please try verifying again"
+  notLinked: "You have not linked your accounts yet. Please use /%link_command_name% first."

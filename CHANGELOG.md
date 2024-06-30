@@ -5,22 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.4.0](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/1.4.0) - unreleased
+## [2.0.0](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/1.4.0) - unreleased
 
 This is a large update! It's recommended to update as soon as possible, as it contains multiple security and bug fixes.
 It also vastly improves the plugin's stability.
 
 ### Added
 - A language file validator, which will update potentially old files existing on servers.
-- Basic config file validation
+- Basic config file validation, versioning, and updating.
 - Support for Discord slash commands
 
 ### Changed
 - Improved alerts for servers running old or unsupported versions. Messages are more descriptive, and differentiate between release and pre-release, development or test builds.
 - The player count on the bot's activity is now updated every 3 minutes, instead of every 30 minutes.
 
-### Deprecated
-- Chat commands (the ones where you configure a prefix and send a message in a channel to get the bot to respond) are deprecated. While they still work if you set the config to accept them, support is no longer provided for them, and you should migrate away as soon as possible. They will be removed in a future release.
+### Removed
+- Chat commands (the ones where you configure a prefix and send a message in a channel to get the bot to respond) have been removed. You should now use Discord slash commands.
 
 ### Fixed
 - Fixes a potential memory leak when starting the server

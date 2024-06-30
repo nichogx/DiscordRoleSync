@@ -1,3 +1,7 @@
+# Used internally for backwards-compatibility with old config files.
+# Please DO NOT change this manually as the plugin WILL crash.
+configVersion: 2
+
 # The language the plugin and bot should run in.
 # Check the Spigot page for supported languages.
 #   You can add your own language files inside the language
@@ -7,6 +11,8 @@ language: "en_US"
 commandNames:
   # The Discord command that will link users
   link: "link"
+  # The Discord command that will verify users (only if requireVerification is on)
+  verify: "verify"
   # The Discord command that administrators can use to get information
   info: "info"
   # The Discord command that administrators can use to link other users
@@ -14,33 +20,12 @@ commandNames:
   # The Discord command that administrators can use to unlink users
   unlink: "unlink"
 
-botInfo:
+bot:
   # Token -- you should keep this a secret. Get one from the Discord developer portal.
   token: ""
 
   # Server where the bot will look for roles
   server: "000000000000000000"
-
-  # ==== LEGACY BOT OPTIONS ====
-
-  # These are from before the bot was updated to use Discord slash commands.
-  # Chat commands are a deprecated behavior and will be removed in a future release.
-
-  # If this is set to false, legacy chat commands (commands that you send
-  # as a message instead of using /command) will be enabled in addition to
-  # slash commands. You shouldn't need this, unless you want to preserve
-  # pre-1.4.0 behavior.
-  disableChatCommands: true
-  # The prefix the bot should listen to (can be any length).
-  # Only relevant for chat commands. Will be ignored when using slash commands.
-  prefix: "-"
-  # The bot will listen for commands from regular users on these chats.
-  # It will always reply to commands from who has the roles in adminCommandRoles.
-  # Only relevant for chat commands. Will be ignored when using slash commands.
-  channelsToListen:
-    - "000000000000000000" # general
-
-  # ==== END LEGACY BOT OPTIONS ====
 
 database:
   # Which database to use. Options are sqlite (file) or mysql.
@@ -73,13 +58,6 @@ requireVerification: false
 # they try to verify their account)
 discordUrl: ""
 
-# Whether to delete the user commands after reacting and a few seconds pass
-deleteCommands: false
-
-# Time, in seconds, to wait before deleting a command. This is ignored if
-# deleteCommands is false, but is necessary otherwise.
-deleteAfter: 10
-
 # How the bot should change the Discord nicknames when the user is linked.
 # Possible values are:
 # - no: the bot will not touch the Discord nicknames
@@ -104,11 +82,6 @@ giveLinkedRole: false
 # The role that should be given to linked users. Ignored if giveLinkedRole is false
 linkedRole: "000000000000000000" # linked
 
-# IDs of the roles that should be allowed to use admin commands such as unlink and info
-adminCommandRoles:
-  - "000000000000000000" # administrator
-  - "000000000000000000" # moderator
-
 # Permission groups to add to users with one of the roles in the list.
 # Follow the example and remove or add more as needed.
 groups:
@@ -119,23 +92,6 @@ groups:
   vip:
     - "000000000000000000" # twitch subs
     - "000000000000000000" # irl friends or something
-
-# Emojis to use for reaction.
-# To use a custom emoji, you can put its ID instead of the actual unicode emoji.
-# Emoji unicode codepoints (U+1F6D1 is a codepoint) can be found at https://emojipedia.org/
-react:
-  # If the command was successful
-  onSuccess: "U+2705"
-  # If the user made an error (account already linked, Minecraft user does not exist, etc.)
-  onUserError: "U+274C"
-  # If something went wrong with the bot (this should never happen. If it does, either something is wrong
-  # with the config or the bot. If you need help, contact the developer).
-  onBotError: "U+26A0"
-  # If the user does not have permission for that command
-  onPermissionError: "U+1F6D1"
-
-# Reply to the discord commands with messages in the same channel instead of reacting.
-messageFeedback: false
 
 # Configuration for the prefix that the bot will send with the messages in-game
 chatPrefix:

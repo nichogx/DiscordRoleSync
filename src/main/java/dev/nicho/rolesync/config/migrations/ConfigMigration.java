@@ -1,15 +1,12 @@
-package dev.nicho.rolesync.util.config.migrations;
+package dev.nicho.rolesync.config.migrations;
 
-import dev.nicho.rolesync.util.config.ConfigReader;
+import dev.nicho.rolesync.config.ConfigReader;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.*;
 
 /**
@@ -79,7 +76,7 @@ public class ConfigMigration {
      * migrated configs to have specific values, different from
      * the default one in the new version.
      *
-     * @param name  The name of the key.
+     * @param name  The name of the key. This is the NEW KEY.
      * @param value The value it should have in the final config.
      */
     public void hardcode(String name, Object value) {
@@ -101,10 +98,12 @@ public class ConfigMigration {
         FileConfiguration oldConfig = parseFileConfiguration(config);
         FileConfiguration newConfig = createNewConfig();
 
+        int version = newConfig.getInt("configVersion");
+
         // Initializes the new config with the same-named values from the old one.
         oldConfig.getValues(true).forEach((k, v) -> {
-            // Only keys that also exist in the new file should be included
-            if (newConfig.contains(k, true)) {
+            // Only leaf keys that also exist in the new file should be included
+            if (newConfig.contains(k, true) && !oldConfig.isConfigurationSection(k)) {
                 newConfig.set(k, v);
             }
         });
@@ -113,9 +112,11 @@ public class ConfigMigration {
         this.hardcoded.forEach(newConfig::set);
 
         // Update all renamed keys
-        this.renamed.forEach((name, previously) -> {
-            newConfig.set(name, oldConfig.get(previously));
-        });
+        this.renamed.forEach((name, previously) -> newConfig.set(name, oldConfig.get(previously)));
+
+        // Lastly, set the new configVersion. This might have
+        // been overridden by the previous steps.
+        newConfig.set("configVersion", version);
 
         return newConfig;
     }

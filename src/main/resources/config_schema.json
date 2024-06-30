@@ -22,6 +22,9 @@
         "link": {
           "type": "string"
         },
+        "verify": {
+          "type": "string"
+        },
         "info": {
           "type": "string"
         },
@@ -34,30 +37,18 @@
       },
       "required": [
         "link",
+        "verify",
         "info",
         "admLink",
         "unlink"
       ]
     },
-    "botInfo": {
+    "bot": {
       "type": "object",
       "properties": {
-        "disableChatCommands": {
-          "type": "boolean"
-        },
-        "prefix": {
-          "type": "string"
-        },
         "token": {
           "type": "string",
           "minLength": 1
-        },
-        "channelsToListen": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/discordId"
-          },
-          "minItems": 1
         },
         "server": {
           "$ref": "#/definitions/discordId"
@@ -126,12 +117,6 @@
     "discordUrl": {
       "type": "string"
     },
-    "deleteCommands": {
-      "type": "boolean"
-    },
-    "deleteAfter": {
-      "type": "number"
-    },
     "changeNicknames": {
       "type": "string",
       "enum": [
@@ -155,12 +140,6 @@
     "linkedRole": {
       "$ref": "#/definitions/discordId"
     },
-    "adminCommandRoles": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/discordId"
-      }
-    },
     "groups": {
       "type": "object",
       "additionalProperties": {
@@ -169,32 +148,6 @@
           "$ref": "#/definitions/discordId"
         }
       }
-    },
-    "react": {
-      "type": "object",
-      "properties": {
-        "onSuccess": {
-          "type": "string"
-        },
-        "onUserError": {
-          "type": "string"
-        },
-        "onBotError": {
-          "type": "string"
-        },
-        "onPermissionError": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "onSuccess",
-        "onUserError",
-        "onBotError",
-        "onPermissionError"
-      ]
-    },
-    "messageFeedback": {
-      "type": "boolean"
     },
     "chatPrefix": {
       "type": "object",
@@ -275,21 +228,16 @@
   "required": [
     "language",
     "commandNames",
-    "botInfo",
+    "bot",
     "database",
     "requireVerification",
     "discordUrl",
-    "deleteCommands",
-    "deleteAfter",
     "changeNicknames",
     "manageWhitelist",
     "whitelistRoles",
     "giveLinkedRole",
     "linkedRole",
-    "adminCommandRoles",
     "groups",
-    "react",
-    "messageFeedback",
     "chatPrefix",
     "alternativeServer",
     "alwaysOnlineMode",

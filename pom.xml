@@ -98,16 +98,6 @@
             <url>https://repo.papermc.io/repository/maven-public/</url>
         </repository>
 
-        <!--
-        TODO(#2): remove this repository after upgrading JDA to 5.0.0. Newer JDA versions
-            are available on maven central or JDA's repo.
-        -->
-        <repository>
-            <id>jcenter</id>
-            <name>jcenter-bintray</name>
-            <url>https://jcenter.bintray.com</url>
-        </repository>
-
         <!-- For VaultAPI -->
         <repository>
             <id>jitpack.io</id>
@@ -170,7 +160,7 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>4.1.1_145</version>
+            <version>5.0.0-beta.24</version>
             <!-- Disables audio natives, to reduce .jar size. -->
             <exclusions>
                 <exclusion>
@@ -193,16 +183,6 @@
             <groupId>com.networknt</groupId>
             <artifactId>json-schema-validator</artifactId>
             <version>1.4.2</version>
-        </dependency>
-        <!--
-        TODO(#2): Remove this once JDA is updated. json-schema-validator requires a newer version
-            than the one included in JDA. This forces JDA to use 2.17.1 instead of pulling 2.10 as
-            a dependency. JDA 5.0.0 uses 2.17 so does not require this.
-         -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.17.1</version>
         </dependency>
 
         <!-- On server -->

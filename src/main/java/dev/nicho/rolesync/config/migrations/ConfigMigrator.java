@@ -1,6 +1,6 @@
-package dev.nicho.rolesync.util.config.migrations;
+package dev.nicho.rolesync.config.migrations;
 
-import dev.nicho.rolesync.util.config.ConfigReader;
+import dev.nicho.rolesync.config.ConfigReader;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -25,6 +25,8 @@ public class ConfigMigrator {
         // Version 2 is the current config.yml
         // NOTE: when updating this to 3, legacy v2 should be saved somewhere else (e.g. config_versions/2.yml)
         ConfigMigration v1to2 = new ConfigMigration(1, "config.yml");
+        v1to2.renamedKey("botInfo.token", "bot.token");
+        v1to2.renamedKey("botInfo.server", "bot.server");
         migrations.add(v1to2);
 
         try {
@@ -57,6 +59,11 @@ public class ConfigMigrator {
 
         this.plugin.getLogger().info("Running migration from version " + version);
         FileConfiguration migrated = migration.run(config);
+
+        if (migrated.getInt("configVersion") == version) {
+            this.plugin.getLogger().severe("Config migration failed. configVersion was not updated.");
+            return null;
+        }
 
         // Try migrating again
         FileConfiguration nextMigration = this.run(migrated);

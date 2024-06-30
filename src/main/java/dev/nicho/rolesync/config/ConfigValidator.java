@@ -1,4 +1,4 @@
-package dev.nicho.rolesync.util.config;
+package dev.nicho.rolesync.config;
 
 import com.networknt.schema.InputFormat;
 import com.networknt.schema.JsonSchema;

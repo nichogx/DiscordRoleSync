@@ -1,4 +1,4 @@
-package dev.nicho.rolesync.util.config;
+package dev.nicho.rolesync.config;
 
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;

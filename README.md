@@ -28,7 +28,7 @@ Just copy the .jar to the plugins folder and run the server once to generate the
 3. In the left sidebar, click "Bot"
 4. Click "add bot" and confirm
 5. In this page, you can change your bot's picture and username.
-6. Turn on "Server Members Intent" and "Message Content Intent" - it won't work without this as the bot needs to work with the member list and listen to commands
+6. Turn on "Server Members Intent" - it won't work without this as the bot needs to work with the member list
 7. Click copy token and paste it in the config file. Anyone with your token can log in as your bot, so you should keep it secret as if it were a password.
 8. Go back to the Discord developer website and on the left sidebar, click "OAuth2"
 9. Select "bot" as a scope then copy the link
@@ -37,22 +37,22 @@ Just copy the .jar to the plugins folder and run the server once to generate the
 Don't forget to put all roles in the configs. You should put the role IDs, not the role names. To get the ID you should enable developer mode in Discord, then right-click the role and copy ID (it's a number of approximately 18 digits). The same thing applies for the server ID and channel IDs.
 
 ## How it Works
-It's pretty simple: all your users should use the -link command in Discord to link their Minecraft account:
+It's pretty simple: all your users should use the `/link` command in Discord to link their Minecraft account:
 
-`-link myMCusername`
+`/link myMCusername`
 
 As soon as they do this, their roles will keep synchronized while they are in the server. When your users get the Discord role, they will automatically get the permission plugin group. Updates are instant.
 
-Staff can also use the `-admlink` command to force link a user:
+Staff can also use the `/admlink` command to force link a user:
 
-`-admlink discordID mcUsername`
+`/admlink discordID mcUsername`
 
 The Discord ID of the user is a 17 to 20-digit number.
 
-The `-info` and `-unlink` commands are available for staff use. Both accept Discord IDs or Minecraft usernames.
-The users need to remain in the Discord server to keep their roles. If they leave the server or are unlinked with the -unlink command, they are removed from the whitelist and every role is removed from them.
+The `/info` and `/unlink` commands are available for staff use. Both accept Discord IDs or Minecraft usernames. By default, these three admin commands are available for everyone that has the `MANAGE ROLES` Discord permission. This can be modified in your Discord server.
+The users need to remain in the Discord server to keep their roles. If they leave the server or are unlinked with the `/unlink` command, they are removed from the whitelist and every role is removed from them.
 
-If verification is enabled, users will either get the code when they are kicked by whitelist (if whitelist management is enabled) or by typing /drs verify in the Minecraft chat (if it is disabled).
+If verification is enabled (`requireVerification: true` on the config), users will either get the code when they are kicked by whitelist (if whitelist management is enabled) or by typing `/drs verify` in the Minecraft chat. This code then needs to be sent in Discord using `/verify <code>`.
 
 ## Languages and Translation
 Currently, the languages supported (and bundled with the plugin) are:
@@ -67,6 +67,7 @@ Currently, the languages supported (and bundled with the plugin) are:
 - Russian (ru_RU)
 
 If you want to add your language, you can copy the en_US.yml file and edit it to your language. If you are interested in having your translation bundled with the plugin, please contact me via Discord or make a merge request on GitLab, I'll be happy to include it :D
+As updates to this plugin are released, only English and Portuguese are updated (as those are the languages I speak). Other languages might get out of date and will use English as a default. Please let me know if you'd like to help update these languages!
 
 ## Permission Plugins
 This plugin should work with every permission plugin that supports Vault.
@@ -97,4 +98,3 @@ All users are permitted to use the /drs verify command
 ## Known Issues and Warnings
 
 - The plugin might not work if installed with some plugins that also use the JDA library, if they use an older version and are loaded before (such as Minecord).
-- No config file validation. You should be fine as long as you keep the format of the default file. Please don't remove any properties from the config file as it will result in null pointer exceptions :p

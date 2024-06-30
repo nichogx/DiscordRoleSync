@@ -1,4 +1,4 @@
-package dev.nicho.rolesync.util.mojang;
+package dev.nicho.rolesync.bot.mojang;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;

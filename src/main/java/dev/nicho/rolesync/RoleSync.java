@@ -4,15 +4,16 @@ import com.networknt.schema.JsonSchema;
 import com.networknt.schema.JsonSchemaFactory;
 import com.networknt.schema.SpecVersion;
 import com.networknt.schema.ValidationMessage;
+import dev.nicho.rolesync.bot.SyncBot;
 import dev.nicho.rolesync.db.DatabaseHandler;
 import dev.nicho.rolesync.db.MySQLHandler;
 import dev.nicho.rolesync.db.SQLiteHandler;
 import dev.nicho.rolesync.listeners.PlayerJoinListener;
 import dev.nicho.rolesync.listeners.WhitelistLoginListener;
 import dev.nicho.rolesync.metrics.MetricCacher;
-import dev.nicho.rolesync.util.config.ConfigValidator;
-import dev.nicho.rolesync.util.config.migrations.ConfigMigration;
-import dev.nicho.rolesync.util.config.migrations.ConfigMigrator;
+import dev.nicho.rolesync.config.ConfigValidator;
+import dev.nicho.rolesync.config.migrations.ConfigMigration;
+import dev.nicho.rolesync.config.migrations.ConfigMigrator;
 import dev.nicho.rolesync.util.plugin_meta.PluginVersion;
 import dev.nicho.rolesync.util.vault.VaultAPI;
 
@@ -21,12 +22,8 @@ import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.logging.Level;
-import javax.security.auth.login.LoginException;
 
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.requests.GatewayIntent;
-import net.dv8tion.jda.api.utils.cache.CacheFlag;
+import net.dv8tion.jda.api.exceptions.InvalidTokenException;
 import net.milkbowl.vault.permission.Permission;
 import org.apache.commons.io.FileUtils;
 import org.bstats.bukkit.Metrics;
@@ -52,8 +49,7 @@ public class RoleSync extends JavaPlugin {
     private boolean configLoaded = false;
 
     private DatabaseHandler db = null;
-    private SyncBot syncBot = null;
-    private JDA jda = null;
+    private SyncBot bot = null;
     private VaultAPI vault = null;
 
     private String chatPrefix = null;
@@ -82,6 +78,15 @@ public class RoleSync extends JavaPlugin {
             FileConfiguration updatedConfig = migrator.run(getConfig());
             if (updatedConfig != null) {
                 getLogger().info("Config file has been migrated. Saving and reloading.");
+
+                // Save old config to a backup file
+                getConfig().save(Paths.get(getDataFolder().getPath(), String.format(
+                        "config-bkp-%d-%d.yml",
+                        getConfig().getInt("configVersion", 1),
+                        System.currentTimeMillis()
+                )).toString());
+
+                // Save new config
                 updatedConfig.save(Paths.get(getDataFolder().getPath(), "config.yml").toString());
 
                 reloadConfig();
@@ -158,7 +163,7 @@ public class RoleSync extends JavaPlugin {
             }
 
             this.vault = new VaultAPI(rsp.getProvider(), managedGroups);
-            this.syncBot = new SyncBot(this, language, this.db, this.vault);
+            this.bot = new SyncBot(this);
             startBot();
 
         } catch (IOException | SQLException e) {
@@ -191,10 +196,10 @@ public class RoleSync extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        // Cleanup bot
         synchronized (this) {
-            if (this.jda != null)
-                this.jda.shutdown();
+            // Cleanup bot
+            if (this.bot != null)
+                this.bot.shutdown();
 
             for (MetricCacher<?> cacher : metricCaches.values()) {
                 cacher.stop();
@@ -216,7 +221,7 @@ public class RoleSync extends JavaPlugin {
                 () -> String.valueOf(getConfig().getBoolean("manageWhitelist"))));
 
         metrics.addCustomChart(new SimplePie("delete_commands",
-                () -> String.valueOf(getConfig().getBoolean("deleteCommands"))));
+                () -> String.valueOf(getConfig().getBoolean("bot.legacyOptions.commandDeletion.enable"))));
 
         metrics.addCustomChart(new SimplePie("linked_role",
                 () -> String.valueOf(getConfig().getBoolean("giveLinkedRole"))));
@@ -350,12 +355,9 @@ public class RoleSync extends JavaPlugin {
                 return false;
             }
 
-            syncBot.stopTimers();
-            synchronized (this) {
-                jda.shutdown();
-            }
-
+            bot.shutdown();
             startBot();
+
             sender.sendMessage(ChatColor.BLUE + chatPrefix + ChatColor.GREEN + language.getString("botRestarted"));
 
             return true;
@@ -368,10 +370,11 @@ public class RoleSync extends JavaPlugin {
                             sender.sendMessage(ChatColor.BLUE + chatPrefix + ChatColor.RESET + language.getString("pleaseLink")
                                     + " " + getConfig().getString("discordUrl"));
                         } else if (!userInfo.verified) {
-                            sender.sendMessage(ChatColor.BLUE + chatPrefix + ChatColor.RESET + language.getString("verificationInstructions")
-                                    + " " + ChatColor.AQUA + userInfo.code);
+                            sender.sendMessage(ChatColor.BLUE + chatPrefix + ChatColor.RESET + language.getString("verification.instructions")
+                                    .replace("%verify_command_name%", getConfig().getString("commandNames.verify", "verify"))
+                                    .replace("%verification_code%", ChatColor.AQUA + String.valueOf(userInfo.code) + ChatColor.RESET));
                         } else {
-                            sender.sendMessage(ChatColor.BLUE + chatPrefix + ChatColor.RESET + language.getString("alreadyVerified"));
+                            sender.sendMessage(ChatColor.BLUE + chatPrefix + ChatColor.RESET + language.getString("verification.alreadyVerified"));
                         }
                     } catch (SQLException e) {
                         sender.sendMessage(ChatColor.RED + language.getString("commandError"));
@@ -509,31 +512,25 @@ public class RoleSync extends JavaPlugin {
     private void startBot() {
         this.getServer().getScheduler().runTaskAsynchronously(this, () -> {
             try {
-                getLogger().info("Initializing bot");
-                JDABuilder builder = JDABuilder
-                        .create(getConfig().getString("botInfo.token"),
-                                GatewayIntent.GUILD_MEMBERS,
-                                GatewayIntent.GUILD_MESSAGES,
-                                GatewayIntent.DIRECT_MESSAGES,
-                                GatewayIntent.GUILD_BANS)
-                        .disableCache(
-                                CacheFlag.EMOTE,
-                                CacheFlag.VOICE_STATE,
-                                CacheFlag.ACTIVITY,
-                                CacheFlag.CLIENT_STATUS
-                        );
-
-                builder.addEventListeners(this.syncBot);
-
-                synchronized (this) {
-                    this.jda = builder.build();
-                }
-            } catch (LoginException e) {
+                this.bot.start();
+            } catch (InvalidTokenException | IllegalArgumentException e) {
                 getLogger().log(Level.SEVERE, "Error logging in. Did you set your token in config.yml?", e);
 
                 // Switch back to main thread to disable ourselves
                 this.getServer().getScheduler().runTask(this, () -> this.setEnabled(false));
             }
         });
+    }
+
+    public FileConfiguration getLanguage() {
+        return language;
+    }
+
+    public DatabaseHandler getDb() {
+        return db;
+    }
+
+    public VaultAPI getVault() {
+        return vault;
     }
 }

@@ -2,16 +2,15 @@ linkedTo: "Linkado a"
 unknownUser: "usuário desconhecido"
 discordAlreadyLinked: "Sua conta do Discord já está linkada a uma conta do Minecraft"
 minecraftAlreadyLinked: "Sua conta do Minecraft já está linkada a uma conta do Discord"
-successLink: "You have successfully linked your accounts"
-successUnlink: "You have successfully unlinked the accounts"
-successVerify: "You have successfully verified this account"
+successLink: "As contas foram linkadas"
+successUnlink: "As contas foram deslinkadas"
+successVerify: "A conta foi verificada"
 
-userNotLinked: "This user is not linked"
-incorrectVerificationCode: "Incorrect verification code. Please try verifying again"
+userNotLinked: "Este usuário não está linkado"
 
 noPermissionError: "Você não tem permissão para rodar esse comando."
 commandError: "Erro ao rodar esse comando. Por favor veja o console."
-incorrectCommandFormat: "The command is formatted incorrectly."
+incorrectCommandFormat: "Este comando está formatado incorretamente."
 
 usage: "Uso:"
 drsReloadDescription: "Dar reload nos arquivos de config e línguas"
@@ -20,8 +19,6 @@ drsBotRestartDescription: "Reinicia o bot"
 botRestarted: "Bot reiniciado."
 
 drsVerifyDescription: "Verificar sua conta do Discord"
-alreadyVerified: "Você já é verificado"
-verificationInstructions: "Por favor envie esse código na DM do bot do Discord:"
 
 pleaseLink: "Por favor, faça link da sua conta no nosso servidor do Discord:"
 
@@ -42,3 +39,31 @@ nonReleaseVersion:
     UNKNOWN: "Você está em uma versão de desenvolvimento do DiscordRoleSync. Nenhum suporte é fornecido. Por favor, atualize para a versão suportada mais recente, a menos que saiba o que está fazendo."
     DEVELOPMENT_PREVIEW: "Você está em uma versão de preview de desenvolvimento do DiscordRoleSync. Suporte não é fornecido, e você pode encontrar bugs. Por favor, atualize para a versão suportada mais recente, a menos que saiba o que está fazendo."
     RELEASE_CANDIDATE: "Você está em uma versão beta/candidata para release do DiscordRoleSync. Você pode encontrar bugs. Por favor, reporte qualquer problemas encontrados ao desenvolvedor via GitLab ou Discord, para que possam ser resolvidos para a versão final."
+
+commandDescriptions:
+  link: "Linka sua conta do Discord à sua conta do Minecraft"
+  verify: "Verifica sua conta do Minecraft à sua conta do Discord"
+  unlink: "Unlinks a user's Discord account or Minecraft username"
+  admlink: "Linka uma conta do Discord à uma conta do Minecraft"
+  info: "Informação de link de uma conta do Discord ou conta do Minecraft"
+
+commandArguments:
+  minecraftUsername:
+    link: "O nome do Minecraft para linkar"
+    unlink: "O nome do Minecraft para deslinkar"
+    info: "O nome do Minecraft para obter informação"
+    admlink: "O nome do Minecraft para linkar"
+  discordUser:
+    unlink: "O usuário do Discor para deslinkar"
+    info: "O usuário do Discor para obter informação"
+    admlink: "O usuário do Discor para linkar"
+  verificationCode: "O código de verificação obtido no Mineraft"
+
+fullLinkedTo: "Usuário %discord_user% está linkado à conta do Minecraft %minecraft_user%"
+
+verification:
+  instructions: "Por favor verifique sua conta usando /%verify_command_name% on Discord. Seu código de verificação é: %verification_code%"
+  alreadyVerified: "Você já está verificado."
+  wrongDigits: "O código de verificação deve ter %d dígitos."
+  wrongCode: "Código de verificação incorreto. Por favor, tente novamente."
+  notLinked: "Você ainda não linkou suas contas. Use /%link_command_name% primeiro."
