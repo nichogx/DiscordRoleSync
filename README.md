@@ -67,6 +67,7 @@ Currently, the languages supported (and bundled with the plugin) are:
 - Russian (ru_RU)
 
 If you want to add your language, you can copy the en_US.yml file and edit it to your language. If you are interested in having your translation bundled with the plugin, please contact me via Discord or make a merge request on GitLab, I'll be happy to include it :D
+
 As updates to this plugin are released, only English and Portuguese are updated (as those are the languages I speak). Other languages might get out of date and will use English as a default. Please let me know if you'd like to help update these languages!
 
 ## Permission Plugins
