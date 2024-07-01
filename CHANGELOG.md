@@ -19,9 +19,11 @@ It also vastly improves the plugin's stability.
 - Improved alerts for servers running old or unsupported versions. Messages are more descriptive, and differentiate between release and pre-release, development or test builds.
 - The player count on the bot's activity is now updated every 3 minutes, instead of every 30 minutes.
 - Embed colors now support custom hex colors, and different colors can be specified for info, error or success messages.
+- Verification now needs to be done via a Discord `/verify` command, instead of sending the code to the bot's DM.
 
 ### Removed
 - Chat commands (the ones where you configure a prefix and send a message in a channel to get the bot to respond) have been removed. You should now use Discord slash commands.
+  - Message reactions, response deletion, and other chat-related features and config options have also been removed, since there are no more chat commands.
 
 ### Fixed
 - Fixes a potential memory leak when starting the server
@@ -29,6 +31,7 @@ It also vastly improves the plugin's stability.
 - Correctly cleans up async bot tasks when shutting down or restarting the Discord bot.
 - Fixes a bstats metric that had been broken since the beta (linked users)
 - Fixes a bug where the linked user's name would be "null" if they hadn't joined the server before linking.
+- Fixed a bug where some features did not respect the `/drs reload` command
 
 ## [1.3.1](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/1.3.1) - 2024-06-21
 
