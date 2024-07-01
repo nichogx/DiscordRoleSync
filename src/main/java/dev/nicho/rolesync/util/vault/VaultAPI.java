@@ -1,27 +1,30 @@
 package dev.nicho.rolesync.util.vault;
 
+import dev.nicho.rolesync.RoleSync;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class VaultAPI {
 
     private final Permission permProvider;
-    private final List<String> managedGroups;
+    private final RoleSync plugin;
 
     /**
-     * Creates a VaultAPI that will manage the groups in the list.
+     * Creates a VaultAPI that will manage groups.
      *
-     * @param managedGroups the list of groups to manage
+     * @param plugin the JavaPlugin
      * @throws IllegalStateException if Vault is not loaded.
      */
-    public VaultAPI(Permission permProvider, List<String> managedGroups) throws IllegalStateException {
+    public VaultAPI(RoleSync plugin, Permission permProvider) throws IllegalStateException {
         this.permProvider = permProvider;
-        this.managedGroups = managedGroups;
+        this.plugin = plugin;
     }
 
     /**
@@ -34,7 +37,7 @@ public class VaultAPI {
     public void setGroups(String uuid, @Nullable List<String> groups) {
         OfflinePlayer player = Bukkit.getOfflinePlayer(UUID.fromString(uuid));
 
-        for (String managedPerm : managedGroups) {
+        for (String managedPerm : getManagedGroups()) {
             permProvider.playerRemoveGroup(null, player, managedPerm);
         }
 
@@ -48,5 +51,16 @@ public class VaultAPI {
      */
     public String getPermPluginName() {
         return this.permProvider.getName();
+    }
+
+    protected List<String> getManagedGroups() {
+        ConfigurationSection perms = plugin.getConfig().getConfigurationSection("groups");
+        List<String> managedGroups = new ArrayList<>();
+        for (String perm : perms.getKeys(true)) {
+            if (perms.getStringList(perm).isEmpty()) continue;
+            managedGroups.add(perm);
+        }
+
+        return managedGroups;
     }
 }

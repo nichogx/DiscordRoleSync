@@ -154,21 +154,13 @@ public class RoleSync extends JavaPlugin {
                 this.db = new SQLiteHandler(this, new File(getDataFolder(), "database.db"));
             }
 
-            // get all managed groups
-            ConfigurationSection perms = getConfig().getConfigurationSection("groups");
-            List<String> managedGroups = new ArrayList<>();
-            for (String perm : perms.getKeys(true)) {
-                if (perms.getStringList(perm).isEmpty()) continue;
-                managedGroups.add(perm);
-            }
-
             // get permissions provider (vault)
             RegisteredServiceProvider<Permission> rsp = Bukkit.getServicesManager().getRegistration(Permission.class);
             if (rsp == null) {
                 throw new IllegalStateException("Vault is not loaded.");
             }
 
-            this.vault = new VaultAPI(rsp.getProvider(), managedGroups);
+            this.vault = new VaultAPI(this, rsp.getProvider());
             this.bot = new SyncBot(this);
             startBot();
 

@@ -43,7 +43,8 @@ class VaultAPITest {
         );
 
         Permission permProvider = Mockito.mock(Permission.class);
-        VaultAPI vault = new VaultAPI(permProvider, managedGroups);
+        VaultAPI vault = Mockito.spy(new VaultAPI(null, permProvider));
+        Mockito.doReturn(managedGroups).when(vault).getManagedGroups();
 
         vault.setGroups(UUID.randomUUID().toString(), Collections.singletonList("test-group"));
 
@@ -63,8 +64,7 @@ class VaultAPITest {
         Permission permProvider = Mockito.mock(Permission.class);
         Mockito.when(permProvider.getName()).thenReturn("TestPermPlugin");
 
-        VaultAPI vault = new VaultAPI(permProvider, null);
-
+        VaultAPI vault = new VaultAPI(null, permProvider);
 
         assertEquals(vault.getPermPluginName(), "TestPermPlugin", "Incorrect permission plugin name returned");
     }
