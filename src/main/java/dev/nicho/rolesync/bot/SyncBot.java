@@ -6,6 +6,7 @@ import dev.nicho.rolesync.bot.listeners.MemberEventsListener;
 import dev.nicho.rolesync.bot.listeners.SlashCommandListener;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.events.session.ShutdownEvent;
@@ -38,7 +39,14 @@ public class SyncBot extends ListenerAdapter {
         plugin.getLogger().info("Finished initializing bot.");
     }
 
-    public void start() throws InvalidTokenException {
+    /**
+     * Starts the bot
+     *
+     * @throws InvalidTokenException if the token is invalid
+     * @throws IllegalStateException if the bot is not in the configured server, or doesn't have
+     *                               the required permissions
+     */
+    public void start() throws InvalidTokenException, IllegalStateException {
         plugin.getLogger().info("Initializing bot");
         JDABuilder builder = JDABuilder
                 .create(plugin.getConfig().getString("bot.token"),
@@ -68,12 +76,15 @@ public class SyncBot extends ListenerAdapter {
         jda.updateCommands()
                 .addCommands(slashCommandListener.getCommandData())
                 .queue();
-
     }
 
+    /**
+     * Shuts down the bot. Blocks for up to two seconds before forcing shutdown.
+     */
     public void shutdown() {
         this.stopTimers();
 
+        if (this.jda == null) return;
         synchronized (this) {
             plugin.getLogger().info("Shutting down bot...");
             this.jda.shutdown();
@@ -136,6 +147,21 @@ public class SyncBot extends ListenerAdapter {
             plugin.getLogger().severe("An error occurred while checking all users.\n" +
                     e.getMessage());
         }
+
+        Guild guild = jda.getGuildById(plugin.getConfig().getString("bot.server"));
+        if (guild == null) {
+            plugin.getLogger().severe("Bot is not a member of the configured server. This plugin will not work correctly.");
+        } else {
+            Permission[] requiredPermissions = {
+                    Permission.MANAGE_ROLES,
+            };
+
+            for (Permission p : requiredPermissions) {
+                if (!guild.getSelfMember().hasPermission()) {
+                    plugin.getLogger().severe("Bot does not have required permission" + p + ". This plugin will not work correctly.");
+                }
+            }
+        }
     }
 
     @Override
@@ -144,7 +170,10 @@ public class SyncBot extends ListenerAdapter {
         this.stopTimers();
     }
 
-    public void stopTimers() {
+    /**
+     * Stops all timers that have been created for the bot.
+     */
+    private void stopTimers() {
         synchronized (this) {
             if (this.presenceTimer != null) {
                 this.presenceTimer.cancel();
