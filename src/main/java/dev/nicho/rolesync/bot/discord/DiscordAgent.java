@@ -2,11 +2,17 @@ package dev.nicho.rolesync.bot.discord;
 
 import dev.nicho.rolesync.RoleSync;
 import dev.nicho.rolesync.db.DatabaseHandler;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.exceptions.PermissionException;
+import net.dv8tion.jda.api.interactions.InteractionHook;
+import net.dv8tion.jda.api.requests.restaction.WebhookMessageCreateAction;
 import org.bukkit.configuration.ConfigurationSection;
 
+import java.awt.Color;
+import java.lang.reflect.Field;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +25,11 @@ public class DiscordAgent {
         this.plugin = plugin;
     }
 
+    /**
+     * Reconciles the user's Minecraft groups, based on the roles they currently have.
+     *
+     * @param member The Discord member
+     */
     public void checkMemberRoles(Member member) {
         try {
             checkMemberRoles(member, plugin.getDb().getLinkedUserInfo(member.getId()));
@@ -28,6 +39,12 @@ public class DiscordAgent {
         }
     }
 
+    /**
+     * Reconciles the user's Minecraft groups, based on the roles they currently have.
+     *
+     * @param member   The Discord member
+     * @param userInfo The LinkedUserInfo object for this user
+     */
     public void checkMemberRoles(Member member, DatabaseHandler.LinkedUserInfo userInfo) {
         try {
             ConfigurationSection perms = plugin.getConfig().getConfigurationSection("groups");
@@ -62,8 +79,15 @@ public class DiscordAgent {
         }
     }
 
-    public void setPermissions(String uuid, List<String> permsToHave) {
-        Runnable task = () -> plugin.getVault().setGroups(uuid, permsToHave);
+    /**
+     * Removes all managed groups from the user, leaving only the ones in the list passed in.
+     * This is done asynchronously, unless the permission plugin being used is PermissionsEx.
+     *
+     * @param uuid         UUID for the Minecraft user
+     * @param groupsToHave The list of groups to keep
+     */
+    public void setPermissions(String uuid, List<String> groupsToHave) {
+        Runnable task = () -> plugin.getVault().setGroups(uuid, groupsToHave);
 
         // PEX does not support running tasks asynchronously
         if (plugin.getServer().getPluginManager().getPlugin("PermissionsEx") != null) {
@@ -73,6 +97,12 @@ public class DiscordAgent {
         }
     }
 
+    /**
+     * Removes the linked role and the nickname from the user, if those
+     * are being used.
+     *
+     * @param member The Discord member
+     */
     public void removeRoleAndNickname(Member member) {
         try {
             if (plugin.getConfig().getBoolean("giveLinkedRole")) {
@@ -84,7 +114,8 @@ public class DiscordAgent {
                 }
 
                 member.getGuild().removeRoleFromMember(member, role).queue(null,
-                        error -> plugin.getLogger().warning("Error while adding role: " + error.getMessage()));
+                        error -> plugin.getLogger().warning("Error while adding role: " + error.getMessage())
+                );
             }
         } catch (PermissionException e) {
             plugin.getLogger().warning("Bot has no permissions to remove roles for a user.");
@@ -93,23 +124,33 @@ public class DiscordAgent {
         try {
             // reset nickname
             if (plugin.getConfig().getString("changeNicknames").equalsIgnoreCase("after")) {
-                member.modifyNickname(null).queue(null, error -> {
-                });
+                member.modifyNickname(null).queue(null,
+                        error -> plugin.getLogger().warning("Error while changing user's nickname: " + error.getMessage())
+                );
             }
         } catch (PermissionException e) {
             plugin.getLogger().warning("Bot has no permissions to reset nickname of a user.");
         }
     }
 
+    /**
+     * Removes the linked role and the nickname to the user, if those
+     * are being used.
+     *
+     * @param member The Discord member
+     * @param mcUser The Minecraft username
+     */
     public void giveRoleAndNickname(Member member, String mcUser) {
         try {
             if (mcUser != null) {
                 if (plugin.getConfig().getString("changeNicknames").equalsIgnoreCase("after")) {
-                    member.modifyNickname(member.getUser().getName() + " (" + mcUser + ")").queue(null, error -> {
-                    });
+                    member.modifyNickname(member.getUser().getName() + " (" + mcUser + ")").queue(null,
+                            error -> plugin.getLogger().warning("Error while changing user's nickname: " + error.getMessage())
+                    );
                 } else if (plugin.getConfig().getString("changeNicknames").equalsIgnoreCase("replace")) {
-                    member.modifyNickname(mcUser).queue(null, error -> {
-                    });
+                    member.modifyNickname(mcUser).queue(null,
+                            error -> plugin.getLogger().warning("Error while changing user's nickname: " + error.getMessage())
+                    );
                 }
             }
         } catch (PermissionException e) {
@@ -120,8 +161,7 @@ public class DiscordAgent {
             if (plugin.getConfig().getBoolean("giveLinkedRole")) {
                 Role role = member.getGuild().getRoleById(plugin.getConfig().getString("linkedRole"));
                 if (role == null) {
-                    plugin.getLogger().warning("Linked role does not exist.");
-                    return;
+                    throw new IllegalStateException("Linked role does not exist");
                 }
 
                 member.getGuild().addRoleToMember(member, role).queue(null,
@@ -129,7 +169,67 @@ public class DiscordAgent {
             }
         } catch (PermissionException e) {
             plugin.getLogger().warning("Bot has no permissions to add roles for a user.");
+        } catch (IllegalStateException e) {
+            plugin.getLogger().severe("Error while giving user the linked role: " + e.getMessage());
         }
+    }
+
+    /**
+     * Replies to the user's command using the InteractionHook, with an embed
+     * if the plugin is configured to do so.
+     *
+     * @param hook    The InteractionHook to reply to
+     * @param message The message to send
+     * @return The message create action to be queued
+     */
+    public WebhookMessageCreateAction<Message> buildReply(InteractionHook hook, String message) {
+        return buildReply(hook, ReplyType.INFO, message);
+    }
+
+    /**
+     * Replies to the user's command using the InteractionHook, with an embed
+     * if the plugin is configured to do so.
+     *
+     * @param hook      The InteractionHook to reply to
+     * @param replyType The reply type
+     * @param message   The message to send
+     * @return The message create action to be queued
+     */
+    public WebhookMessageCreateAction<Message> buildReply(InteractionHook hook, ReplyType replyType, String message) {
+        if (!plugin.getConfig().getBoolean("embed.useEmbed", false)) {
+            return hook.sendMessage(message);
+        }
+
+        // User has embeds enabled
+        String embedTitle = plugin.getConfig().getString("embed.title");
+
+        EmbedBuilder builder = new EmbedBuilder()
+                .setTitle(embedTitle)
+                .setDescription(message);
+
+        String colorConfig = plugin.getConfig().getString(
+                String.format("embed.colors.%s", replyType),
+                "WHITE"
+        );
+        
+        return hook.sendMessageEmbeds(
+                builder.setColor(getColorFromString(colorConfig)).build()
+        );
+    }
+
+    private Color getColorFromString(String colorString) {
+        if (colorString.matches("^#[0-9A-Fa-f]{1,6}$")) {
+            return Color.decode(colorString);
+        }
+
+        try {
+            Field field = Class.forName("java.awt.Color").getField(colorString);
+            return (Color) field.get(null);
+        } catch (Exception e) {
+            plugin.getLogger().warning("Error while sending message with embed: embed color " + colorString + " is invalid. Defaulting to WHITE.");
+        }
+
+        return Color.WHITE;
     }
 
     private boolean hasRoleFromList(Member member, List<String> roleList) {

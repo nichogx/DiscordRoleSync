@@ -18,6 +18,7 @@ It also vastly improves the plugin's stability.
 ### Changed
 - Improved alerts for servers running old or unsupported versions. Messages are more descriptive, and differentiate between release and pre-release, development or test builds.
 - The player count on the bot's activity is now updated every 3 minutes, instead of every 30 minutes.
+- Embed colors now support custom hex colors, and different colors can be specified for info, error or success messages.
 
 ### Removed
 - Chat commands (the ones where you configure a prefix and send a message in a channel to get the bot to respond) have been removed. You should now use Discord slash commands.

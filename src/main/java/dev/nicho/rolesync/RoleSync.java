@@ -73,11 +73,24 @@ public class RoleSync extends JavaPlugin {
             getLogger().info("Reading config.yml");
             saveDefaultConfig();
 
+            ConfigValidator validator;
+            try (InputStream schemaStream = getResource("config_schema.json")) {
+                JsonSchemaFactory schemaFactory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V7);
+                JsonSchema schema = schemaFactory.getSchema(schemaStream);
+                validator = new ConfigValidator(schema);
+            }
+
             getLogger().info("Attempting to migrate config.yml");
             ConfigMigrator migrator = new ConfigMigrator(this);
             FileConfiguration updatedConfig = migrator.run(getConfig());
             if (updatedConfig != null) {
-                getLogger().info("Config file has been migrated. Saving and reloading.");
+                getLogger().info("Config file has been migrated. Validating...");
+                Set<ValidationMessage> configErrors = validator.validateYaml(updatedConfig.saveToString());
+                if (configErrors != null) {
+                    throw new InvalidConfigurationException("Migrated config.yaml failed to validate: " + configErrors);
+                }
+
+                getLogger().info("Migrated config.yaml has been validated.");
 
                 // Save old config to a backup file
                 getConfig().save(Paths.get(getDataFolder().getPath(), String.format(
@@ -93,13 +106,6 @@ public class RoleSync extends JavaPlugin {
                 getLogger().info("Done migrating configs!");
             } else {
                 getLogger().info("No configs to migrate.");
-            }
-
-            ConfigValidator validator;
-            try (InputStream schemaStream = getResource("config_schema.json")) {
-                JsonSchemaFactory schemaFactory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V7);
-                JsonSchema schema = schemaFactory.getSchema(schemaStream);
-                validator = new ConfigValidator(schema);
             }
 
             String config = getConfig().saveToString();

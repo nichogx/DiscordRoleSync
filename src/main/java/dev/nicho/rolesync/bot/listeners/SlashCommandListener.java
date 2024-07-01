@@ -3,6 +3,7 @@ package dev.nicho.rolesync.bot.listeners;
 import dev.nicho.rolesync.RoleSync;
 import dev.nicho.rolesync.bot.discord.DiscordCommand;
 import dev.nicho.rolesync.bot.discord.DiscordAgent;
+import dev.nicho.rolesync.bot.discord.ReplyType;
 import dev.nicho.rolesync.bot.exceptions.UserErrorException;
 import dev.nicho.rolesync.db.DatabaseHandler;
 import dev.nicho.rolesync.bot.mojang.MojangAPI;
@@ -59,18 +60,18 @@ public class SlashCommandListener extends ListenerAdapter {
                     try {
                         this.linkUser(Objects.requireNonNull(event.getMember()).getId(), mcUsername);
                     } catch (IOException | SQLException e) {
-                        hook.sendMessage(plugin.getLanguage().getString("commandError")).queue();
+                        discordAgent.buildReply(hook, ReplyType.ERROR, plugin.getLanguage().getString("commandError")).queue();
                         plugin.getLogger().severe("An error occurred while trying to link the user.\n" +
                                 e.getMessage());
 
                         return;
                     } catch (UserErrorException e) {
-                        hook.sendMessage(e.getMessage()).queue();
+                        discordAgent.buildReply(hook, ReplyType.ERROR, e.getMessage()).queue();
 
                         return;
                     }
 
-                    hook.sendMessage(plugin.getLanguage().getString("successLink")).queue();
+                    discordAgent.buildReply(hook, ReplyType.SUCCESS, plugin.getLanguage().getString("successLink")).queue();
                 }
         ));
 
@@ -118,17 +119,17 @@ public class SlashCommandListener extends ListenerAdapter {
                         discordAgent.giveRoleAndNickname(member, userInfo.username);
                         discordAgent.checkMemberRoles(member);
                     } catch (SQLException e) {
-                        hook.sendMessage(plugin.getLanguage().getString("commandError")).queue();
+                        discordAgent.buildReply(hook, ReplyType.ERROR, plugin.getLanguage().getString("commandError")).queue();
                         plugin.getLogger().severe("An error occurred while trying to link the user.\n" +
                                 e.getMessage());
 
                         return;
                     } catch (UserErrorException e) {
-                        hook.sendMessage(e.getMessage()).queue();
+                        discordAgent.buildReply(hook, ReplyType.ERROR, e.getMessage()).queue();
                         return;
                     }
 
-                    hook.sendMessage(plugin.getLanguage().getString("successVerify")).queue();
+                    discordAgent.buildReply(hook, ReplyType.SUCCESS, plugin.getLanguage().getString("successVerify")).queue();
                 }
         ));
 
@@ -152,7 +153,7 @@ public class SlashCommandListener extends ListenerAdapter {
                     if ((mcUser == null) == (discordUser == null)) {
                         // Will be true only if mcUser and discordUser
                         // are both specified or both not specified
-                        hook.sendMessage(plugin.getLanguage().getString("incorrectCommandFormat")).queue();
+                        discordAgent.buildReply(hook, ReplyType.ERROR, plugin.getLanguage().getString("incorrectCommandFormat")).queue();
                         return;
                     }
 
@@ -181,18 +182,18 @@ public class SlashCommandListener extends ListenerAdapter {
 
                         guild.retrieveMemberById(userInfo.discordId).queue(discordAgent::removeRoleAndNickname);
                     } catch (SQLException | IOException e) {
-                        hook.sendMessage(plugin.getLanguage().getString("commandError")).queue();
+                        discordAgent.buildReply(hook, ReplyType.ERROR, plugin.getLanguage().getString("commandError")).queue();
                         plugin.getLogger().severe("An error occurred while trying to unlink the user.\n" +
                                 e.getMessage());
 
                         return;
                     } catch (UserErrorException e) {
-                        hook.sendMessage(e.getMessage()).queue();
+                        discordAgent.buildReply(hook, ReplyType.ERROR, e.getMessage()).queue();
 
                         return;
                     }
 
-                    hook.sendMessage(plugin.getLanguage().getString("successUnlink")).queue();
+                    discordAgent.buildReply(hook, ReplyType.SUCCESS, plugin.getLanguage().getString("successUnlink")).queue();
                 }
         ));
 
@@ -216,7 +217,7 @@ public class SlashCommandListener extends ListenerAdapter {
                     if ((mcUser == null) == (discordUser == null)) {
                         // Will be true only if mcUser and discordUser
                         // are both specified or both not specified
-                        hook.sendMessage(plugin.getLanguage().getString("incorrectCommandFormat")).queue();
+                        discordAgent.buildReply(hook, ReplyType.ERROR, plugin.getLanguage().getString("incorrectCommandFormat")).queue();
                         return;
                     }
 
@@ -240,18 +241,18 @@ public class SlashCommandListener extends ListenerAdapter {
                                 name = user.getAsMention();
                             }
 
-                            hook.sendMessage(
+                            discordAgent.buildReply(hook,
                                     plugin.getLanguage().getString("fullLinkedTo")
                                             .replace("%discord_user%", name)
                                             .replace("%minecraft_user%", mcUserInfo)
                             ).queue();
                         });
                     } catch (SQLException | IOException e) {
-                        hook.sendMessage(plugin.getLanguage().getString("commandError")).queue();
+                        discordAgent.buildReply(hook, ReplyType.ERROR, plugin.getLanguage().getString("commandError")).queue();
                         plugin.getLogger().severe("An error occurred while trying to unlink the user.\n" +
                                 e.getMessage());
                     } catch (UserErrorException e) {
-                        hook.sendMessage(e.getMessage()).queue();
+                        discordAgent.buildReply(hook, ReplyType.ERROR, e.getMessage()).queue();
                     }
                 }
         ));
@@ -276,18 +277,18 @@ public class SlashCommandListener extends ListenerAdapter {
                     try {
                         this.linkUser(discordUser.getId(), mcUser);
                     } catch (IOException | SQLException e) {
-                        hook.sendMessage(plugin.getLanguage().getString("commandError")).queue();
+                        discordAgent.buildReply(hook, ReplyType.ERROR, plugin.getLanguage().getString("commandError")).queue();
                         plugin.getLogger().severe("An error occurred while trying to link the user.\n" +
                                 e.getMessage());
 
                         return;
                     } catch (UserErrorException e) {
-                        hook.sendMessage(e.getMessage()).queue();
+                        discordAgent.buildReply(hook, ReplyType.ERROR, e.getMessage()).queue();
 
                         return;
                     }
 
-                    hook.sendMessage(plugin.getLanguage().getString("successLink")).queue();
+                    discordAgent.buildReply(hook, ReplyType.SUCCESS, plugin.getLanguage().getString("successLink")).queue();
                 }
         ));
     }
@@ -302,7 +303,7 @@ public class SlashCommandListener extends ListenerAdapter {
             InteractionHook hook = event.getHook();
             hook.setEphemeral(true);
 
-            hook.sendMessage("Unknown command " + commandName + ".").queue();
+            discordAgent.buildReply(hook, "Unknown command " + commandName + ".").queue();
             return;
         }
 

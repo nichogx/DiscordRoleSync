@@ -6,6 +6,32 @@
     "discordId": {
       "type": "string",
       "pattern": "^\\d{16,}$"
+    },
+    "color": {
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "BLACK",
+            "BLUE",
+            "CYAN",
+            "DARK_GRAY",
+            "GRAY",
+            "GREEN",
+            "LIGHT_GRAY",
+            "MAGENTA",
+            "ORANGE",
+            "PINK",
+            "RED",
+            "WHITE",
+            "YELLOW"
+          ]
+        },
+        {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{1,6}$"
+        }
+      ]
     }
   },
   "additionalProperties": false,
@@ -170,58 +196,40 @@
       "type": "boolean"
     },
     "embed": {
-      "oneOf": [
-        {
-          "title": "Enabled",
-          "type": "object",
-          "properties": {
-            "useEmbed": {
-              "enum": [
-                false
-              ]
-            }
-          },
-          "required": [
-            "useEmbed"
+      "type": "object",
+      "properties": {
+        "useEmbed": {
+          "enum": [
+            true
           ]
         },
-        {
-          "title": "Disabled",
+        "title": {
+          "type": "string"
+        },
+        "colors": {
           "type": "object",
           "properties": {
-            "useEmbed": {
-              "enum": [
-                true
-              ]
+            "INFO": {
+              "$ref": "#/definitions/color"
             },
-            "title": {
-              "type": "string"
+            "SUCCESS": {
+              "$ref": "#/definitions/color"
             },
-            "color": {
-              "type": "string",
-              "enum": [
-                "BLACK",
-                "BLUE",
-                "CYAN",
-                "DARK_GRAY",
-                "GRAY",
-                "GREEN",
-                "LIGHT_GRAY",
-                "MAGENTA",
-                "ORANGE",
-                "PINK",
-                "RED",
-                "WHITE",
-                "YELLOW"
-              ]
+            "ERROR": {
+              "$ref": "#/definitions/color"
             }
           },
           "required": [
-            "useEmbed",
-            "title",
-            "color"
+            "INFO",
+            "SUCCESS",
+            "ERROR"
           ]
         }
+      },
+      "required": [
+        "useEmbed",
+        "title",
+        "colors"
       ]
     }
   },

@@ -119,6 +119,13 @@ embed:
   useEmbed: false
   # The title to set on the embeds
   title: "Discord Role Sync"
-  # The color.
+  # The color for the embed messages.
   # Must be one of https://docs.oracle.com/javase/8/docs/api/java/awt/Color.html?is-external=true
-  color: "WHITE"
+  # or a HEX color in the format #BD3A3A (including the #).
+  colors:
+    # For informational replies. This is the default.
+    INFO: "#4287F5"
+    # For success replies
+    SUCCESS: "#4CC754"
+    # For error replies
+    ERROR: "#BD3A3A"
