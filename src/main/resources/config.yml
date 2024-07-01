@@ -74,24 +74,24 @@ manageWhitelist: false
 
 # IDs of the roles that should have their members in the whitelist.json file
 whitelistRoles:
-  - "000000000000000000" # whitelisted
+  - "000000000000000000"
 
 # If the bot should give the linked players a role (which will be removed if they are unlinked)
 giveLinkedRole: false
 
 # The role that should be given to linked users. Ignored if giveLinkedRole is false
-linkedRole: "000000000000000000" # linked
+linkedRole: "000000000000000000"
 
 # Permission groups to add to users with one of the roles in the list.
 # Follow the example and remove or add more as needed.
 groups:
-  admin:
-    - "000000000000000000" # administrator
+  admin: # The name of the Minecraft permissions group
+    - "000000000000000000" # The ID of a Discord role
   mod:
-    - "000000000000000000" # moderator
+    - "000000000000000000" # The same role can give multiple groups
   vip:
-    - "000000000000000000" # twitch subs
-    - "000000000000000000" # irl friends or something
+    - "111111111111111111" # Multiple Discord roles can give
+    - "222222222222222222" # access to the same Minecraft group
 
 # Configuration for the prefix that the bot will send with the messages in-game
 chatPrefix:
