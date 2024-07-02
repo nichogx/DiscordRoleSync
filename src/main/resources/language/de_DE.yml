@@ -1,76 +1,74 @@
-linkedTo: "Verbunden zu"
-unknownUser: "Unbekannter Benutzer"
-discordAlreadyLinked: "Dein Discord Account ist bereits mit einem Minecraft Account verbunden"
-minecraftAlreadyLinked: "Dein Minecraft Account ist bereits mit einem Minecraft Account verbunden"
-successLink: "You have successfully linked your accounts"
-successUnlink: "You have successfully unlinked the accounts"
-successVerify: "You have successfully verified this account"
+linkedTo: "Verknüpft mit"
+unknownUser: "Unbekannter Nutzer"
+discordAlreadyLinked: "Dein Discord-Account ist bereits mit einem Minecraft-Account verknüpft"
+minecraftAlreadyLinked: "Dein Minecraft-Account ist bereits mit einem Discord-Account verknüpft"
+successLink: "Du hast deine Accounts erfolgreich verknüpft"
+successUnlink: "Du hast deine Accounts erfolgreich getrennt"
+successVerify: "Du hast diesen Account erfolgreich verifiziert"
 
-userNotLinked: "This user is not linked"
-incorrectVerificationCode: "Incorrect verification code. Please try verifying again"
+userNotLinked: "Dieser Nutzer ist nicht verknüpft"
 
 noPermissionError: "Du hast keine Berechtigung für diesen Befehl"
-commandError: "Fehler beim ausführen des Befehls. Bitte überprüfe die Konsole."
-incorrectCommandFormat: "The command is formatted incorrectly."
+commandError: "Fehler beim Ausführen des Befehls. Bitte überprüfe die Konsole."
+incorrectCommandFormat: "Der Befehl ist fehlerhaft formatiert."
 
 usage: "Nutzung:"
-drsReloadDescription: "Lade config und language Dateien neu"
+drsReloadDescription: "Lade Sprach- und Konfigurationsdateien neu"
 
 drsBotRestartDescription: "Startet den Bot neu"
 botRestarted: "Bot ist neugestartet."
 
-drsVerifyDescription: "Verifiziere deinen Discord Account"
-alreadyVerified: "Du bist bereits verifiziert"
-verificationInstructions: "Bitte antworte mit diesem Code auf die Privatnachricht des Discord Bots:"
+drsVerifyDescription: "Verifiziere deinen Discord-Account"
 
-pleaseLink: "Bitte verbinde deinen Account auf unserem Discord Server:"
+pleaseLink: "Bitte verknüpfe deinen Account auf unserem Discord-Server:"
 
-whitelistErrorKickMsg: "Es ist ein Fehler beim überprüfen der Whitelist aufgetreten. Bitte kontaktiere einen Server Administrator"
-whitelistNotVerifiedKickMsg: "Du bist nicht verifiziert. Bitte antworte mit diesem Code auf die Privatnachricht des Discord Bots:"
-notWhitelistedKickMsg: "Du bist auf dem Server nicht gewhitelisted"
+whitelistErrorKickMsg: "Beim Überprüfen der Whitelist ist ein Fehler aufgetreten. Bitte kontaktiere einen Server-Administrator"
+whitelistNotVerifiedKickMsg: "Du bist nicht verifiziert. Bitte antworte mit diesem Code auf die Privatnachricht des Discord-Bots:"
+notWhitelistedKickMsg: "Du bist nicht auf der Whitelist dieses Servers"
 
-notLatestVersion: "Veraltete Version von DiscordRoleSync."
-latest: "Neuste:"
+notLatestVersion: "Du hast nicht die neueste Version von DiscordRoleSync."
+latest: "Neueste:"
 current: "Aktuelle:"
 
 reloadComplete: "Neuladen abgeschlossen"
 
-playersOnline: "%d/%d players"
-
-# Translation needed! Everything below this line was added after this translation
-# was written. Please make a merge request or contact me to update these to your language!
-##
+playersOnline: "%d/%d Spieler"
 
 nonReleaseVersion:
   running:
-    UNKNOWN: "You are running a development build of DiscordRoleSync. No support is provided. Please update to the latest supported version unless you know what you are doing."
-    DEVELOPMENT_PREVIEW: "You are running a development preview version of DiscordRoleSync. This is unsupported and might contain bugs. Please update to the latest supported version unless you know what you are doing."
-    RELEASE_CANDIDATE: "You are running a beta/release candidate version of DiscordRoleSync. You might encounter bugs. Please report any issues to the developer via GitLab or Discord, so they can be fixed for the release."
+    UNKNOWN: "Du verwendest eine Entwicklerversion von DiscordRoleSync. Es steht kein Support zur Verfügung. Bitte aktualisiere auf die neueste unterstützte Version, wenn du dir nicht sicher bist."
+    DEVELOPMENT_PREVIEW: "Du verwendest eine Entwicklervorschau von DiscordRoleSync. Es steht kein Support zur Verfügung. Bitte aktualisiere auf die neueste unterstützte Version, wenn du dir nicht sicher bist."
+    RELEASE_CANDIDATE: "Du verwendest eine Beta/Vorabversion von DiscordRoleSync. Sie könnte fehlerhaft sein. Bitte gib Probleme über GitLab oder Discord an den Entwickler weiter, sodass sie bis zum Release behoben werden können."
 
 commandDescriptions:
-  link: "Links your Discord account to a Minecraft username"
-  verify: "Verifies your Minecraft account as being owned by your Discord account"
-  unlink: "Unlinks a user's Discord account or Minecraft username"
-  admlink: "Force-links a user's Discord account to a Minecraft username"
-  info: "Gets link information about a Discord account or a Minecraft username"
+  link: "Verknüpft deinen Discord-Account mit einem Minecraft-Nutzernamen"
+  verify: "Bestätigt, dass dein Minecraft-Account zu deinem Discord-Account gehört"
+  unlink: "Trennt den Minecraft-Nutzernamen oder Discord-Account eines Nutzers"
+  admlink: "Erzwingt die Veknüpfung eines Discord-Account mit einem Minecraft-Nutzernamen"
+  info: "Holt Infos zur Veknüpfung eines Discord-Accounts oder Minecraft-Nutzernamens"
 
 commandArguments:
   minecraftUsername:
-    link: "The Minecraft username to link to"
-    unlink: "The Minecraft username to unlink"
-    info: "The Minecraft username to get info for"
-    admlink: "The Minecraft username to link"
+    link: "Minecraft-Nutzername, der verknüpft werden soll"
+    unlink: "Minecraft-Nutzername, der getrennt werden soll"
+    info: "Minecraft-Nutzername, zu dem Infos nötig sind"
+    admlink: "Minecraft-Nutzername, der verknüpft werden soll"
   discordUser:
-    unlink: "The Discord user to unlink"
-    info: "The Discord user to get info for"
-    admlink: "The Discord user to link"
-  verificationCode: "The verification code obtained in Minecraft"
+    unlink: "Discord-Account, der getrennt werden soll"
+    info: "Discord-Account, zu dem Infos nötig sind"
+    admlink: "Discord-Account, der verknüpft werden soll"
+  verificationCode: "Verifizierungs-Code aus Minecraft"
 
-fullLinkedTo: "Discord user %discord_user% is linked to Minecraft user %minecraft_user%"
+fullLinkedTo: "Discord-Account %discord_user% ist mit Minecraft-Account %minecraft_user% verknüpft"
 
 verification:
-  instructions:
-  alreadyVerified: "You are already verified"
-  wrongDigits: "Verification code must be %d digits long."
-  wrongCode: "Incorrect verification code. Please try verifying again"
-  notLinked: "You have not linked your accounts yet. Please use /%link_command_name% first."
+  instructions: "Bitte verifiziere deinen Account mit /%verify_command_name% auf Discord. Dein Verifizierungs-Code lautet: %verification_code%"
+  alreadyVerified: "Du bist bereits verifiziert"
+  wrongDigits: "Verifizierungs-Code muss aus %d Ziffern bestehen."
+  wrongCode: "Falscher Verifizierungs-Code. Versuche es bitte erneut"
+  notLinked: "Du hast deine Accounts noch nicht verknüpft. Bitte verwende zuerst /%link_command_name%"
+
+# Translation needed! Everything below this line was added after this translation
+# was written. Please make a merge request or contact me to update these to your language!
+# If there's nothing below this line, this file has been fully translated!
+##

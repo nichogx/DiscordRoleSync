@@ -67,6 +67,10 @@ if __name__ == "__main__":
             if key not in file_keys:
                 file_errors.append(f"Key {key} is missing.")
 
+        for key in file_keys:
+            if key not in all_keys:
+                file_errors.append(f"Extra key {key} not in main file")
+
         if len(file_errors) > 0:
             errors.append({
                 "name": lang_file,
