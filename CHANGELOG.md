@@ -14,6 +14,7 @@ It also vastly improves the plugin's stability.
 - A language file validator, which will update potentially old files existing on servers.
 - Basic config file validation, versioning, and updating.
 - Support for Discord slash commands
+- **Experimental:** Added experimental support for Geyser/Bedrock users. Must be enabled in the config by setting up `experimental.geyser`.
 
 ### Changed
 - Improved alerts for servers running old or unsupported versions. Messages are more descriptive, and differentiate between release and pre-release, development or test builds.

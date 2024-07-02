@@ -112,7 +112,12 @@ public class ConfigMigration {
         this.hardcoded.forEach(newConfig::set);
 
         // Update all renamed keys
-        this.renamed.forEach((name, previously) -> newConfig.set(name, oldConfig.get(previously)));
+        this.renamed.forEach((name, previously) -> {
+            // Don't update if the old config does not contain the key
+            if (oldConfig.contains(previously, true)) {
+                newConfig.set(name, oldConfig.get(previously));
+            }
+        });
 
         // Lastly, set the new configVersion. This might have
         // been overridden by the previous steps.

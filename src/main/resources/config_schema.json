@@ -229,6 +229,9 @@
         "title",
         "colors"
       ]
+    },
+    "experimental": {
+      "type": "object"
     }
   },
   "required": [

@@ -1,4 +1,4 @@
-package dev.nicho.rolesync.bot.mojang;
+package dev.nicho.rolesync.minecraft;
 
 import dev.nicho.rolesync.RoleSync;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -13,9 +13,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class MojangAPITest {
 
     @Test
-    void testGetServerUrl() {
+    void testGetMojangApiUrl() {
         FileConfiguration config = Mockito.mock(FileConfiguration.class);
-        Mockito.when(config.getString(Mockito.anyString())).thenReturn("");
 
         JavaPlugin plugin = Mockito.mock(RoleSync.class);
         Mockito.when(plugin.getConfig()).thenReturn(config);
@@ -25,27 +24,32 @@ class MojangAPITest {
 
         MojangAPI mojang = new MojangAPI(plugin);
 
-        assertEquals("https://api.mojang.com", mojang.getServerUrl(null).toString());
+        Mockito.when(config.getString(Mockito.anyString())).thenReturn(null);
+        assertEquals("https://api.mojang.com", mojang.getMojangApiUrl().toString());
         Mockito.verify(logger, Mockito.never()).warning(Mockito.anyString());
         Mockito.clearInvocations(logger);
 
-        assertEquals("https://api.mojang.com", mojang.getServerUrl("").toString());
+        Mockito.when(config.getString(Mockito.anyString())).thenReturn("");
+        assertEquals("https://api.mojang.com", mojang.getMojangApiUrl().toString());
         Mockito.verify(logger, Mockito.never()).warning(Mockito.anyString());
         Mockito.clearInvocations(logger);
 
-        assertEquals("https://api.mojang.com", mojang.getServerUrl("test").toString());
+        Mockito.when(config.getString(Mockito.anyString())).thenReturn("test");
+        assertEquals("https://api.mojang.com", mojang.getMojangApiUrl().toString());
         Mockito.verify(logger, Mockito.times(1)).warning(
                 "Unable to use server 'test'. URL cannot be parsed."
         );
         Mockito.clearInvocations(logger);
 
-        assertEquals("https://api.mojang.com", mojang.getServerUrl("test.com").toString());
+        Mockito.when(config.getString(Mockito.anyString())).thenReturn("test.com");
+        assertEquals("https://api.mojang.com", mojang.getMojangApiUrl().toString());
         Mockito.verify(logger, Mockito.times(1)).warning(
                 "Unable to use server 'test.com'. URL cannot be parsed."
         );
         Mockito.clearInvocations(logger);
 
-        assertEquals("https://test.com", mojang.getServerUrl("https://test.com").toString());
+        Mockito.when(config.getString(Mockito.anyString())).thenReturn("https://test.com");
+        assertEquals("https://test.com", mojang.getMojangApiUrl().toString());
         Mockito.verify(logger, Mockito.never()).warning(Mockito.anyString());
         Mockito.clearInvocations(logger);
     }

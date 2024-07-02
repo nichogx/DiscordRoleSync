@@ -265,9 +265,12 @@ public class RoleSync extends JavaPlugin {
             if (permPlugin != null && !permPlugin.isEmpty()) return permPlugin;
             return "unknown/other";
         }));
-        
+
         metrics.addCustomChart(new SimplePie("use_embeds",
                 () -> String.valueOf(getConfig().getBoolean("embed.useEmbed"))));
+
+        metrics.addCustomChart(new SimplePie("enabled_geyser_support",
+                () -> String.valueOf(getConfig().getBoolean("experimental.geyser.enableGeyserSupport", false))));
 
         // Expensive metrics, or metrics that shouldn't run on the main thread.
 

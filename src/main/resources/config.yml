@@ -129,3 +129,16 @@ embed:
     SUCCESS: "#4CC754"
     # For error replies
     ERROR: "#BD3A3A"
+
+# Experimental
+# These options are experimental. They are subject to change between versions (including breaking changes).
+# Please report any bugs, issues or requests that related to these experimental options on the Discord or GitLab.
+experimental:
+  # Geyser usernames start with a dot (`.example`). They will be automatically recognized if this
+  # option is on, when linked with `/link .example`.
+  # If using LuckPerms, allow-invalid-usernames must be true in the LuckPerms config file.
+  geyser:
+    # Enables Geyser support for linking Bedrock IDs.
+    enableGeyserSupport: false
+    # Get one at https://xbl.io. This should be kept secret.
+    openXblApiKey: ""

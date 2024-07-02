@@ -6,7 +6,9 @@ import dev.nicho.rolesync.bot.discord.DiscordAgent;
 import dev.nicho.rolesync.bot.discord.ReplyType;
 import dev.nicho.rolesync.bot.exceptions.UserErrorException;
 import dev.nicho.rolesync.db.DatabaseHandler;
-import dev.nicho.rolesync.bot.mojang.MojangAPI;
+import dev.nicho.rolesync.minecraft.UUIDType;
+import dev.nicho.rolesync.minecraft.UserSearch;
+import dev.nicho.rolesync.minecraft.UserSearchResult;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -31,7 +33,7 @@ public class SlashCommandListener extends ListenerAdapter {
     private final JDA jda;
 
     private final DiscordAgent discordAgent;
-    private final MojangAPI mojang;
+    private final UserSearch mojang;
 
     private final Map<String, DiscordCommand> commands;
 
@@ -40,7 +42,7 @@ public class SlashCommandListener extends ListenerAdapter {
         this.jda = jda;
 
         this.discordAgent = new DiscordAgent(plugin);
-        this.mojang = new MojangAPI(plugin);
+        this.mojang = new UserSearch(plugin);
 
         this.commands = new HashMap<>();
 
@@ -162,8 +164,8 @@ public class SlashCommandListener extends ListenerAdapter {
                         if (discordUser != null) {
                             userInfo = plugin.getDb().getLinkedUserInfo(discordUser.getAsUser().getId());
                         } else { // try minecraft nick
-                            String uuid = mojang.nameToUUID(mcUser.getAsString()).uuid;
-                            if (uuid != null) userInfo = plugin.getDb().getLinkedUserInfo(uuid);
+                            UserSearchResult uuidSearch = mojang.nameToUUID(mcUser.getAsString());
+                            if (uuidSearch != null) userInfo = plugin.getDb().getLinkedUserInfo(uuidSearch.uuid);
                         }
 
                         if (userInfo == null) {
@@ -226,15 +228,15 @@ public class SlashCommandListener extends ListenerAdapter {
                         if (discordUser != null) {
                             userInfo = plugin.getDb().getLinkedUserInfo(discordUser.getAsUser().getId());
                         } else { // try minecraft nick
-                            String uuid = mojang.nameToUUID(mcUser.getAsString()).uuid;
-                            if (uuid != null) userInfo = plugin.getDb().getLinkedUserInfo(uuid);
+                            UserSearchResult userSearchResult = mojang.nameToUUID(mcUser.getAsString());
+                            if (userSearchResult != null) userInfo = plugin.getDb().getLinkedUserInfo(userSearchResult.uuid);
                         }
 
                         if (userInfo == null) {
                             throw new UserErrorException(plugin.getLanguage().getString("userNotLinked"));
                         }
 
-                        final String mcUserInfo = String.format("%s (%s)", userInfo.username, userInfo.uuid);
+                        final String mcUserInfo = String.format("%s (`%s` - `%s`)", userInfo.username, userInfo.uuid, UUIDType.getTypeForUUID(userInfo.uuid));
                         jda.retrieveUserById(userInfo.discordId).queue(user -> {
                             String name = "_" + plugin.getLanguage().getString("unknownUser") + "_";
                             if (user != null) {
@@ -325,12 +327,12 @@ public class SlashCommandListener extends ListenerAdapter {
             throw new UserErrorException(plugin.getLanguage().getString("discordAlreadyLinked"));
         }
 
-        MojangAPI.MojangSearchResult result = mojang.nameToUUID(mcUsername);
-        String uuid = result.uuid;
-        if (uuid == null) {
+        UserSearchResult result = mojang.nameToUUID(mcUsername);
+        if (result == null) {
             throw new UserErrorException(plugin.getLanguage().getString("unknownUser"));
         }
 
+        String uuid = result.uuid;
         userInfo = plugin.getDb().getLinkedUserInfo(uuid);
         if (userInfo != null) {
             throw new UserErrorException(plugin.getLanguage().getString("minecraftAlreadyLinked"));
