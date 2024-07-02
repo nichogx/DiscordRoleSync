@@ -140,5 +140,3 @@ experimental:
   geyser:
     # Enables Geyser support for linking Bedrock IDs.
     enableGeyserSupport: false
-    # Get one at https://xbl.io. This should be kept secret.
-    openXblApiKey: ""

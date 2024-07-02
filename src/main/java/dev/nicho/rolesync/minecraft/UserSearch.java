@@ -24,7 +24,7 @@ public class UserSearch {
     public UserSearch(JavaPlugin plugin) {
         this.plugin = plugin;
         this.mojangAPI = new MojangAPI(plugin);
-        this.xboxAPI = new XboxAPI(plugin);
+        this.xboxAPI = new XboxAPI();
     }
 
     /**
@@ -64,7 +64,7 @@ public class UserSearch {
 
         if (uuidType == UUIDType.BEDROCK) {
             // Experimental! Geyser support
-            return xboxAPI.searchName(name);
+            return xboxAPI.searchName(name.substring(1)); // remove the first dot
         }
 
         // Authenticated
