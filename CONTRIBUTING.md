@@ -30,3 +30,30 @@ Versions are automatically defined by CI.
 - When built from master, the version will be `master-<sha>`. This is not meant for distribution.
 - When built from a branch, the version will be `branch-<sha>`. This is not meant for distribution.
 - When built locally, the version will be `develop`. This is not meant for distribution.
+
+## Publishing
+
+Publishing will be done by the maintainer, once changes warrant a new release. 
+
+For now, all platforms are manual. Release candidates are uploaded to Modrinth and Hangar. Only full releases are uploaded to Spigot.
+
+Steps for all platforms:
+1. Tag the version and wait for CI to pass
+2. Download the resulting .jar and use it for individual uploads to the following
+
+### Modrinth
+1. Upload a new version to Modrinth at https://modrinth.com/plugin/discordrolesync
+    - Compatible Minecraft versions have to be selected again. Select everything after 1.8.8
+    - Update the version's changelog by copying the raw CHANGELOG.md for the new version
+2. Update the description by copying the raw README.md. Remove Spigot and Hangar badges.
+
+### Hangar
+1. Upload a new version to Modrinth at https://hangar.papermc.io/NichoGX/DiscordRoleSync
+    - Compatible Minecraft versions have to be selected again. Select everything after 1.8
+    - Update the version's changelog by copying the raw CHANGELOG.md for the new version
+2. Update the description by copying the raw README.md. Remove Spigot and Modrinth badges.
+
+### Spigot
+1. Upload a new version to SpigotMC at https://www.spigotmc.org/resources/discord-role-sync.78829
+    - The version's changelog needs to be manually translated from CHANGELOG.md to Spigot's format
+2. Update the description by copying the generated bbcode artifact. Remove Modrinth and Hangar badges.
