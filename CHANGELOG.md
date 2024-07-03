@@ -21,6 +21,7 @@ It also vastly improves the plugin's stability.
 - The player count on the bot's activity is now updated every 3 minutes, instead of every 30 minutes.
 - Embed colors now support custom hex colors, and different colors can be specified for info, error or success messages.
 - Verification now needs to be done via a Discord `/verify` command, instead of sending the code to the bot's DM.
+- Reduced plugin .jar size by removing unnecessary dependencies that are already bundled with Paper/Spigot.
 
 ### Removed
 - Chat commands (the ones where you configure a prefix and send a message in a channel to get the bot to respond) have been removed. You should now use Discord slash commands.

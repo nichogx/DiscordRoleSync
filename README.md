@@ -1,6 +1,6 @@
 # DiscordRoleSync
 
-View this plugin on [SpigotMC](https://www.spigotmc.org/resources/discord-role-sync.78829/)
+View this plugin on: [Modrinth](https://modrinth.com/plugin/discordrolesync) | [SpigotMC](https://www.spigotmc.org/resources/discord-role-sync.78829/)
 
 DiscordRoleSync is a Minecraft plugin for syncing Discord roles and Minecraft permissions. This syncs Discord to Minecraft only, it is not both ways.
 
