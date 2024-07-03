@@ -10,8 +10,6 @@ api-version: 1.13
 
 depend:
   - Vault
-loadbefore: # Minecord uses an older API version. The methods from their version have been deprecated but not removed.
-  - Minecord
 
 commands:
   discordrolesync:

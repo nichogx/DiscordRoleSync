@@ -68,8 +68,14 @@
                             </filters>
                             <relocations>
                                 <relocation>
+                                    <!-- Some plugins use old versions of bstats with different APIs -->
                                     <pattern>org.bstats</pattern>
-                                    <shadedPattern>dev.nicho.rolesync</shadedPattern>
+                                    <shadedPattern>DiscordRoleSync.org.bstats</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <!-- Other plugins such as Minecord use JDA at old versions -->
+                                    <pattern>net.dv8tion</pattern>
+                                    <shadedPattern>DiscordRoleSync.net.dv8tion</shadedPattern>
                                 </relocation>
                             </relocations>
                             <createDependencyReducedPom>false</createDependencyReducedPom>

@@ -103,7 +103,3 @@ If you swap between offline and online (or vice-versa), you'll need to delete th
 - `discordrolesync.notifyupdates`: Users with this permission will be notified when they join if an update is available.
 
 All users are permitted to use the /drs verify command
-
-## Known Issues and Warnings
-
-- The plugin might not work if installed with some plugins that also use the JDA library, if they use an older version and are loaded before (such as Minecord).
