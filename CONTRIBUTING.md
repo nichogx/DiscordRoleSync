@@ -18,7 +18,7 @@ Please make sure you practice good code higiene. Make a descriptive merge reques
 
 ## Structure
 
-This project is built using Gradle, using Java version 8. This plugin is fairly simple and I want to keep support for as many users as possible. This means everything Java 8+ and MC 1.8.8+.
+This project is built with Maven, using Java version 8. This plugin is fairly simple and I want to keep support for as many users as possible. This means everything Java 8+ and MC 1.8.8+.
 
 There are a few Python scripts, mainly for CI, but these are not packaged as part of the final release.
 
