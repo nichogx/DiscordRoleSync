@@ -25,7 +25,7 @@ public class SQLiteHandler extends DatabaseHandler {
         try {
             Class.forName("org.sqlite.JDBC");
         } catch (ClassNotFoundException e) {
-            throw new IllegalStateException("Unable to load SQLite JBDC driver. This is probably a bug with the plugin and should be reported.\n" +
+            throw new IllegalStateException("Unable to load SQLite JBDC driver. If SQLite is not bundled with your server, you may need to manually add these libraries. Please report this to the developer.\n" +
                     e.getMessage());
         }
 
