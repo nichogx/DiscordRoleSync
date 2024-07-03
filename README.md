@@ -1,6 +1,13 @@
 # DiscordRoleSync
 
-View this plugin on: [Modrinth](https://modrinth.com/plugin/discordrolesync) | [SpigotMC](https://www.spigotmc.org/resources/discord-role-sync.78829/)
+[![Latest Release](https://gitlab.com/nichogx/DiscordRoleSync/-/badges/release.svg)](https://gitlab.com/nichogx/DiscordRoleSync/-/releases)
+[![Game Versions](https://img.shields.io/modrinth/game-versions/g5nO2LNq?label=Game%20Versions)](https://modrinth.com/plugin/discordrolesync)
+[![Modrinth](https://img.shields.io/modrinth/dt/g5nO2LNq?logo=modrinth&label=Modrinth)](https://modrinth.com/plugin/discordrolesync)
+[![SpigotMC](https://img.shields.io/spiget/downloads/78829?logo=spigotmc&label=SpigotMC)](https://www.spigotmc.org/resources/discord-role-sync.78829)
+
+[![Discord](https://img.shields.io/discord/710557651758481480.svg?label=Discord&logo=discord)](https://discord.com/invite/JBNejsW)
+[![GitLab Issues](https://img.shields.io/gitlab/issues/open/nichogx%2FDiscordRoleSync?label=Issues&logo=gitlab)](https://gitlab.com/nichogx/DiscordRoleSync/-/issues)
+[![Pipeline Status](https://gitlab.com/nichogx/DiscordRoleSync/badges/master/pipeline.svg?key_text=Pipeline)](https://gitlab.com/nichogx/DiscordRoleSync/-/commits/master)
 
 DiscordRoleSync is a Minecraft plugin for syncing Discord roles and Minecraft permissions. This syncs Discord to Minecraft only, it is not both ways.
 
