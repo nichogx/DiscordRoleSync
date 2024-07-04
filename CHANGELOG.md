@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.0.1](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/2.0.1) - unreleased
 
+### Changed
+- Default translations are no longer copied out of the .jar into the plugin folder. This means you will get updated translations when updating the plugin, instead of using whatever version existed when you first installed the plugin.
+- The path for custom translations has been changed from `language` to `translations`.
+- Updated Spanish translation
+
 ### Fixed
 - The error message when a user is not found while linking is now shown properly to the user, as opposed to throwing a cryptic error on the console
 

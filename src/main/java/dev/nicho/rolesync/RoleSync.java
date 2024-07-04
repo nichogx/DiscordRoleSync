@@ -34,6 +34,7 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.*;
@@ -58,11 +59,21 @@ public class RoleSync extends JavaPlugin {
             // Delete old libraries that were downloaded with DependencyManager
             File libFolder = new File(getDataFolder(), "lib");
             if (libFolder.exists() && libFolder.isDirectory()) {
-                getLogger().info("Deleting old dependencies from lib folder");
+                getLogger().info("Deleting old lib folder");
                 FileUtils.deleteDirectory(libFolder);
             }
+
+            // Delete old language folder that was replaced with translations
+            File langFolder = new File(getDataFolder(), "language");
+            if (langFolder.exists() && langFolder.isDirectory()) {
+                getLogger().info("Deleting old language folder");
+                FileUtils.deleteDirectory(langFolder);
+            }
+
+            // Create the new translations folder
+            Files.createDirectories(Paths.get(getDataFolder().getPath(), "translations"));
         } catch (Exception e) {
-            getLogger().severe("An error occurred while removing old dependencies.\n" +
+            getLogger().severe("An error occurred while updating old plugin configuration.\n" +
                     e.getMessage());
             this.setEnabled(false);
         }
@@ -396,18 +407,15 @@ public class RoleSync extends JavaPlugin {
     }
 
     private void loadLang() throws IOException, InvalidConfigurationException {
-        getLogger().info("Updating language files");
+        getLogger().info("Updating custom translation files");
 
         int updated = updateLangFiles();
         getLogger().info(String.format("Updated %d language file%s", updated, updated == 1 ? "" : "s"));
 
-        getLogger().info("Reading language file");
-        File langFile = loadLangFile(getConfig().getString("language"));
-        getLogger().info("Loaded " + langFile.getName());
-
-        if (language == null) language = new YamlConfiguration();
-
-        language.load(langFile);
+        String lang = getConfig().getString("language");
+        getLogger().info("Reading language file for " + lang);
+        language = loadLangFile(lang);
+        getLogger().info("Language file loaded! " + language.getString("hello"));
     }
 
     /**
@@ -426,15 +434,15 @@ public class RoleSync extends JavaPlugin {
                 Reader reader = new InputStreamReader(stream)
         ) {
             english = YamlConfiguration.loadConfiguration(reader);
-        } catch (IOException e) {
-            throw new RuntimeException("Default language file not found in the .jar.");
+        } catch (Exception e) {
+            throw new RuntimeException("Default language file not found in the .jar: " + e.getMessage());
         }
 
         Set<String> keys = english.getKeys(true);
 
         int updated = 0;
 
-        File languageFolder = new File(getDataFolder(), "language");
+        File languageFolder = new File(getDataFolder(), "translations");
         if (!languageFolder.isDirectory()) {
             // If the language folder does not exist, then there are no
             // language files to update.
@@ -471,7 +479,7 @@ public class RoleSync extends JavaPlugin {
             FileConfiguration newConfig = migration.run(loaded);
 
             try {
-                newConfig.save(Paths.get(getDataFolder().getPath(), "language", language).toString());
+                newConfig.save(Paths.get(getDataFolder().getPath(), "translations", language).toString());
             } catch (IOException e) {
                 getLogger().severe("Failed to update language file." + e.getMessage());
                 continue;
@@ -485,30 +493,32 @@ public class RoleSync extends JavaPlugin {
 
     /**
      * Loads the requested language file.
+     * Will load from plugin/DiscordRoleSync/translations/ if it exists,
+     * otherwise will just read from the .jar.
      * If the language file does not exist, will default to en_US.
      *
      * @param language the language filename to use (without the extension).
      * @return the found or newly created file (extracted from the .jar)
      */
-    private File loadLangFile(String language) {
-        File langFile = new File(getDataFolder(), String.format("language/%s.yml", language));
+    private YamlConfiguration loadLangFile(String language) {
+        File langFile = new File(getDataFolder(), String.format("translations/%s.yml", language));
 
         if (langFile.exists()) {
-            return langFile;
+            getLogger().info(String.format("Found custom translation %s.yml", language));
+            return YamlConfiguration.loadConfiguration(langFile);
         }
 
-        getLogger().info(String.format("Language file %s.yml does not exist, extracting from jar", language));
-
-        try {
-            saveResource(String.format("language/%s.yml", language), false);
-        } catch (IllegalArgumentException e) {
+        try (
+                InputStream stream = getResource(String.format("language/%s.yml", language));
+                Reader reader = new InputStreamReader(stream)
+        ) {
+            return YamlConfiguration.loadConfiguration(reader);
+        } catch (Exception e) {
             getLogger().warning(
-                    String.format("Language file %s.yml does not exist in jar. Is it supported?" +
-                            " Defaulting to %s.", language, defaultLanguage));
+                    String.format("Language file %s.yml does not exist in jar or in custom translation folder" +
+                            ". Is it supported? Defaulting to %s.", language, defaultLanguage));
             return loadLangFile(defaultLanguage);
         }
-
-        return loadLangFile(getConfig().getString("language"));
     }
 
     private void startBot() {

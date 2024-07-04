@@ -1,3 +1,5 @@
+hello: "Hallo!"
+
 linkedTo: "Verknüpft mit"
 unknownUser: "Unbekannter Nutzer"
 discordAlreadyLinked: "Dein Discord-Account ist bereits mit einem Minecraft-Account verknüpft"

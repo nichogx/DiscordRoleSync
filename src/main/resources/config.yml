@@ -3,9 +3,10 @@
 configVersion: 2
 
 # The language the plugin and bot should run in.
-# Check the Spigot page for supported languages.
-#   You can add your own language files inside the language
-#   folder and put the name of the file (without the extension) here.
+# A list of supported languages can be found here: https://gitlab.com/nichogx/DiscordRoleSync/-/tree/master/src/main/resources/language
+#   You can add your own language files inside the `plugins/DiscordRoleSync/translations` folder and put the name of the file (without the extension) here.
+#   You can copy any of the files from the link above into your custom translations folder and update it to your liking.
+#   Files in the translation folder will be used over the ones in the .jar.
 language: "en_US"
 
 commandNames:
