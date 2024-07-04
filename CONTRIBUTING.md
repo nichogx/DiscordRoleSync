@@ -69,7 +69,9 @@ Once a version is tagged, the release is built and must be uploaded to the place
 As far as I can tell, Spigot does not have an API for automatic uploads.
 
 - Only releases are uploaded
+  - There's no beta channel in Spigot
 - Publishing and description updates are **manual**
-  - Publish a new version by downloading the artifact and **manually** uploading to Spigot
+  - Publish a new version with the .jar direct download link from the GitLab release
   - The version's changelog needs to be **manually** translated from CHANGELOG.md to Spigot's format
+    - The translation script can also be run locally
   - The description is automatically generated to bbcode in an artifact, but must be **manually** updated. Badges must be **manually** removed.
