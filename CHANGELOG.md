@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.0.0](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/1.4.0) - unreleased
+## [2.0.0](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/2.0.0) - 2024-07-03
 
 This is a large update! It's recommended to update as soon as possible, as it contains multiple security and bug fixes.
 It also vastly improves the plugin's stability.
@@ -34,6 +34,9 @@ It also vastly improves the plugin's stability.
 - Fixes a bstats metric that had been broken since the beta (linked users)
 - Fixes a bug where the linked user's name would be "null" if they hadn't joined the server before linking.
 - Fixed a bug where some features did not respect the `/drs reload` command
+
+This update changes the major version because it breaks backwards-compatibility by removing chat commands. It is a drop-in replacement for server owners in every other way. 
+Configs and language files will be automatically updated. Databases are fully compatible with 1.x.x.
 
 ## [1.3.1](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/1.3.1) - 2024-06-21
 
