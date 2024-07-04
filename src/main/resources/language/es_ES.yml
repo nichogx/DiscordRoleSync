@@ -2,15 +2,15 @@ linkedTo: "Conectado a"
 unknownUser: "Usuario Desconocido"
 discordAlreadyLinked: "Tu cuenta de Discord ya está conectada con una cuenta de Minecraft"
 minecraftAlreadyLinked: "Tu cuenta de Minecraft ya está conectada con una cuenta de Discord"
-successLink: "You have successfully linked your accounts"
-successUnlink: "You have successfully unlinked the accounts"
-successVerify: "You have successfully verified this account"
+successLink: "Has vinculado tus cuentas exitosamente"
+successUnlink: "Has desvinculado las cuentas exitosamente"
+successVerify: "Has verificado esta cuenta exitosamente"
 
-userNotLinked: "This user is not linked"
+userNotLinked: "Este usuario no está vinculado"
 
 noPermissionError: "No tienes permisos para ejecutar este comando."
 commandError: "Ha surgido un error mientras se ejecutaba el comando. Por favor, revisa la consola."
-incorrectCommandFormat: "The command is formatted incorrectly."
+incorrectCommandFormat: "El comando está mal formateado."
 
 usage: "Uso:"
 drsReloadDescription: "Recargar la configuración y los archivos del idioma"
@@ -22,7 +22,7 @@ drsVerifyDescription: "Verifica tu cuenta de Discord"
 
 pleaseLink: "Por favor, conecta tu cuenta en nuestro servidor de Discord:"
 
-whitelistErrorKickMsg: "Un error ha ocurrido mientras comprobabamos si estabas en la whitelist. Por favor contacta con el administrador del servidor."
+whitelistErrorKickMsg: "Un error ha ocurrido mientras comprobábamos si estabas en la whitelist. Por favor contacta con el administrador del servidor."
 whitelistNotVerifiedKickMsg: "No estás verificado. Por favor envía este código por mensaje privado al bot de Discord:"
 notWhitelistedKickMsg: "No estás en la whitelist (lista de jugadores admitidos) del servidor"
 
@@ -32,42 +32,45 @@ current: "Actual:"
 
 reloadComplete: "Recarga completa"
 
-playersOnline: "%d/%d players"
-
-# Translation needed! Everything below this line was added after this translation
-# was written. Please make a merge request or contact me to update these to your language!
-##
+playersOnline: "%d/%d jugadores"
 
 nonReleaseVersion:
   running:
-    UNKNOWN: "You are running a development build of DiscordRoleSync. No support is provided. Please update to the latest supported version unless you know what you are doing."
-    DEVELOPMENT_PREVIEW: "You are running a development preview version of DiscordRoleSync. This is unsupported and might contain bugs. Please update to the latest supported version unless you know what you are doing."
-    RELEASE_CANDIDATE: "You are running a beta/release candidate version of DiscordRoleSync. You might encounter bugs. Please report any issues to the developer via GitLab or Discord, so they can be fixed for the release."
+    UNKNOWN: "Estás ejecutando una versión de desarrollo de DiscordRoleSync. No se proporciona soporte. Por favor actualiza a la última versión soportada a menos que sepas lo que estás haciendo."
+    DEVELOPMENT_PREVIEW: "Estás ejecutando una versión de vista previa de desarrollo de DiscordRoleSync. Esto no tiene soporte y puede contener errores. Por favor actualiza a la última versión soportada a menos que sepas lo que estás haciendo."
+    RELEASE_CANDIDATE: "Estás ejecutando una versión beta/candidata para lanzamiento de DiscordRoleSync. Podrías encontrar errores. Por favor informa cualquier problema al desarrollador a través de GitLab o Discord, para que puedan ser solucionados para el lanzamiento."
 
 commandDescriptions:
-  link: "Links your Discord account to a Minecraft username"
-  verify: "Verifies your Minecraft account as being owned by your Discord account"
-  unlink: "Unlinks a user's Discord account or Minecraft username"
-  admlink: "Force-links a user's Discord account to a Minecraft username"
-  info: "Gets link information about a Discord account or a Minecraft username"
+  link: "Vincula tu cuenta de Discord con un nombre de usuario de Minecraft"
+  verify: "Verifica que tu cuenta de Minecraft te pertenece a través de tu cuenta de Discord"
+  unlink: "Desvincula la cuenta de Discord de un usuario o el nombre de usuario de Minecraft"
+  admlink: "Fuerza la vinculación de la cuenta de Discord de un usuario con un nombre de usuario de Minecraft"
+  info: "Obtiene información de vinculación sobre una cuenta de Discord o un nombre de usuario de Minecraft"
 
 commandArguments:
   minecraftUsername:
-    link: "The Minecraft username to link to"
-    unlink: "The Minecraft username to unlink"
-    info: "The Minecraft username to get info for"
-    admlink: "The Minecraft username to link"
+    link: "El nombre de usuario de Minecraft a vincular"
+    unlink: "El nombre de usuario de Minecraft a desvincular"
+    info: "El nombre de usuario de Minecraft para obtener información"
+    admlink: "El nombre de usuario de Minecraft a vincular"
   discordUser:
-    unlink: "The Discord user to unlink"
-    info: "The Discord user to get info for"
-    admlink: "The Discord user to link"
-  verificationCode: "The verification code obtained in Minecraft"
+    unlink: "El usuario de Discord a desvincular"
+    info: "El usuario de Discord para obtener información"
+    admlink: "El usuario de Discord a vincular"
+  verificationCode: "El código de verificación obtenido en Minecraft"
 
-fullLinkedTo: "Discord user %discord_user% is linked to Minecraft user %minecraft_user%"
+fullLinkedTo: "El usuario de Discord %discord_user% está vinculado con el usuario de Minecraft %minecraft_user%"
 
 verification:
-  instructions: "Please verify your account using /%verify_command_name% on Discord. Your verification code is: %verification_code%"
+  instructions: "Por favor verifica tu cuenta usando /%verify_command_name% en Discord. Tu código de verificación es: %verification_code%"
   alreadyVerified: "Ya estás verificado"
-  wrongDigits: "Verification code must be %d digits long."
-  wrongCode: "Incorrect verification code. Please try verifying again"
-  notLinked: "You have not linked your accounts yet. Please use /%link_command_name% first."
+  wrongDigits: "El código de verificación debe tener %d dígitos."
+  wrongCode: "Código de verificación incorrecto. Por favor intenta verificar nuevamente"
+  notLinked: "Aún no has vinculado tus cuentas. Por favor usa /%link_command_name% primero."
+
+minecraftUserNotFound: "Este usuario de Minecraft no existe."
+
+# Translation needed! Everything below this line was added after this translation
+# was written. Please make a merge request or contact me to update these to your language!
+# If there's nothing below this line, this file has been fully translated!
+##

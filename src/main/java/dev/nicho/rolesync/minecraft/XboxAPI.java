@@ -25,8 +25,6 @@ public class XboxAPI {
         HttpURLConnection c = (HttpURLConnection) reqUrl.openConnection();
         c.setRequestMethod("GET");
 
-        InputStream response = c.getInputStream();
-
         c.connect();
         int responseCode = c.getResponseCode();
         if (responseCode == 404) {
@@ -39,11 +37,13 @@ public class XboxAPI {
             ));
         }
 
-        Scanner scanner = new Scanner(response);
-
-        JSONObject body = new JSONObject(scanner.useDelimiter("\\A").next());
-        scanner.close();
-        response.close();
+        JSONObject body;
+        try (
+                InputStream response = c.getInputStream();
+                Scanner scanner = new Scanner(response)
+        ) {
+            body = new JSONObject(scanner.useDelimiter("\\A").next());
+        }
 
         // The Geyser UUID is the hex XUID, with all leading zeros
         String uuid = String.format("%032X", body.getLong("xuid"));

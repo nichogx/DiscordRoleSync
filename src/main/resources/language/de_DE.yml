@@ -68,6 +68,8 @@ verification:
   wrongCode: "Falscher Verifizierungs-Code. Versuche es bitte erneut"
   notLinked: "Du hast deine Accounts noch nicht verknüpft. Bitte verwende zuerst /%link_command_name%"
 
+minecraftUserNotFound: "Dieser Minecraft-Benutzer existiert nicht."
+
 # Translation needed! Everything below this line was added after this translation
 # was written. Please make a merge request or contact me to update these to your language!
 # If there's nothing below this line, this file has been fully translated!

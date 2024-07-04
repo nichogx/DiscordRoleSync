@@ -53,7 +53,6 @@ public class MojangAPI {
         URL reqUrl = new URL(getMojangApiUrl(), "users/profiles/minecraft/" + name);
         HttpURLConnection c = (HttpURLConnection) reqUrl.openConnection();
         c.setRequestMethod("GET");
-        InputStream response = c.getInputStream();
 
         c.connect();
         int responseCode = c.getResponseCode();
@@ -67,11 +66,14 @@ public class MojangAPI {
             ));
         }
 
-        Scanner scanner = new Scanner(response);
+        JSONObject body;
+        try (
+                InputStream response = c.getInputStream();
+                Scanner scanner = new Scanner(response)
+        ) {
+            body = new JSONObject(scanner.useDelimiter("\\A").next());
+        }
 
-        JSONObject body = new JSONObject(scanner.useDelimiter("\\A").next());
-        scanner.close();
-        response.close();
         return new UserSearchResult(
                 body.getString("name"),
                 uuidAddDashes(body.getString("id"))

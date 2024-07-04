@@ -122,7 +122,7 @@ public class SlashCommandListener extends ListenerAdapter {
                         discordAgent.checkMemberRoles(member);
                     } catch (SQLException e) {
                         discordAgent.buildReply(hook, ReplyType.ERROR, plugin.getLanguage().getString("commandError")).queue();
-                        plugin.getLogger().severe("An error occurred while trying to link the user.\n" +
+                        plugin.getLogger().severe("An error occurred while trying to verify the user.\n" +
                                 e.getMessage());
 
                         return;
@@ -329,7 +329,7 @@ public class SlashCommandListener extends ListenerAdapter {
 
         UserSearchResult result = mojang.nameToUUID(mcUsername);
         if (result == null) {
-            throw new UserErrorException(plugin.getLanguage().getString("unknownUser"));
+            throw new UserErrorException(plugin.getLanguage().getString("minecraftUserNotFound"));
         }
 
         String uuid = result.uuid;

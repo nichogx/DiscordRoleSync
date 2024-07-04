@@ -67,3 +67,5 @@ verification:
   wrongDigits: "Verification code must be %d digits long."
   wrongCode: "Incorrect verification code. Please try verifying again"
   notLinked: "You have not linked your accounts yet. Please use /%link_command_name% first."
+
+minecraftUserNotFound: "This Minecraft user does not exist."

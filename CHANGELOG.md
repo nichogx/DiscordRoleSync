@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.1](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/2.0.1) - unreleased
+
+### Fixed
+- The error message when a user is not found while linking is now shown properly to the user, as opposed to throwing a cryptic error on the console
+
 ## [2.0.0](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/2.0.0) - 2024-07-03
 
 This is a large update! It's recommended to update as soon as possible, as it contains multiple security and bug fixes.

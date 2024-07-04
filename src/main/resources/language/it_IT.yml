@@ -36,6 +36,7 @@ playersOnline: "%d/%d players"
 
 # Translation needed! Everything below this line was added after this translation
 # was written. Please make a merge request or contact me to update these to your language!
+# If there's nothing below this line, this file has been fully translated!
 ##
 
 nonReleaseVersion:
@@ -71,3 +72,5 @@ verification:
   wrongDigits: "Verification code must be %d digits long."
   wrongCode: "Incorrect verification code. Please try verifying again"
   notLinked: "You have not linked your accounts yet. Please use /%link_command_name% first."
+
+minecraftUserNotFound: "This Minecraft user does not exist."
