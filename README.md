@@ -18,13 +18,16 @@ This can use both SQLite (automatically created, no setup needed) or MySQL. MySQ
 
 This plugin has been tested on Minecraft versions 1.8.8 to 1.21.
 
-## Contributing
-This is a side project in maintenance mode, and I do not have too much time to add new features. As such, I've made it open source and welcome contributions.
-I've recently picked up support for this plugin again, and am in the process of cleaning up the code. I'm not a Java expert, so feel free to make clean-up, opinionated contributions if you'd like.
+## Features
 
-The source code can be found on [GitLab](https://gitlab.com/nichogx/DiscordRoleSync). Please see [CONTRIBUTING.md](https://gitlab.com/nichogx/DiscordRoleSync/-/blob/master/CONTRIBUTING.md) for more information.
+Some features are optional and can be opted in or out from the config file.
+- Sync roles from Discord to Minecraft groups. Users will be added/removed from Minecraft groups based on the Discord roles they have
+- Add a Discord role to users that have been linked
+- Control who can access your server (whitelist) using a Discord role
+- Update user's Discord nicknames based on their Minecraft username
 
-If needed, you can reach me via GitLab or [Discord](https://discord.com/invite/JBNejsW). Those are also the places to report bugs!
+### Experimental Features
+- Geyser Support: Version 2.0.0 adds experimental support for Geyser (Bedrock) users. Please report any issues you run into while using this!
 
 ## Installation
 You should first install [Vault](https://www.spigotmc.org/resources/vault.34315/) as this plugin will not work without it.
@@ -89,13 +92,6 @@ Tested and confirmed working:
 
 A note on PermissionsEx: I do not recommend using PermissionsEx as it is deprecated and does not support asynchronous permission adding. Performance might be worse when using it in large servers.
 
-## Online and Offline Server Mode
-This plugin is made with primarily online servers in mind. It works with offline servers, however it might conflict with "login plugins" that change a user's UUID after they join. Usage with these plugins is not supported.
-
-Please node that in offline mode servers, linking usernames is case-sensitive.
-
-If you swap between offline and online (or vice-versa), you'll need to delete the database. If you are using SQLite, just delete the database.db file. If you are using MySQL, execute `DROP TABLE syncbot_discordmcusers;`, replacing `syncbot` with the prefix in your config.yml file if you have changed it.
-
 ## Permission Nodes
 
 - `discordrolesync.reload`: Use the /drs reload command
@@ -103,3 +99,20 @@ If you swap between offline and online (or vice-versa), you'll need to delete th
 - `discordrolesync.notifyupdates`: Users with this permission will be notified when they join if an update is available.
 
 All users are permitted to use the /drs verify command
+
+## Known Issues and Limitations
+
+### Offline Server Mode
+Please node that in offline mode servers, linking usernames is **case-sensitive**.
+
+While this plugin works with offline servers, it might conflict with "login plugins" that change a user's UUID after they join. Usage with these plugins is not supported yet. Please let me know via Discord or a GitLab issue if you'd like support for this to be added.
+
+If you swap between offline and online (or vice-versa), you'll need to delete the database. If you are using SQLite, just delete the database.db file. If you are using MySQL, execute `DROP TABLE syncbot_discordmcusers;`, replacing `syncbot` with the prefix in your config.yml file if you have changed it.
+
+## Feature Requests, Bug Reports and Contributions
+
+This plugin is open source! The source code can be found on [GitLab](https://gitlab.com/nichogx/DiscordRoleSync). Please see [CONTRIBUTING.md](https://gitlab.com/nichogx/DiscordRoleSync/-/blob/master/CONTRIBUTING.md) for more information.
+
+Contributions are more than welcome! I've recently picked up support for this plugin again, and am in the process of cleaning up the code. I'm not a Java expert, so feel free to make clean-up, opinionated contributions if you'd like.
+
+If needed, you can reach me via [GitLab](https://gitlab.com/nichogx/DiscordRoleSync) or [Discord](https://discord.com/invite/JBNejsW). To report bugs or request features, you can either create an issue in GitLab or contact me via Discord.
