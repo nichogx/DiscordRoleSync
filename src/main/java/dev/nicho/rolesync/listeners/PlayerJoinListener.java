@@ -1,30 +1,24 @@
 package dev.nicho.rolesync.listeners;
 
-import dev.nicho.rolesync.db.DatabaseHandler;
+import dev.nicho.rolesync.RoleSync;
 import dev.nicho.rolesync.db.DatabaseHandler.LinkedUserInfo;
 import dev.nicho.rolesync.util.plugin_meta.PluginVersion;
 import org.bukkit.ChatColor;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
 import java.sql.SQLException;
 
 public class PlayerJoinListener implements Listener {
 
-    private final DatabaseHandler db;
-    private final YamlConfiguration lang;
-    private final JavaPlugin plugin;
+    private final RoleSync plugin;
 
     private final String chatPrefix;
 
-    public PlayerJoinListener(DatabaseHandler db, YamlConfiguration lang, JavaPlugin plugin) {
-        this.db = db;
-        this.lang = lang;
+    public PlayerJoinListener(RoleSync plugin) {
         this.plugin = plugin;
 
         this.chatPrefix = plugin.getConfig().getString("chatPrefix.text", "[DRS]") + " ";
@@ -38,12 +32,12 @@ public class PlayerJoinListener implements Listener {
 
         plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
             try {
-                LinkedUserInfo usrInfo = db.getLinkedUserInfo(uuid);
+                LinkedUserInfo usrInfo = plugin.getDb().getLinkedUserInfo(uuid);
                 if (usrInfo != null && !username.equals(usrInfo.username)) {
                     plugin.getLogger().info(
                             String.format("User with UUID %s has changed names from '%s' to '%s', updating in the database...", uuid, usrInfo.username, username)
                     );
-                    db.updateUsername(uuid, username);
+                    plugin.getDb().updateUsername(uuid, username);
                 }
             } catch (SQLException e) {
                 plugin.getLogger().severe("Error while checking/update newly joined user's username.\n" +
@@ -58,7 +52,7 @@ public class PlayerJoinListener implements Listener {
             if (versionType != PluginVersion.VersionType.RELEASE) {
                 // Server is running an unsupported version. Alert the user.
                 String message = ChatColor.BLUE + this.chatPrefix + ChatColor.RED
-                        + lang.getString("nonReleaseVersion.running." + versionType.toString());
+                        + plugin.getLanguage().getString("nonReleaseVersion.running." + versionType.toString());
 
                 event.getPlayer().sendMessage(message);
                 return;
@@ -79,10 +73,10 @@ public class PlayerJoinListener implements Listener {
 
                 if (isOldVersion) {
                     String message = ChatColor.BLUE + this.chatPrefix + ChatColor.AQUA
-                            + lang.getString("notLatestVersion") + "\n" +
-                            ChatColor.BLUE + this.chatPrefix + ChatColor.AQUA + lang.getString("current") + " "
+                            + plugin.getLanguage().getString("notLatestVersion") + "\n" +
+                            ChatColor.BLUE + this.chatPrefix + ChatColor.AQUA + plugin.getLanguage().getString("current") + " "
                             + ChatColor.RED + installedVersion + ChatColor.AQUA + "\n" +
-                            ChatColor.BLUE + this.chatPrefix + ChatColor.AQUA + lang.getString("latest") + " "
+                            ChatColor.BLUE + this.chatPrefix + ChatColor.AQUA + plugin.getLanguage().getString("latest") + " "
                             + ChatColor.GREEN + latestVersion;
 
                     event.getPlayer().sendMessage(message);

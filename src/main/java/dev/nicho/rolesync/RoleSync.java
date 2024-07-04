@@ -187,9 +187,9 @@ public class RoleSync extends JavaPlugin {
 
         // event listeners
         if (getConfig().getBoolean("manageWhitelist")) {
-            getServer().getPluginManager().registerEvents(new WhitelistLoginListener(db, language, this), this);
+            getServer().getPluginManager().registerEvents(new WhitelistLoginListener(this), this);
         }
-        getServer().getPluginManager().registerEvents(new PlayerJoinListener(db, language, this), this);
+        getServer().getPluginManager().registerEvents(new PlayerJoinListener(this), this);
 
         // bstats metrics
         registerMetrics();
