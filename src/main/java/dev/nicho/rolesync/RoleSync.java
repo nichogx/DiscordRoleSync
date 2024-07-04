@@ -5,24 +5,17 @@ import com.networknt.schema.JsonSchemaFactory;
 import com.networknt.schema.SpecVersion;
 import com.networknt.schema.ValidationMessage;
 import dev.nicho.rolesync.bot.SyncBot;
+import dev.nicho.rolesync.config.ConfigValidator;
+import dev.nicho.rolesync.config.migrations.ConfigMigration;
+import dev.nicho.rolesync.config.migrations.ConfigMigrator;
 import dev.nicho.rolesync.db.DatabaseHandler;
 import dev.nicho.rolesync.db.MySQLHandler;
 import dev.nicho.rolesync.db.SQLiteHandler;
 import dev.nicho.rolesync.listeners.PlayerJoinListener;
 import dev.nicho.rolesync.listeners.WhitelistLoginListener;
 import dev.nicho.rolesync.metrics.MetricCacher;
-import dev.nicho.rolesync.config.ConfigValidator;
-import dev.nicho.rolesync.config.migrations.ConfigMigration;
-import dev.nicho.rolesync.config.migrations.ConfigMigrator;
 import dev.nicho.rolesync.util.plugin_meta.PluginVersion;
 import dev.nicho.rolesync.util.vault.VaultAPI;
-
-import java.io.*;
-import java.nio.file.Paths;
-import java.sql.SQLException;
-import java.util.*;
-import java.util.logging.Level;
-
 import net.dv8tion.jda.api.exceptions.InvalidTokenException;
 import net.milkbowl.vault.permission.Permission;
 import org.apache.commons.io.FileUtils;
@@ -39,6 +32,12 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.*;
+import java.nio.file.Paths;
+import java.sql.SQLException;
+import java.util.*;
+import java.util.logging.Level;
 
 public class RoleSync extends JavaPlugin {
 

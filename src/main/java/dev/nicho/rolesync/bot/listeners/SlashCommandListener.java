@@ -1,8 +1,8 @@
 package dev.nicho.rolesync.bot.listeners;
 
 import dev.nicho.rolesync.RoleSync;
-import dev.nicho.rolesync.bot.discord.DiscordCommand;
 import dev.nicho.rolesync.bot.discord.DiscordAgent;
+import dev.nicho.rolesync.bot.discord.DiscordCommand;
 import dev.nicho.rolesync.bot.discord.ReplyType;
 import dev.nicho.rolesync.bot.exceptions.UserErrorException;
 import dev.nicho.rolesync.db.DatabaseHandler;

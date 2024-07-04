@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageCreateAction;
 import org.bukkit.configuration.ConfigurationSection;
 
-import java.awt.Color;
+import java.awt.*;
 import java.lang.reflect.Field;
 import java.sql.SQLException;
 import java.util.ArrayList;

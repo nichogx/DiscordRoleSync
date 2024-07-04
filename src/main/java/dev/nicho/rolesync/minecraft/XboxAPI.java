@@ -1,12 +1,13 @@
 package dev.nicho.rolesync.minecraft;
 
-import org.bukkit.plugin.java.JavaPlugin;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.*;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Scanner;
 
 import static dev.nicho.rolesync.minecraft.UserSearch.uuidAddDashes;
