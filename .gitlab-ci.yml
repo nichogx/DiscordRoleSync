@@ -9,6 +9,7 @@ stages:
   - lint
   - test
   - build
+  - pre-publish
   - publish
 
 ## SAST -- default linter
@@ -89,8 +90,8 @@ maven-package:
 ## Publish
 ###
 
-publish-gitlab:
-  stage: publish
+gitlab-registry:
+  stage: pre-publish
 
   image: curlimages/curl:latest
   rules:
@@ -101,6 +102,18 @@ publish-gitlab:
         --header "JOB-TOKEN: ${CI_JOB_TOKEN}" \
         --upload-file target/discord_role_sync-${CI_COMMIT_TAG}.jar \
         ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/discord_role_sync/${CI_COMMIT_TAG}/discord_role_sync-${CI_COMMIT_TAG}.jar
+
+publish-gitlab:
+  stage: publish
+
+  image: python:3.12-alpine
+  rules:
+    - if: $CI_COMMIT_TAG
+  before_script:
+    - cd ci
+    - pip install -r requirements.txt
+  script:
+    - python publish_gitlab.py
 
 publish-modrinth:
   stage: publish

@@ -37,7 +37,13 @@ Publishing will be done by the maintainer, once changes warrant a new release.
 
 Release candidates are uploaded to Modrinth and Hangar. Only full releases are uploaded to Spigot.
 
-Once a version is tagged, each 
+Once a version is tagged, the release is built and must be uploaded to the places this plugin is distributed at.
+
+### [GitLab](https://gitlab.com/nichogx/DiscordRoleSync/-/releases)
+
+- Release candidates and releases are uploaded as releases
+- Publishing is automatic through GitLab CI when a tag is created
+  - Release description is pulled from CHANGELOG.md
 
 ### [Modrinth](https://modrinth.com/plugin/discordrolesync) 
 [![target-Modrinth](https://img.shields.io/modrinth/dt/g5nO2LNq?logo=modrinth&label=Modrinth)](https://modrinth.com/plugin/discordrolesync)
@@ -45,7 +51,7 @@ Once a version is tagged, each
 - Release candidates are uploaded to the "Beta" channel
 - Releases are uploaded to the "Release" channel
 - Publishing and description updates are automatic through GitLab CI when a tag is created
-  - Description is made from the README.md. Non-Modrinth target badges are automatically removed.
+  - Description is made from the README.md
   - Changelog is pulled from CHANGELOG.md
 
 ### [Hangar](https://hangar.papermc.io/NichoGX/DiscordRoleSync)
@@ -54,7 +60,7 @@ Once a version is tagged, each
 - Release candidates are uploaded to the "Beta" channel
 - Releases are uploaded to the "Release" channel
 - Publishing and description updates are automatic through GitLab CI when a tag is created
-   - Description is made from the README.md. Non-Hangar target badges are automatically removed.
+   - Description is made from the README.md
    - Changelog is pulled from CHANGELOG.md
 
 ### [Spigot](https://www.spigotmc.org/resources/discord-role-sync.78829)
@@ -66,4 +72,4 @@ As far as I can tell, Spigot does not have an API for automatic uploads.
 - Publishing and description updates are **manual**
   - Publish a new version by downloading the artifact and **manually** uploading to Spigot
   - The version's changelog needs to be **manually** translated from CHANGELOG.md to Spigot's format
-  - The description is automatically generated to bbcode in an artifact, but must be **manually** updated. Non-Spigot target badges must be **manually** removed.
+  - The description is automatically generated to bbcode in an artifact, but must be **manually** updated. Badges must be **manually** removed.

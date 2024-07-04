@@ -92,7 +92,7 @@ if __name__ == "__main__":
         "Authorization": f"Bearer {jwt}",
 
         "Content-Type": "application/json",
-    }, json={"content": get_readme("Hangar")})
+    }, json={"content": get_readme()})
 
     if not desc_r.ok:
         raise Exception(f"Error updating Hangar description: HTTP {desc_r.status_code} {desc_r.text}")

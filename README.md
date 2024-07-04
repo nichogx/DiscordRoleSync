@@ -1,6 +1,6 @@
 # Discord Role Sync
 
-[![Latest Release](https://gitlab.com/nichogx/DiscordRoleSync/-/badges/release.svg)](https://gitlab.com/nichogx/DiscordRoleSync/-/releases)
+[![Latest Release](https://img.shields.io/gitlab/v/release/52019314?sort=semver&display_name=release&label=Latest%20Release)](https://gitlab.com/nichogx/DiscordRoleSync/-/releases)
 [![Game Versions](https://img.shields.io/modrinth/game-versions/g5nO2LNq?label=Game%20Versions)](https://modrinth.com/plugin/discordrolesync)
 [![target-Modrinth](https://img.shields.io/modrinth/dt/g5nO2LNq?logo=modrinth&label=Modrinth)](https://modrinth.com/plugin/discordrolesync)
 [![target-SpigotMC](https://img.shields.io/spiget/downloads/78829?logo=spigotmc&label=SpigotMC)](https://www.spigotmc.org/resources/discord-role-sync.78829)

@@ -35,11 +35,19 @@ class ReleaseType(Enum):
         return ReleaseType.UNKNOWN
 
 
-def get_readme(target):
+include_badges = ["Discord", "GitLab Issues"]
+def should_include_badge(line):
+    for badge in include_badges:
+        if line.startswith(f"[![{badge}"):
+            return True
+
+    return False
+
+def get_readme():
     description = ""
     with open("../README.md") as f:
         for line in f:
-            if line.startswith("[![target-") and not line.startswith(f"[![target-{target}"):
+            if line.startswith("[![") and not should_include_badge(line):
                 continue
 
             description += line

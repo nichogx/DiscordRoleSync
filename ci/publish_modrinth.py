@@ -83,7 +83,7 @@ if __name__ == "__main__":
         "User-Agent": user_agent,
 
         "Content-Type": "application/json",
-    }, json={"body": get_readme("Modrinth")})
+    }, json={"body": get_readme()})
 
     if not desc_r.ok:
         raise Exception(f"Error updating Modrinth description: HTTP {desc_r.status_code} {desc_r.text}")
