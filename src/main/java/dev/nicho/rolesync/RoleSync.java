@@ -96,10 +96,10 @@ public class RoleSync extends JavaPlugin {
                 getLogger().info("Config file has been migrated. Validating...");
                 Set<ValidationMessage> configErrors = validator.validateYaml(updatedConfig.saveToString());
                 if (configErrors != null) {
-                    throw new InvalidConfigurationException("Migrated config.yaml failed to validate: " + configErrors);
+                    throw new InvalidConfigurationException("Migrated config.yml failed to validate: " + configErrors);
                 }
 
-                getLogger().info("Migrated config.yaml has been validated.");
+                getLogger().info("Migrated config.yml has been validated.");
 
                 // Save old config to a backup file
                 getConfig().save(Paths.get(getDataFolder().getPath(), String.format(
@@ -120,7 +120,7 @@ public class RoleSync extends JavaPlugin {
             String config = getConfig().saveToString();
             Set<ValidationMessage> configErrors = validator.validateYaml(config);
             if (configErrors != null) {
-                throw new InvalidConfigurationException("config.yaml failed to validate: " + configErrors);
+                throw new InvalidConfigurationException("config.yml failed to validate: " + configErrors);
             }
 
             loadLang();
@@ -343,24 +343,12 @@ public class RoleSync extends JavaPlugin {
                 return false;
             }
 
-            try {
-                reloadConfig();
-                loadLang();
+            reloadConfig();
+            loadLang();
 
-                sender.sendMessage(ChatColor.BLUE + chatPrefix + ChatColor.GREEN + language.getString("reloadComplete"));
+            sender.sendMessage(ChatColor.BLUE + chatPrefix + ChatColor.GREEN + language.getString("reloadComplete"));
 
-                return true;
-            } catch (InvalidConfigurationException e) {
-                sender.sendMessage(ChatColor.BLUE + chatPrefix + ChatColor.RED + language.getString("commandError"));
-                getLogger().severe("One of the yml files is invalid.\n" + e.getMessage());
-
-                return false;
-            } catch (IOException e) {
-                sender.sendMessage(ChatColor.BLUE + chatPrefix + ChatColor.RED + language.getString("commandError"));
-                getLogger().severe("An error occurred while loading the yml files.\n" + e.getMessage());
-
-                return false;
-            }
+            return true;
         } else if (args[0].equalsIgnoreCase("botrestart")) {
             if (!sender.hasPermission("discordrolesync.botrestart")) {
                 sender.sendMessage(ChatColor.BLUE + chatPrefix + ChatColor.RED + language.getString("noPermissionError"));
@@ -406,7 +394,7 @@ public class RoleSync extends JavaPlugin {
         return true;
     }
 
-    private void loadLang() throws IOException, InvalidConfigurationException {
+    private void loadLang() {
         getLogger().info("Updating custom translation files");
 
         int updated = updateLangFiles();
