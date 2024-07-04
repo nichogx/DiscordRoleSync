@@ -1,4 +1,4 @@
-package dev.nicho.rolesync.metrics;
+package dev.nicho.rolesync.util.caching;
 
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;

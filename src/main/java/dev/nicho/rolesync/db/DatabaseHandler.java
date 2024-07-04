@@ -1,7 +1,7 @@
 package dev.nicho.rolesync.db;
 
+import dev.nicho.rolesync.RoleSync;
 import org.bukkit.Bukkit;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.security.SecureRandom;
 import java.sql.Connection;
@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 
 public abstract class DatabaseHandler {
 
-    protected final JavaPlugin plugin;
+    protected final RoleSync plugin;
     protected final SecureRandom random;
 
     /**
@@ -20,7 +20,7 @@ public abstract class DatabaseHandler {
      *
      * @param plugin a link to the plugin
      */
-    protected DatabaseHandler(JavaPlugin plugin) {
+    protected DatabaseHandler(RoleSync plugin) {
         this.plugin = plugin;
         this.random = new SecureRandom();
     }
@@ -331,7 +331,7 @@ public abstract class DatabaseHandler {
 
     private void checkAsync() {
         if (Bukkit.isPrimaryThread()) {
-            throw new IllegalStateException("Attempted to execute a database operation from the server thread!");
+            plugin.debugLog("Database operation called from main Bukkit thread.");
         }
     }
 

@@ -25,9 +25,7 @@ Some features are optional and can be opted in or out from the config file.
 - Add a Discord role to users that have been linked
 - Control who can access your server (whitelist) using a Discord role
 - Update user's Discord nicknames based on their Minecraft username
-
-### Experimental Features
-- Geyser Support: Version 2.0.0 adds experimental support for Geyser (Bedrock) users. Please report any issues you run into while using this!
+- Integration with PlaceholderAPI
 
 ## Installation
 You should first install [Vault](https://www.spigotmc.org/resources/vault.34315/) as this plugin will not work without it.
@@ -100,14 +98,29 @@ A note on PermissionsEx: I do not recommend using PermissionsEx as it is depreca
 
 All users are permitted to use the /drs verify command
 
-## Known Issues and Limitations
+## Integrations
 
-### Offline Server Mode
-Please node that in offline mode servers, linking usernames is **case-sensitive**.
+### PlaceholderAPI
 
-While this plugin works with offline servers, it might conflict with "login plugins" that change a user's UUID after they join. Usage with these plugins is not supported yet. Please let me know via Discord or a GitLab issue if you'd like support for this to be added.
+The PlaceholderAPI integration can be enabled by setting `integrations.plugins.PlaceholderAPI` to `true` in the config.
 
-If you swap between offline and online (or vice-versa), you'll need to delete the database. If you are using SQLite, just delete the database.db file. If you are using MySQL, execute `DROP TABLE syncbot_discordmcusers;`, replacing `syncbot` with the prefix in your config.yml file if you have changed it.
+This will allow the Bot's status message to read from placeholders. 
+
+It also enables a Placeholder Expansion for this plugin, with the following placeholders supported:
+- `%drs_linked_users%`: the number of linked users
+- `%drs_link_status%`: if the user is linked or not
+- `%drs_discord_username%`: the Discord username of the user, if linked. Empty if not linked.
+- `%drs_discord_nick%`: the Discord nick of the user, if linked. Empty if not linked.
+
+PlaceholderAPI integration is new and might still need some improvements. Please let me know if you have a request or bug report.
+
+### Geyser
+
+The Geyser integration can be enabled by setting `experimental.geyser.enableGeyserSupport` to `true` in the config.
+
+When enabled, linking to a username that starts with a dot (`.exampleuser`) will be treated as a Geyser user.
+
+This is an experimental feature. Please let me know if you have a request or bug report.
 
 ## Feature Requests, Bug Reports and Contributions
 
@@ -116,3 +129,12 @@ This plugin is open source! The source code can be found on [GitLab](https://git
 Contributions are more than welcome! I've recently picked up support for this plugin again, and am in the process of cleaning up the code. I'm not a Java expert, so feel free to make clean-up, opinionated contributions if you'd like.
 
 If needed, you can reach me via [GitLab](https://gitlab.com/nichogx/DiscordRoleSync) or [Discord](https://discord.com/invite/JBNejsW). To report bugs or request features, you can either create an issue in GitLab or contact me via Discord.
+
+## Known Issues and Limitations
+
+### Offline Server Mode
+Please node that in offline mode servers, linking usernames is **case-sensitive**.
+
+While this plugin works with offline servers, it might conflict with "login plugins" that change a user's UUID after they join. Usage with these plugins is not supported yet. Please let me know via Discord or a GitLab issue if you'd like support for this to be added.
+
+If you swap between offline and online (or vice-versa), you'll need to delete the database. If you are using SQLite, just delete the database.db file. If you are using MySQL, execute `DROP TABLE syncbot_discordmcusers;`, replacing `syncbot` with the prefix in your config.yml file if you have changed it.

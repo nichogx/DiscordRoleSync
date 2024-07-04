@@ -10,7 +10,7 @@ import org.mockito.Mockito;
 
 import java.util.logging.Logger;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class UserSearchTest {
 

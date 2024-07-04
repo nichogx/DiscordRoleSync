@@ -34,8 +34,6 @@ current: "Current:"
 
 reloadComplete: "Reload complete"
 
-playersOnline: "%d/%d players"
-
 nonReleaseVersion:
   running:
     UNKNOWN: "You are running a development build of DiscordRoleSync. No support is provided. Please update to the latest supported version unless you know what you are doing."
@@ -61,13 +59,17 @@ commandArguments:
     admlink: "The Discord user to link"
   verificationCode: "The verification code obtained in Minecraft"
 
-fullLinkedTo: "Discord user %discord_user% is linked to Minecraft user %minecraft_user%"
+fullLinkedTo: "Discord user $discord_user$ is linked to Minecraft user $minecraft_user$"
 
 verification:
-  instructions: "Please verify your account using /%verify_command_name% on Discord. Your verification code is: %verification_code%"
+  instructions: "Please verify your account using /$verify_command_name$ on Discord. Your verification code is: $verification_code$"
   alreadyVerified: "You are already verified"
   wrongDigits: "Verification code must be %d digits long."
   wrongCode: "Incorrect verification code. Please try verifying again"
-  notLinked: "You have not linked your accounts yet. Please use /%link_command_name% first."
+  notLinked: "You have not linked your accounts yet. Please use /$link_command_name$ first."
 
 minecraftUserNotFound: "This Minecraft user does not exist."
+
+linkStatus:
+  linked: "Linked"
+  notLinked: "Not Linked"

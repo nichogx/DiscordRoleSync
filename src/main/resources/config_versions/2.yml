@@ -1,6 +1,6 @@
 # Used internally for backwards-compatibility with old config files.
 # Please DO NOT change this manually as the plugin WILL crash.
-configVersion: 3
+configVersion: 2
 
 # The language the plugin and bot should run in.
 # A list of supported languages can be found here: https://gitlab.com/nichogx/DiscordRoleSync/-/tree/master/src/main/resources/language
@@ -110,13 +110,9 @@ alternativeServer: ""
 # is in offline mode.
 alwaysOnlineMode: false
 
-botActivity:
-  # Whether the bot should show an activity status
-  enable: false
-  # The text for the bot's status.
-  # Supports $online_players$, $linked_players$ and $total_players$.
-  # Also supports PlaceholderAPI placeholders if you have that plugin installed (requires integrations.plugins.PlaceholderAPI: true).
-  status: "$online_players$/$total_players$ players online"
+# Whether the bot should show the number of players online
+# as its "playing" status
+showPlayers: false
 
 # Embed configurations for messages (optional)
 embed:
@@ -134,15 +130,6 @@ embed:
     SUCCESS: "#4CC754"
     # For error replies
     ERROR: "#BD3A3A"
-
-# Enable or disable integrations with other plugins.
-# Requires a full server restart to take effect.
-integrations:
-  plugins:
-    # This plugin can read and write placeholders.
-    # This plugin's placeholders are cached for 2 minutes when first accessed,
-    # because they are slightly expensive to compute.
-    PlaceholderAPI: false
 
 # Experimental
 # These options are experimental. They are subject to change between versions (including breaking changes).

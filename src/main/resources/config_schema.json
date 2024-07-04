@@ -39,6 +39,9 @@
     "configVersion": {
       "type": "integer"
     },
+    "enableDebugLogging": {
+      "type": "boolean"
+    },
     "language": {
       "type": "string"
     },
@@ -192,8 +195,20 @@
     "alwaysOnlineMode": {
       "type": "boolean"
     },
-    "showPlayers": {
-      "type": "boolean"
+    "botActivity": {
+      "type": "object",
+      "properties": {
+        "enable": {
+          "type": "boolean"
+        },
+        "status": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "enable",
+        "status"
+      ]
     },
     "embed": {
       "type": "object",
@@ -232,6 +247,20 @@
     },
     "experimental": {
       "type": "object"
+    },
+    "integrations": {
+      "type": "object",
+      "properties": {
+        "plugins": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "boolean"
+          }
+        }
+      },
+      "required": [
+        "plugins"
+      ]
     }
   },
   "required": [
@@ -250,7 +279,8 @@
     "chatPrefix",
     "alternativeServer",
     "alwaysOnlineMode",
-    "showPlayers",
-    "embed"
+    "botActivity",
+    "embed",
+    "integrations"
   ]
 }

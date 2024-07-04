@@ -4,11 +4,13 @@ import dev.nicho.rolesync.RoleSync;
 import dev.nicho.rolesync.bot.discord.DiscordAgent;
 import dev.nicho.rolesync.bot.listeners.MemberEventsListener;
 import dev.nicho.rolesync.bot.listeners.SlashCommandListener;
+import me.clip.placeholderapi.PlaceholderAPI;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.events.session.ShutdownEvent;
 import net.dv8tion.jda.api.exceptions.InvalidTokenException;
@@ -18,6 +20,7 @@ import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.bukkit.Server;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.sql.SQLException;
 import java.time.Duration;
@@ -113,19 +116,34 @@ public class SyncBot extends ListenerAdapter {
 
         plugin.getLogger().info("Logged in: " + event.getJDA().getSelfUser().getName());
 
-        if (this.plugin.getConfig().getBoolean("showPlayers")) {
+        if (this.plugin.getConfig().getBoolean("botActivity.enable")) {
             Server server = this.plugin.getServer();
 
             // Lock to update the timers
             synchronized (this) {
                 this.presenceTimer = server.getScheduler().runTaskTimerAsynchronously(this.plugin, () -> {
-                    String template = plugin.getLanguage().getString("playersOnline");
-                    if (template == null) {
-                        template = "%d/%d players";
+                    String template = plugin.getConfig().getString("botActivity.status");
+                    String msg = template
+                            .replace("$online_players$", String.valueOf(server.getOnlinePlayers().size()))
+                            .replace("$total_players$", String.valueOf(server.getMaxPlayers()));
+
+                    // Only make a database call if required
+                    if (template.contains("$linked_players$")) {
+                        try {
+                            msg = msg.replace("$linked_players$",
+                                    String.valueOf(plugin.getDb().getLinkedUserCount())
+                            );
+                        } catch (SQLException e) {
+                            plugin.getLogger().warning("Error getting linked user count to set on the Bot's activity: " + e.getMessage());
+                        }
                     }
 
-                    String msg = String.format(template, server.getOnlinePlayers().size(), server.getMaxPlayers());
-                    this.jda.getPresence().setActivity(Activity.playing(msg));
+                    // PlaceholderAPI if it's available
+                    if (plugin.getIntegrationEnabled("PlaceholderAPI")) {
+                        msg = PlaceholderAPI.setPlaceholders(null, msg);
+                    }
+
+                    this.jda.getPresence().setActivity(Activity.customStatus(msg));
                 }, 0L, 3600L); // run every 3 minutes
             }
         }
@@ -181,5 +199,31 @@ public class SyncBot extends ListenerAdapter {
                 this.presenceTimer = null;
             }
         }
+    }
+
+    /**
+     * Gets a Discord username from a Discord ID
+     *
+     * @param discordId The Discord ID to check
+     * @return The Discord username. null if not found.
+     */
+    public @Nullable String getDiscordUsername(String discordId) {
+        User user = this.jda.getUserById(discordId);
+        if (user == null) return null;
+
+        return user.getName();
+    }
+
+    /**
+     * Gets a Discord nickname from a Discord ID
+     *
+     * @param discordId The Discord ID to check
+     * @return The Discord nickname. null if not found.
+     */
+    public @Nullable String getDiscordNickname(String discordId) {
+        User user = this.jda.getUserById(discordId);
+        if (user == null) return null;
+
+        return user.getEffectiveName();
     }
 }

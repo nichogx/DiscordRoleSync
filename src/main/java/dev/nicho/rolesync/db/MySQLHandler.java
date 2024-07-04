@@ -1,7 +1,7 @@
 package dev.nicho.rolesync.db;
 
+import dev.nicho.rolesync.RoleSync;
 import org.apache.commons.dbcp.BasicDataSource;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -10,7 +10,7 @@ public class MySQLHandler extends DatabaseHandler {
 
     private final BasicDataSource ds;
 
-    public MySQLHandler(JavaPlugin plugin, String host, int port, String db, String user, String passwd) throws SQLException {
+    public MySQLHandler(RoleSync plugin, String host, int port, String db, String user, String passwd) throws SQLException {
         super(plugin);
 
         this.ds = new BasicDataSource();

@@ -8,7 +8,13 @@ main: dev.nicho.rolesync.RoleSync
 # This plugin has been tested in 1.8.8-1.21 and is confirmed working, though.
 api-version: 1.13
 
+softdepend:
+  # This plugin can read from PlaceholderAPI in some strings, and provides
+  # its own placeholders too.
+  - PlaceholderAPI
+
 depend:
+  # Uses Vault to manage permissions
   - Vault
 
 commands:

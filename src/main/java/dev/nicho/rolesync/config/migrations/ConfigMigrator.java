@@ -22,12 +22,16 @@ public class ConfigMigrator {
         this.plugin = plugin;
 
         // Version 1 to 2
-        // Version 2 is the current config.yml
-        // NOTE: when updating this to 3, legacy v2 should be saved somewhere else (e.g. config_versions/2.yml)
-        ConfigMigration v1to2 = new ConfigMigration(1, "config.yml");
+        ConfigMigration v1to2 = new ConfigMigration(1, "config_versions/2.yml");
         v1to2.renamedKey("botInfo.token", "bot.token");
         v1to2.renamedKey("botInfo.server", "bot.server");
         migrations.add(v1to2);
+
+        // Version 2 to 3
+        // When updating to 4, change the resource path here.
+        ConfigMigration v2to3 = new ConfigMigration(2, "config.yml");
+        v2to3.renamedKey("showPlayers", "botActivity.enable");
+        migrations.add(v2to3);
 
         try {
             this.latestVersion = ConfigReader

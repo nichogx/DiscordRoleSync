@@ -103,7 +103,7 @@ public class SlashCommandListener extends ListenerAdapter {
                         DatabaseHandler.LinkedUserInfo userInfo = plugin.getDb().getLinkedUserInfo(discordId);
                         if (userInfo == null) {
                             throw new UserErrorException(
-                                    plugin.getLanguage().getString("verification.notLinked").replace("%link_command_name%", link)
+                                    plugin.getLanguage().getString("verification.notLinked").replace("$link_command_name$", link)
                             );
                         }
 
@@ -245,8 +245,8 @@ public class SlashCommandListener extends ListenerAdapter {
 
                             discordAgent.buildReply(hook,
                                     plugin.getLanguage().getString("fullLinkedTo")
-                                            .replace("%discord_user%", name)
-                                            .replace("%minecraft_user%", mcUserInfo)
+                                            .replace("$discord_user$", name)
+                                            .replace("$minecraft_user$", mcUserInfo)
                             ).queue();
                         });
                     } catch (SQLException | IOException e) {

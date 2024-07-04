@@ -11,9 +11,10 @@ import dev.nicho.rolesync.config.migrations.ConfigMigrator;
 import dev.nicho.rolesync.db.DatabaseHandler;
 import dev.nicho.rolesync.db.MySQLHandler;
 import dev.nicho.rolesync.db.SQLiteHandler;
+import dev.nicho.rolesync.integrations.placeholders.RoleSyncPlaceholderExpansion;
 import dev.nicho.rolesync.listeners.PlayerJoinListener;
 import dev.nicho.rolesync.listeners.WhitelistLoginListener;
-import dev.nicho.rolesync.metrics.MetricCacher;
+import dev.nicho.rolesync.util.caching.MetricCacher;
 import dev.nicho.rolesync.util.plugin_meta.PluginVersion;
 import dev.nicho.rolesync.util.vault.VaultAPI;
 import net.dv8tion.jda.api.exceptions.InvalidTokenException;
@@ -199,6 +200,11 @@ public class RoleSync extends JavaPlugin {
         } catch (IOException e) {
             getLogger().warning("Unable to run checks on the installed plugin version.\n" + e.getMessage());
         }
+
+        // PlaceholderAPI
+        if (this.getIntegrationEnabled("PlaceholderAPI")) {
+            (new RoleSyncPlaceholderExpansion(this)).register();
+        }
     }
 
     @Override
@@ -234,7 +240,7 @@ public class RoleSync extends JavaPlugin {
                 () -> String.valueOf(getConfig().getBoolean("giveLinkedRole"))));
 
         metrics.addCustomChart(new SimplePie("show_players_online",
-                () -> String.valueOf(getConfig().getBoolean("showPlayers"))));
+                () -> String.valueOf(getConfig().getBoolean("botActivity.enable"))));
 
         metrics.addCustomChart(new SimplePie("require_verification",
                 () -> String.valueOf(getConfig().getBoolean("requireVerification"))));
@@ -281,10 +287,13 @@ public class RoleSync extends JavaPlugin {
         metrics.addCustomChart(new SimplePie("enabled_geyser_support",
                 () -> String.valueOf(getConfig().getBoolean("experimental.geyser.enableGeyserSupport", false))));
 
+        metrics.addCustomChart(new SimplePie("integration_placeholder_api",
+                () -> String.valueOf(getIntegrationEnabled("PlaceholderAPI"))));
+
         // Expensive metrics, or metrics that shouldn't run on the main thread.
 
-        String linkedUsersChartId = "linked_users";
-        MetricCacher<Integer> linkedUsersCache = new MetricCacher<>(this, () -> db.getLinkedUserCount(), 36000L);
+        String linkedUsersChartId = "linked_users"; // Update linked user count every 10 minutes
+        MetricCacher<Integer> linkedUsersCache = new MetricCacher<>(this, () -> db.getLinkedUserCount(), 12000L);
         this.metricCaches.put(linkedUsersChartId, linkedUsersCache);
 
         this.getServer().getScheduler().runTaskLater(this, () -> {
@@ -372,8 +381,8 @@ public class RoleSync extends JavaPlugin {
                                     + " " + getConfig().getString("discordUrl"));
                         } else if (!userInfo.verified) {
                             sender.sendMessage(ChatColor.BLUE + chatPrefix + ChatColor.RESET + language.getString("verification.instructions")
-                                    .replace("%verify_command_name%", getConfig().getString("commandNames.verify", "verify"))
-                                    .replace("%verification_code%", ChatColor.AQUA + String.valueOf(userInfo.code) + ChatColor.RESET));
+                                    .replace("$verify_command_name$", getConfig().getString("commandNames.verify", "verify"))
+                                    .replace("$verification_code$", ChatColor.AQUA + String.valueOf(userInfo.code) + ChatColor.RESET));
                         } else {
                             sender.sendMessage(ChatColor.BLUE + chatPrefix + ChatColor.RESET + language.getString("verification.alreadyVerified"));
                         }
@@ -539,5 +548,37 @@ public class RoleSync extends JavaPlugin {
 
     public VaultAPI getVault() {
         return vault;
+    }
+
+    public SyncBot getBot() {
+        return bot;
+    }
+
+    /**
+     * Checks if a plugin integration is enabled
+     *
+     * @param integration The plugin's name
+     * @return true if enabled, false otherwise
+     */
+    public boolean getIntegrationEnabled(String integration) {
+        return Bukkit.getPluginManager().isPluginEnabled(integration) &&
+                getConfig().getBoolean("integrations.plugins." + integration, true);
+    }
+
+    /**
+     * Logs a debug message.
+     * Apparently, Bukkit does not let you change the level of the default plugin logger, so I guess
+     * we'll do this...
+     *
+     * @param msg The message to log
+     */
+    public void debugLog(String msg) {
+        // Enable debug logging
+        String installedVersion = getDescription().getVersion();
+        PluginVersion.VersionType versionType = PluginVersion.getVersionType(installedVersion);
+        boolean isDevVersion = versionType != PluginVersion.VersionType.RELEASE && versionType != PluginVersion.VersionType.RELEASE_CANDIDATE;
+        if (isDevVersion || getConfig().getBoolean("enableDebugLogging", false)) {
+            getLogger().warning("[DEBUG] " + msg);
+        }
     }
 }

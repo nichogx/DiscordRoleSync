@@ -34,8 +34,6 @@ current: "Actual:"
 
 reloadComplete: "Recarga completa"
 
-playersOnline: "%d/%d jugadores"
-
 nonReleaseVersion:
   running:
     UNKNOWN: "Estás ejecutando una versión de desarrollo de DiscordRoleSync. No se proporciona soporte. Por favor actualiza a la última versión soportada a menos que sepas lo que estás haciendo."
@@ -61,16 +59,20 @@ commandArguments:
     admlink: "El usuario de Discord a vincular"
   verificationCode: "El código de verificación obtenido en Minecraft"
 
-fullLinkedTo: "El usuario de Discord %discord_user% está vinculado con el usuario de Minecraft %minecraft_user%"
+fullLinkedTo: "El usuario de Discord $discord_user$ está vinculado con el usuario de Minecraft $minecraft_user$"
 
 verification:
-  instructions: "Por favor verifica tu cuenta usando /%verify_command_name% en Discord. Tu código de verificación es: %verification_code%"
+  instructions: "Por favor verifica tu cuenta usando /$verify_command_name$ en Discord. Tu código de verificación es: $verification_code$"
   alreadyVerified: "Ya estás verificado"
   wrongDigits: "El código de verificación debe tener %d dígitos."
   wrongCode: "Código de verificación incorrecto. Por favor intenta verificar nuevamente"
-  notLinked: "Aún no has vinculado tus cuentas. Por favor usa /%link_command_name% primero."
+  notLinked: "Aún no has vinculado tus cuentas. Por favor usa /$link_command_name$ primero."
 
 minecraftUserNotFound: "Este usuario de Minecraft no existe."
+
+linkStatus:
+  linked: "Vinculado"
+  notLinked: "No vinculado"
 
 # Translation needed! Everything below this line was added after this translation
 # was written. Please make a merge request or contact me to update these to your language!
