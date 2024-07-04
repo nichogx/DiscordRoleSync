@@ -35,25 +35,35 @@ Versions are automatically defined by CI.
 
 Publishing will be done by the maintainer, once changes warrant a new release. 
 
-For now, all platforms are manual. Release candidates are uploaded to Modrinth and Hangar. Only full releases are uploaded to Spigot.
+Release candidates are uploaded to Modrinth and Hangar. Only full releases are uploaded to Spigot.
 
-Steps for all platforms:
-1. Tag the version and wait for CI to pass
-2. Download the resulting .jar and use it for individual uploads to the following
+Once a version is tagged, each 
 
-### Modrinth
-1. Upload a new version to Modrinth at https://modrinth.com/plugin/discordrolesync
-    - Compatible Minecraft versions have to be selected again. Select everything after 1.8.8
-    - Update the version's changelog by copying the raw CHANGELOG.md for the new version
-2. Update the description by copying the raw README.md. Remove Spigot and Hangar badges.
+### [Modrinth](https://modrinth.com/plugin/discordrolesync) 
+[![target-Modrinth](https://img.shields.io/modrinth/dt/g5nO2LNq?logo=modrinth&label=Modrinth)](https://modrinth.com/plugin/discordrolesync)
 
-### Hangar
-1. Upload a new version to Modrinth at https://hangar.papermc.io/NichoGX/DiscordRoleSync
-    - Compatible Minecraft versions have to be selected again. Select everything after 1.8
-    - Update the version's changelog by copying the raw CHANGELOG.md for the new version
-2. Update the description by copying the raw README.md. Remove Spigot and Modrinth badges.
+- Release candidates are uploaded to the "Beta" channel
+- Releases are uploaded to the "Release" channel
+- Publishing and description updates are automatic through GitLab CI when a tag is created
+  - Description is made from the README.md. Non-Modrinth target badges are automatically removed.
+  - Changelog is pulled from CHANGELOG.md
 
-### Spigot
-1. Upload a new version to SpigotMC at https://www.spigotmc.org/resources/discord-role-sync.78829
-    - The version's changelog needs to be manually translated from CHANGELOG.md to Spigot's format
-2. Update the description by copying the generated bbcode artifact. Remove Modrinth and Hangar badges.
+### [Hangar](https://hangar.papermc.io/NichoGX/DiscordRoleSync)
+[![target-Hangar](https://img.shields.io/hangar/dt/discordrolesync?logo=data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcKICAgd2lkdGg9IjIxLjM5MTk5OG1tIgogICBoZWlnaHQ9IjI3LjYyMDc0MW1tIgogICB2aWV3Qm94PSIwIDAgMjEuMzkxOTk4IDI3LjYyMDc0MSIKICAgdmVyc2lvbj0iMS4xIgogICBpZD0ic3ZnNzQxIgogICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgIHhtbG5zOnN2Zz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogIDxkZWZzCiAgICAgaWQ9ImRlZnM3MzgiIC8+CiAgPGcKICAgICBpZD0ibGF5ZXIxIgogICAgIHRyYW5zZm9ybT0idHJhbnNsYXRlKC03Ni4xNzIyMDksLTEyNy42NTA5KSI+CiAgICA8cGF0aAogICAgICAgZD0ibSA5NS44ODgzNjEsMTM5LjUwMDE4IGMgLTIuMDk0NDUsLTAuNzY5NDEgLTUuMTc5NTA0LDIuMjA5NDUgLTYuNjg5NzUyLDYuNzczNjggLTAuNzQ5NjU2LDIuMjc0MDEgLTEuMTExNjA4LDQuOTQxMDEgLTAuNzYzNDE0LDcuNzM0MyBsIC0wLjk2ODczMiwtMC40MDQyOCBjIC0xLjg0NzE1MywtNS43NjA4NiAtMC44MTEzOTQsLTEyLjA2MDA2IDIuMzg5MDIxLC0xNi42MDgwNyB6IgogICAgICAgc3R5bGU9ImZpbGw6I2ZmZmZmZjtmaWxsLW9wYWNpdHk6MTtmaWxsLXJ1bGU6bm9uemVybztzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MC4zNTI3NzgiCiAgICAgICBpZD0icGF0aDE2Ny02LTEiIC8+CiAgICA8cGF0aAogICAgICAgZD0ibSA5Ny4yMzU3MzEsMTQ5LjM0Nzk3IC03LjE2NzA2MywtMi45NzAwNCBjIDEuMzI1MDM5LC0zLjk4OTIxIDMuNzUzNTcxLC02LjM2OTc1IDUuMzM5NjY2LC02LjM2OTc1IDAuMTY4Mjc2LDAgMC4zMjU2MTUsMC4wMjc5IDAuNDcxNjY2LDAuMDc4NyBsIDAuMTMxOTM5LDAuMDU2MSBjIDAuNTY0MDk0LDAuMjcyMzQgMi4yNTk5MDQsMS43Mzc3OCAxLjIyMzc5Miw5LjIwNTAzIgogICAgICAgc3R5bGU9ImZpbGw6I2ZmZmZmZjtmaWxsLW9wYWNpdHk6MTtmaWxsLXJ1bGU6bm9uemVybztzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MC4zNTI3NzgiCiAgICAgICBpZD0icGF0aDE3MS05LTgiIC8+CiAgICA8cGF0aAogICAgICAgZD0ibSA5NC42NjE1MzYsMTMxLjYyODQ3IGMgLTIuMjQ1NzkzLDEuMjEwMDMgLTQuMTIxMTY3LDIuOTYxOTIgLTUuNTU4Mzg5LDUuMDU2MDEgLTMuMTQ3MTQ0LDQuNTY3NDIgLTQuMjI0ODg1LDEwLjc2MzI1IC0yLjU4NTUyMSwxNi41MjY1OCAwLjE5NjUwMSwwLjY5MzIxIDAuNDMyMTU2LDEuMzgxMTMgMC43MTAxNDcsMi4wNjA1OCBsIC05LjU4Njc3NiwtMy45NzgyOCBDIDc0LjAxMTI1MywxNDIuNDA1ODMgNzcuMzQwNDMsMTMxLjgyMjUgODUuMDc3NTg1LDEyNy42NTA5IFoiCiAgICAgICBzdHlsZT0iZmlsbDojZmZmZmZmO2ZpbGwtb3BhY2l0eToxO2ZpbGwtcnVsZTpub256ZXJvO3N0cm9rZTpub25lO3N0cm9rZS13aWR0aDowLjM1Mjc3OCIKICAgICAgIGlkPSJwYXRoMTc1LTItNyIgLz4KICA8L2c+Cjwvc3ZnPgo=&label=Hangar)](https://hangar.papermc.io/NichoGX/DiscordRoleSync)
+
+- Release candidates are uploaded to the "Beta" channel
+- Releases are uploaded to the "Release" channel
+- Publishing and description updates are automatic through GitLab CI when a tag is created
+   - Description is made from the README.md. Non-Hangar target badges are automatically removed.
+   - Changelog is pulled from CHANGELOG.md
+
+### [Spigot](https://www.spigotmc.org/resources/discord-role-sync.78829)
+[![target-SpigotMC](https://img.shields.io/spiget/downloads/78829?logo=spigotmc&label=SpigotMC)](https://www.spigotmc.org/resources/discord-role-sync.78829)
+
+As far as I can tell, Spigot does not have an API for automatic uploads.
+
+- Only releases are uploaded
+- Publishing and description updates are **manual**
+  - Publish a new version by downloading the artifact and **manually** uploading to Spigot
+  - The version's changelog needs to be **manually** translated from CHANGELOG.md to Spigot's format
+  - The description is automatically generated to bbcode in an artifact, but must be **manually** updated. Non-Spigot target badges must be **manually** removed.
