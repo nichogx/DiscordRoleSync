@@ -502,6 +502,13 @@ public class RoleSync extends JavaPlugin {
         ) {
             return YamlConfiguration.loadConfiguration(reader);
         } catch (Exception e) {
+            if (language.equals(defaultLanguage)) {
+                throw new IllegalStateException(
+                        String.format("%s.yml is the default language and was not found. This is a bug. " +
+                                "Please contact the developer.", defaultLanguage)
+                );
+            }
+
             getLogger().warning(
                     String.format("Language file %s.yml does not exist in jar or in custom translation folder" +
                             ". Is it supported? Defaulting to %s.", language, defaultLanguage));
