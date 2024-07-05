@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.1.0](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/2.1.0) - unreleased
+## [2.1.0](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/2.1.0) - 2024-07-04
 
 ### Added
 - [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/) is now supported (optional). Placeholders can be put on the bot's Discord status. Placeholders with linked player count and player link information were also added. See plugin description for a list of placeholders supported. 
