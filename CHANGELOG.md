@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.1](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/2.1.1) - 2024-07-07
+
+### Fixed
+- Fixed compatibility with older Paper versions (MC 1.16 and under) by removing a conflicting dependency.
+
 ## [2.1.0](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/2.1.0) - 2024-07-04
 
 ### Added

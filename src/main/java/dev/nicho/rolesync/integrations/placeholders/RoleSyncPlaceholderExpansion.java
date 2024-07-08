@@ -17,7 +17,6 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 public class RoleSyncPlaceholderExpansion extends PlaceholderExpansion {
 

@@ -1,9 +1,5 @@
 package dev.nicho.rolesync;
 
-import com.networknt.schema.JsonSchema;
-import com.networknt.schema.JsonSchemaFactory;
-import com.networknt.schema.SpecVersion;
-import com.networknt.schema.ValidationMessage;
 import dev.nicho.rolesync.bot.SyncBot;
 import dev.nicho.rolesync.config.ConfigValidator;
 import dev.nicho.rolesync.config.migrations.ConfigMigration;
@@ -83,21 +79,17 @@ public class RoleSync extends JavaPlugin {
             getLogger().info("Reading config.yml");
             saveDefaultConfig();
 
-            ConfigValidator validator;
-            try (InputStream schemaStream = getResource("config_schema.json")) {
-                JsonSchemaFactory schemaFactory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V7);
-                JsonSchema schema = schemaFactory.getSchema(schemaStream);
-                validator = new ConfigValidator(schema);
-            }
+            ConfigValidator validator = new ConfigValidator(this);
 
             getLogger().info("Attempting to migrate config.yml");
             ConfigMigrator migrator = new ConfigMigrator(this);
             FileConfiguration updatedConfig = migrator.run(getConfig());
             if (updatedConfig != null) {
                 getLogger().info("Config file has been migrated. Validating...");
-                Set<ValidationMessage> configErrors = validator.validateYaml(updatedConfig.saveToString());
-                if (configErrors != null) {
-                    throw new InvalidConfigurationException("Migrated config.yml failed to validate: " + configErrors);
+                try {
+                validator.validateYaml(updatedConfig.saveToString());
+                } catch (InvalidConfigurationException e) {
+                    throw new InvalidConfigurationException("Migrated config.yml failed to validate: " + e.getMessage());
                 }
 
                 getLogger().info("Migrated config.yml has been validated.");
@@ -118,11 +110,7 @@ public class RoleSync extends JavaPlugin {
                 getLogger().info("No configs to migrate.");
             }
 
-            String config = getConfig().saveToString();
-            Set<ValidationMessage> configErrors = validator.validateYaml(config);
-            if (configErrors != null) {
-                throw new InvalidConfigurationException("config.yml failed to validate: " + configErrors);
-            }
+            validator.validateYaml(getConfig().saveToString());
 
             loadLang();
         } catch (InvalidConfigurationException e) {
@@ -131,8 +119,7 @@ public class RoleSync extends JavaPlugin {
             this.setEnabled(false);
             return;
         } catch (IOException e) {
-            getLogger().severe("An error occurred while loading the yml files.\n" +
-                    e.getMessage());
+            getLogger().severe("An error occurred while loading the yml files.\n" + e);
             this.setEnabled(false);
             return;
         }
