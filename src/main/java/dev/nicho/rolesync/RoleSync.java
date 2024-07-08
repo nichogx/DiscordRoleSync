@@ -87,7 +87,7 @@ public class RoleSync extends JavaPlugin {
             if (updatedConfig != null) {
                 getLogger().info("Config file has been migrated. Validating...");
                 try {
-                validator.validateYaml(updatedConfig.saveToString());
+                    validator.validateYaml(updatedConfig.saveToString());
                 } catch (InvalidConfigurationException e) {
                     throw new InvalidConfigurationException("Migrated config.yml failed to validate: " + e.getMessage());
                 }
