@@ -20,8 +20,6 @@ import java.util.concurrent.TimeUnit;
 
 public class RoleSyncPlaceholderExpansion extends PlaceholderExpansion {
 
-    private final long defaultTimeoutSeconds = 1;
-
     private final RoleSync plugin;
 
     private final LoadingCache<PlaceholderCacheKey, Optional<String>> cache;
@@ -34,7 +32,7 @@ public class RoleSyncPlaceholderExpansion extends PlaceholderExpansion {
                 .expireAfterWrite(2, TimeUnit.MINUTES)
                 .build(new CacheLoader<PlaceholderCacheKey, Optional<String>>() {
                     @Override
-                    public Optional<String> load(PlaceholderCacheKey key) {
+                    public @NotNull Optional<String> load(@NotNull PlaceholderCacheKey key) {
                         return Optional.ofNullable(uncachedRequest(key.player, key.placeholder));
                     }
                 });
