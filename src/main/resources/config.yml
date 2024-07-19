@@ -135,6 +135,15 @@ embed:
     # For error replies
     ERROR: "#BD3A3A"
 
+# If true, then the bot will reply publicly instead of with a message only the sender
+# can see. This is configured per command. Verify is always private so that verification
+# codes are not accidentally made public.
+publicReplies:
+  link: false
+  info: false
+  admLink: false
+  unlink: false
+
 # Enable or disable integrations with other plugins.
 # Requires a full server restart to take effect.
 integrations:

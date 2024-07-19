@@ -53,7 +53,8 @@ public class SlashCommandListener extends ListenerAdapter {
                         .addOption(OptionType.STRING, "minecraft_username",
                                 plugin.getLanguage().getString("commandArguments.minecraftUsername.link"), true),
                 event -> {
-                    event.deferReply(true).queue();
+                    boolean ephemeral = !plugin.getConfig().getBoolean("publicReplies.link", false);
+                    event.deferReply(ephemeral).queue();
 
                     InteractionHook hook = event.getHook();
                     hook.setEphemeral(true);
@@ -145,7 +146,8 @@ public class SlashCommandListener extends ListenerAdapter {
                         .addOption(OptionType.USER, "discord_user",
                                 plugin.getLanguage().getString("commandArguments.discordUser.unlink")),
                 event -> {
-                    event.deferReply(true).queue();
+                    boolean ephemeral = !plugin.getConfig().getBoolean("publicReplies.unlink", false);
+                    event.deferReply(ephemeral).queue();
 
                     InteractionHook hook = event.getHook();
                     hook.setEphemeral(true);
@@ -209,7 +211,8 @@ public class SlashCommandListener extends ListenerAdapter {
                         .addOption(OptionType.USER, "discord_user",
                                 plugin.getLanguage().getString("commandArguments.discordUser.info")),
                 event -> {
-                    event.deferReply(true).queue();
+                    boolean ephemeral = !plugin.getConfig().getBoolean("publicReplies.info", false);
+                    event.deferReply(ephemeral).queue();
 
                     InteractionHook hook = event.getHook();
                     hook.setEphemeral(true);
@@ -269,7 +272,8 @@ public class SlashCommandListener extends ListenerAdapter {
                         .addOption(OptionType.USER, "discord_user",
                                 plugin.getLanguage().getString("commandArguments.discordUser.admlink"), true),
                 event -> {
-                    event.deferReply(true).queue();
+                    boolean ephemeral = !plugin.getConfig().getBoolean("publicReplies.admlink", false);
+                    event.deferReply(ephemeral).queue();
 
                     InteractionHook hook = event.getHook();
                     hook.setEphemeral(true);
