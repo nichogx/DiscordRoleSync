@@ -1,6 +1,6 @@
 # Used internally for backwards-compatibility with old config files.
 # Please DO NOT change this manually as the plugin WILL crash.
-configVersion: 4
+configVersion: 3
 
 # The language the plugin and bot should run in.
 # A list of supported languages can be found here: https://gitlab.com/nichogx/DiscordRoleSync/-/tree/master/src/main/resources/language
@@ -134,15 +134,6 @@ embed:
     SUCCESS: "#4CC754"
     # For error replies
     ERROR: "#BD3A3A"
-
-# If true, then the bot will reply publicly instead of with a message only the sender
-# can see. This is configured per command. Verify is always private so that verification
-# codes are not accidentally made public.
-publicReplies:
-  link: false
-  info: false
-  admLink: false
-  unlink: false
 
 # Enable or disable integrations with other plugins.
 # Requires a full server restart to take effect.
