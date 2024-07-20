@@ -8,7 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## 2.2.0 - unreleased
 
 ### Added
-- Users can now configure the bot to send command replies publicly in the channel, instead of privately (that only the sender can see). This is configurable per command.
+- You can now configure the bot to send command replies publicly in the channel, instead of privately (that only the sender can see). This is configurable per command.
+- You can now specify a list of roles in which its members will not be renamed by this bot.
+- You can now specify a template for renaming Discord users, supporting PlaceholderAPI and the player's Minecraft username.
+
+### Changed
+- The placeholder `discord_nick` was broken, and has been replaced with `discord_display_name` which is now correct.
 
 ## [2.1.1](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/2.1.1) - 2024-07-07
 
