@@ -154,7 +154,7 @@ public class SyncBot extends ListenerAdapter {
                             .retrieveMemberById(userInfo.discordId).queue(member -> {
                                 if (member != null) {
                                     if (userInfo.verified || !plugin.getConfig().getBoolean("requireVerification")) {
-                                        discordAgent.giveRoleAndNickname(member, null);
+                                        discordAgent.giveRoleAndNickname(member, userInfo.username, userInfo.uuid);
                                     } else {
                                         discordAgent.removeRoleAndNickname(member);
                                     }
@@ -189,6 +189,14 @@ public class SyncBot extends ListenerAdapter {
         this.stopTimers();
     }
 
+    public JDA getJDA() {
+        return jda;
+    }
+
+    public DiscordAgent getAgent() {
+        return discordAgent;
+    }
+
     /**
      * Stops all timers that have been created for the bot.
      */
@@ -220,7 +228,7 @@ public class SyncBot extends ListenerAdapter {
      * @param discordId The Discord ID to check
      * @return The Discord nickname. null if not found.
      */
-    public @Nullable String getDiscordNickname(String discordId) {
+    public @Nullable String getDiscordDisplayName(String discordId) {
         User user = this.jda.getUserById(discordId);
         if (user == null) return null;
 

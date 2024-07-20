@@ -119,7 +119,7 @@ public class SlashCommandListener extends ListenerAdapter {
                             return;
                         }
 
-                        discordAgent.giveRoleAndNickname(member, userInfo.username);
+                        discordAgent.giveRoleAndNickname(member, userInfo.username, userInfo.uuid);
                         discordAgent.checkMemberRoles(member);
                     } catch (SQLException e) {
                         discordAgent.buildReply(hook, ReplyType.ERROR, plugin.getLanguage().getString("commandError")).queue();
@@ -349,7 +349,7 @@ public class SlashCommandListener extends ListenerAdapter {
                 .retrieveMemberById(discordId).queue(member -> {
                     if (member != null) {
                         if (!plugin.getConfig().getBoolean("requireVerification")) {
-                            discordAgent.giveRoleAndNickname(member, result.name);
+                            discordAgent.giveRoleAndNickname(member, result.name, uuid);
                         }
                         discordAgent.checkMemberRoles(member);
                     }

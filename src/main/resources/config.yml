@@ -59,14 +59,23 @@ requireVerification: false
 # they try to verify their account)
 discordUrl: ""
 
-# How the bot should change the Discord nicknames when the user is linked.
-# Possible values are:
-# - no: the bot will not touch the Discord nicknames
-# - after: the bot will put the Minecraft user in parentheses: discord name (mc user)
-# - replace: the bot will replace the user's Discord nickname with the Minecraft user
-# IF YOU SET THIS TO ANYTHING OTHER THAN "no" YOU NEED TO GIVE THE BOT A DISCORD ROLE
-# HIGHER THAN ANY OTHER ROLES. Nickname editing will also not work with server owners :(
-changeNicknames: "no"
+discordRename:
+  # If the bot should change the Discord nicknames when the user is linked, a template
+  # should be pasted here. An empty string ("") means no rename is done.
+  # Supports using $discord_name$ and $minecraft_name$ to replace with the respective values.
+  # Also supports PlaceholderAPI placeholders with % if you have that plugin installed (requires setting integrations.plugins.PlaceholderAPI: true).
+  # Example values are:
+  # - "$discord_name$ ($minecraft_name$)" | to put the Minecraft username after the user's Discord name
+  # - "$minecraft_name$" | to simply replace the Discord nickname with the Minecraft username
+  # - "%some_placeholder%" | to use PlaceholderAPI
+  # - "" | for no renaming
+  # If this is set, you need to give the bot a Discord role higher than any other roles. Nickname
+  # editing will not work with server owners. This is a Discord limitation :(
+  template: ""
+
+  # Users with these roles will not be renamed.
+  excludedRoles:
+    - "000000000000000000"
 
 # Should the bot manage a whitelist?
 # It will kick those that don't have the whitelist role if enabled.
@@ -115,7 +124,7 @@ botActivity:
   enable: false
   # The text for the bot's status.
   # Supports $online_players$, $linked_players$ and $total_players$.
-  # Also supports PlaceholderAPI placeholders if you have that plugin installed (requires integrations.plugins.PlaceholderAPI: true).
+  # Also supports PlaceholderAPI placeholders with % if you have that plugin installed (requires setting integrations.plugins.PlaceholderAPI: true).
   status: "$online_players$/$total_players$ players online"
 
 # Embed configurations for messages (optional)

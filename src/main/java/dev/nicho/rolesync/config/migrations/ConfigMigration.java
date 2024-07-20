@@ -1,6 +1,7 @@
 package dev.nicho.rolesync.config.migrations;
 
 import dev.nicho.rolesync.config.ConfigReader;
+import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -9,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * A ConfigMigration defines a migration between two versions of a
@@ -26,6 +28,7 @@ public class ConfigMigration {
     // A map from new name to the previous name.
     private final Map<String, String> renamed = new HashMap<>();
     private final Map<String, Object> hardcoded = new HashMap<>();
+    private final Map<String, Function<Configuration, Object>> functions = new HashMap<>();
 
     /**
      * Creates a new ConfigMigration
@@ -84,6 +87,17 @@ public class ConfigMigration {
         this.hardcoded.put(name, value);
     }
 
+    /**
+     * Sets a field based on the function passed. The function receives the previous
+     * configuration.
+     *
+     * @param name The name of the new key.
+     * @param transformer The transformer function.
+     */
+    public void function(String name, Function<Configuration, Object> transformer) {
+        this.functions.put(name, transformer);
+    }
+
     public FileConfiguration run(FileConfiguration config) {
         return run(config.saveToString());
     }
@@ -107,6 +121,11 @@ public class ConfigMigration {
             if (newConfig.contains(k, true) && !oldConfig.isConfigurationSection(k)) {
                 newConfig.set(k, v);
             }
+        });
+
+        // Set all function values
+        this.functions.forEach((newName, func) -> {
+            newConfig.set(newName, func.apply(oldConfig));
         });
 
         // Set all hardcoded values

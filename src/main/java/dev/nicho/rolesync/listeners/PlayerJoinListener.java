@@ -3,6 +3,7 @@ package dev.nicho.rolesync.listeners;
 import dev.nicho.rolesync.RoleSync;
 import dev.nicho.rolesync.db.DatabaseHandler.LinkedUserInfo;
 import dev.nicho.rolesync.util.plugin_meta.PluginVersion;
+import net.dv8tion.jda.api.entities.Guild;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -33,14 +34,23 @@ public class PlayerJoinListener implements Listener {
         plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
             try {
                 LinkedUserInfo usrInfo = plugin.getDb().getLinkedUserInfo(uuid);
-                if (usrInfo != null && !username.equals(usrInfo.username)) {
-                    plugin.getLogger().info(
-                            String.format("User with UUID %s has changed names from '%s' to '%s', updating in the database...", uuid, usrInfo.username, username)
-                    );
-                    plugin.getDb().updateUsername(uuid, username);
+                if (usrInfo != null) {
+                    Guild guild = plugin.getBot().getJDA().getGuildById(plugin.getConfig().getString("bot.server"));
+                    if (guild != null) guild.retrieveMemberById(usrInfo.discordId).queue(member -> {
+                        if (member == null) return;
+
+                        plugin.getBot().getAgent().giveRoleAndNickname(member, username, uuid);
+                    });
+
+                    if (!username.equals(usrInfo.username)) {
+                        plugin.getLogger().info(
+                                String.format("User with UUID %s has changed names from '%s' to '%s', updating in the database...", uuid, usrInfo.username, username)
+                        );
+                        plugin.getDb().updateUsername(uuid, username);
+                    }
                 }
             } catch (SQLException e) {
-                plugin.getLogger().severe("Error while checking/update newly joined user's username.\n" +
+                plugin.getLogger().severe("Error while checking/updating newly joined user's username.\n" +
                         e.getMessage());
             }
         });

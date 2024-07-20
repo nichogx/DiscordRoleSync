@@ -236,13 +236,11 @@ public class RoleSync extends JavaPlugin {
                 () -> String.valueOf(getConfig().getBoolean("messageFeedback"))));
 
         metrics.addCustomChart(new SimplePie("change_nicknames", () -> {
-            if (getConfig().getString("changeNicknames").equalsIgnoreCase("after")) {
-                return "After";
-            } else if (getConfig().getString("changeNicknames").equalsIgnoreCase("replace")) {
-                return "Replace";
+            if (!getConfig().getString("discordRename.template").isEmpty()) {
+                return "Custom";
             }
 
-            return "No"; // default is no
+            return "No";
         }));
 
         metrics.addCustomChart(new SimplePie("database_type", () -> {

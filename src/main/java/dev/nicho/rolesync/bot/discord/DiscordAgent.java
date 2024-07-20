@@ -2,6 +2,8 @@ package dev.nicho.rolesync.bot.discord;
 
 import dev.nicho.rolesync.RoleSync;
 import dev.nicho.rolesync.db.DatabaseHandler;
+import dev.nicho.rolesync.minecraft.UserSearchResult;
+import me.clip.placeholderapi.PlaceholderAPI;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -9,6 +11,8 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageCreateAction;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.awt.*;
@@ -16,6 +20,7 @@ import java.lang.reflect.Field;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class DiscordAgent {
 
@@ -123,7 +128,7 @@ public class DiscordAgent {
 
         try {
             // reset nickname
-            if (plugin.getConfig().getString("changeNicknames").equalsIgnoreCase("after")) {
+            if (!plugin.getConfig().getString("discordRename.template").isEmpty()) {
                 member.modifyNickname(null).queue(null,
                         error -> plugin.getLogger().warning("Error while changing user's nickname: " + error.getMessage())
                 );
@@ -139,19 +144,34 @@ public class DiscordAgent {
      *
      * @param member The Discord member
      * @param mcUser The Minecraft username
+     * @param uuid   The Minecraft UUID
      */
-    public void giveRoleAndNickname(Member member, String mcUser) {
+    public void giveRoleAndNickname(Member member, String mcUser, String uuid) {
         try {
-            if (mcUser != null) {
-                if (plugin.getConfig().getString("changeNicknames").equalsIgnoreCase("after")) {
-                    member.modifyNickname(member.getUser().getName() + " (" + mcUser + ")").queue(null,
-                            error -> plugin.getLogger().warning("Error while changing user's nickname: " + error.getMessage())
-                    );
-                } else if (plugin.getConfig().getString("changeNicknames").equalsIgnoreCase("replace")) {
-                    member.modifyNickname(mcUser).queue(null,
-                            error -> plugin.getLogger().warning("Error while changing user's nickname: " + error.getMessage())
-                    );
+            List<String> excludedRoles = plugin.getConfig().getStringList("discordRename.excludedRoles");
+            String renameTemplate = plugin.getConfig().getString("discordRename.template");
+            if (mcUser != null && !renameTemplate.isEmpty() && !hasRoleFromList(member, excludedRoles)) {
+                String nick = renameTemplate
+                        .replace("$discord_name$", member.getUser().getEffectiveName())
+                        .replace("$minecraft_name$", mcUser);
+
+                // PlaceholderAPI if it's available
+                if (plugin.getIntegrationEnabled("PlaceholderAPI") && renameTemplate.contains("%")) {
+                    OfflinePlayer player = Bukkit.getOfflinePlayer(UUID.fromString(uuid));
+                    if (player != null) {
+                        nick = PlaceholderAPI.setPlaceholders(player, nick);
+                    }
                 }
+
+                // Truncate to 32 codepoints
+                nick = nick.codePoints()
+                        .limit(32)
+                        .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                        .toString();
+
+                member.modifyNickname(nick).queue(null,
+                        error -> plugin.getLogger().warning("Error while changing user's nickname: " + error.getMessage())
+                );
             }
         } catch (PermissionException e) {
             plugin.getLogger().warning("Bot has no permissions to change nicknames for a user.");
@@ -211,7 +231,7 @@ public class DiscordAgent {
                 String.format("embed.colors.%s", replyType),
                 "WHITE"
         );
-        
+
         return hook.sendMessageEmbeds(
                 builder.setColor(getColorFromString(colorConfig)).build()
         );

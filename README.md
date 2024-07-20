@@ -109,7 +109,7 @@ It also enables a Placeholder Expansion for this plugin, with the following plac
 - `%drs_linked_users%`: the number of linked users
 - `%drs_link_status%`: if the user is linked or not
 - `%drs_discord_username%`: the Discord username of the user, if linked. Empty if not linked.
-- `%drs_discord_nick%`: the Discord nick of the user, if linked. Empty if not linked.
+- `%drs_discord_display_name%`: the Discord nick of the user, if linked. Empty if not linked.
 
 PlaceholderAPI integration is new and might still need some improvements. Please let me know if you have a request or bug report.
 

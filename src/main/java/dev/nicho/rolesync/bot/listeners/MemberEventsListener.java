@@ -39,7 +39,7 @@ public class MemberEventsListener extends ListenerAdapter {
             DatabaseHandler.LinkedUserInfo userInfo = plugin.getDb().getLinkedUserInfo(event.getMember().getId());
             if (userInfo != null) {
                 if (!plugin.getConfig().getBoolean("requireVerification") || userInfo.verified) {
-                    discordAgent.giveRoleAndNickname(event.getMember(), userInfo.username);
+                    discordAgent.giveRoleAndNickname(event.getMember(), userInfo.username, userInfo.uuid);
                 }
             }
         } catch (SQLException e) {

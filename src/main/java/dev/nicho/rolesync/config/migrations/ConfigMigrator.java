@@ -1,6 +1,9 @@
 package dev.nicho.rolesync.config.migrations;
 
 import dev.nicho.rolesync.config.ConfigReader;
+import org.bukkit.configuration.Configuration;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -29,9 +32,26 @@ public class ConfigMigrator {
 
         // Version 2 to 3
         // When updating to 4, change the resource path here.
-        ConfigMigration v2to3 = new ConfigMigration(2, "config.yml");
+        ConfigMigration v2to3 = new ConfigMigration(2, "config_versions/3.yml");
         v2to3.renamedKey("showPlayers", "botActivity.enable");
         migrations.add(v2to3);
+
+        // Version 3 to 4
+        // When updating to 5, change the resource path here.
+        ConfigMigration v3to4 = new ConfigMigration(3, "config.yml");
+        v3to4.function("discordRename.template", (oldCfg) -> {
+            String old = oldCfg.getString("changeNicknames");
+            if (old.equalsIgnoreCase("after")) {
+                return "$discord_name$ ($minecraft_name$)";
+            }
+
+            if (old.equalsIgnoreCase("replace")) {
+                return "$minecraft_name$";
+            }
+
+            return "";
+        });
+        migrations.add(v3to4);
 
         try {
             this.latestVersion = ConfigReader

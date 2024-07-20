@@ -96,9 +96,9 @@ public class RoleSyncPlaceholderExpansion extends PlaceholderExpansion {
                     return placeholderPlayerDiscordUsername(player);
                 }
 
-                case "discord_nick": {
+                case "discord_display_name": {
                     assert player != null; // Should be handled by `isPlayerAgnostic`
-                    return placeholderPlayerDiscordNick(player);
+                    return placeholderPlayerDiscordDisplayName(player);
                 }
             }
         } catch (SQLException e) {
@@ -133,13 +133,13 @@ public class RoleSyncPlaceholderExpansion extends PlaceholderExpansion {
         return username;
     }
 
-    private String placeholderPlayerDiscordNick(@NotNull OfflinePlayer player) throws SQLException {
+    private String placeholderPlayerDiscordDisplayName(@NotNull OfflinePlayer player) throws SQLException {
         DatabaseHandler.LinkedUserInfo userInfo = plugin.getDb().getLinkedUserInfo(player.getUniqueId().toString());
         if (userInfo == null) {
             return "";
         }
 
-        String nick = plugin.getBot().getDiscordNickname(userInfo.discordId);
+        String nick = plugin.getBot().getDiscordDisplayName(userInfo.discordId);
         if (nick == null) {
             return "";
         }
