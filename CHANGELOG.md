@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - The placeholder `discord_nick` was broken, and has been replaced with `discord_display_name` which is now correct.
+- Improved config file validation, with better and clearer error messages.
 
 ## [2.1.1](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/2.1.1) - 2024-07-07
 

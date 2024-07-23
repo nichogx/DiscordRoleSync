@@ -1,7 +1,8 @@
 package dev.nicho.rolesync;
 
 import dev.nicho.rolesync.bot.SyncBot;
-import dev.nicho.rolesync.config.ConfigValidator;
+import dev.nicho.rolesync.config.linter.ConfigLinter;
+import dev.nicho.rolesync.config.linter.LintResult;
 import dev.nicho.rolesync.config.migrations.ConfigMigration;
 import dev.nicho.rolesync.config.migrations.ConfigMigrator;
 import dev.nicho.rolesync.db.DatabaseHandler;
@@ -79,17 +80,17 @@ public class RoleSync extends JavaPlugin {
             getLogger().info("Reading config.yml");
             saveDefaultConfig();
 
-            ConfigValidator validator = new ConfigValidator(this);
+            ConfigLinter linter = new ConfigLinter(this);
 
             getLogger().info("Attempting to migrate config.yml");
             ConfigMigrator migrator = new ConfigMigrator(this);
             FileConfiguration updatedConfig = migrator.run(getConfig());
             if (updatedConfig != null) {
                 getLogger().info("Config file has been migrated. Validating...");
-                try {
-                    validator.validateYaml(updatedConfig.saveToString());
-                } catch (InvalidConfigurationException e) {
-                    throw new InvalidConfigurationException("Migrated config.yml failed to validate: " + e.getMessage());
+
+                LintResult lintResult = linter.run(updatedConfig);
+                if (!lintResult.isValid()) {
+                    throw new InvalidConfigurationException("Migrated config.yml failed to validate: " + lintResult);
                 }
 
                 getLogger().info("Migrated config.yml has been validated.");
@@ -110,7 +111,12 @@ public class RoleSync extends JavaPlugin {
                 getLogger().info("No configs to migrate.");
             }
 
-            validator.validateYaml(getConfig().saveToString());
+            getLogger().info("Validating config.yml");
+            LintResult lintResult = linter.run(getConfig());
+            if (!lintResult.isValid()) {
+                throw new InvalidConfigurationException("config.yml failed to validate: " + lintResult);
+            }
+            getLogger().info("config.yml has been validated!");
 
             loadLang();
         } catch (InvalidConfigurationException e) {
