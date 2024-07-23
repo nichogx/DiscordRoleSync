@@ -14,11 +14,11 @@ There is a lot of room for improvement. Refactors are very, very welcome, especi
 
 ## Getting a Review
 
-Please make sure you practice good code higiene. Make a descriptive merge request and please describe what you have done to test your changes.
+Please make sure you practice good code hygiene. Make a descriptive merge request and please describe what you have done to test your changes.
 
 ## Structure
 
-This project is built with Maven, using Java version 8. This plugin is fairly simple and I want to keep support for as many users as possible. This means everything Java 8+ and MC 1.8.8+.
+This project is built with Maven, targeting Java 11. While we officially support Java 11 only (as that's what we run in CI), please do not use any APIs that are not available in Java 8 if possible. This plugin is fairly simple and I want to keep support for as many users as possible. This means everything Java 8+ and MC 1.8.8+.
 
 There are a few Python scripts, mainly for CI, but these are not packaged as part of the final release.
 

@@ -29,6 +29,8 @@ Some features are optional and can be opted in or out from the config file.
 ## Installation
 You should first install [Vault](https://www.spigotmc.org/resources/vault.34315/) as this plugin will not work without it.
 
+This plugin targets Java 11, however it has been reported working with Java 8. No support is provided with Java versions below 11.
+
 Just copy the .jar to the plugins folder and run the server once to generate the config files. The plugin will error out due to no config, but that's expected on the first run. Go to the config.yml file and add your Discord bot token. To get one:
 
 1. Go to https://discord.com/developers/applications

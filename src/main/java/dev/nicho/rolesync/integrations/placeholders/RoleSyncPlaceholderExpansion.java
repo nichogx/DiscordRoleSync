@@ -45,7 +45,7 @@ public class RoleSyncPlaceholderExpansion extends PlaceholderExpansion {
             return "";
         }
 
-        return authorList.getFirst();
+        return authorList.get(0);
     }
 
     @Override

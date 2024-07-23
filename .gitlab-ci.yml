@@ -56,7 +56,8 @@ python-infra-test:
 maven-test:
   stage: test
 
-  image: maven:3-eclipse-temurin-22
+  # Use Java 11 to guarantee compatibility with servers using old Java
+  image: maven:3-eclipse-temurin-11
   script:
     - mvn test -Dpackage_version=ci-test
 
@@ -70,7 +71,8 @@ maven-test:
 maven-package:
   stage: build
 
-  image: maven:3-eclipse-temurin-22
+  # Use Java 11 to guarantee compatibility with servers using old Java
+  image: maven:3-eclipse-temurin-11
   script:
     - |
       if [[ -n "$CI_COMMIT_TAG" ]]; then
