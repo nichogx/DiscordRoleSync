@@ -94,9 +94,9 @@
 
     <repositories>
         <repository>
-            <id>central</id>
+            <id>maven_central</id>
             <name>Maven Central</name>
-            <url>https://repo1.maven.org/maven2/</url>
+            <url>https://repo.maven.apache.org/maven2/</url>
         </repository>
 
         <repository>
@@ -156,7 +156,7 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>5.0.0-beta.24</version>
+            <version>5.0.1</version>
             <!-- Disables audio natives, to reduce .jar size. -->
             <exclusions>
                 <exclusion>
