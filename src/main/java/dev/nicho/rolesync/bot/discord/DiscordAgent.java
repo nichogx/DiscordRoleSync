@@ -2,7 +2,6 @@ package dev.nicho.rolesync.bot.discord;
 
 import dev.nicho.rolesync.RoleSync;
 import dev.nicho.rolesync.db.DatabaseHandler;
-import dev.nicho.rolesync.minecraft.UserSearchResult;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;

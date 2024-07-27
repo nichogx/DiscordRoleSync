@@ -1,9 +1,8 @@
 import argparse
 import os
 import re
-from collections.abc import MutableMapping
-
 import yaml
+from collections.abc import MutableMapping
 
 
 def is_language_file(file_path):

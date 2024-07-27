@@ -1,9 +1,6 @@
 package dev.nicho.rolesync.config.migrations;
 
 import dev.nicho.rolesync.config.ConfigReader;
-import org.bukkit.configuration.Configuration;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
