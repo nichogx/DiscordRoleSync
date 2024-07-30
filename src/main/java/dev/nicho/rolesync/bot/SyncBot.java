@@ -39,8 +39,6 @@ public class SyncBot extends ListenerAdapter {
         super();
         this.plugin = plugin;
         this.discordAgent = new DiscordAgent(plugin);
-
-        plugin.getLogger().info("Finished initializing bot.");
     }
 
     /**
@@ -77,9 +75,12 @@ public class SyncBot extends ListenerAdapter {
                 slashCommandListener
         );
 
+        plugin.getLogger().info("Updating bot commands");
         jda.updateCommands()
                 .addCommands(slashCommandListener.getCommandData())
-                .queue();
+                .queue((cmds) -> {
+                    plugin.getLogger().info("Updated bot commands successfully");
+                });
     }
 
     /**

@@ -64,7 +64,7 @@ public class UserSearch {
 
         if (uuidType == UUIDType.BEDROCK) {
             // Experimental! Geyser support
-            return xboxAPI.searchName(name.substring(1)); // remove the first dot
+            return xboxAPI.searchName(name);
         }
 
         // Authenticated

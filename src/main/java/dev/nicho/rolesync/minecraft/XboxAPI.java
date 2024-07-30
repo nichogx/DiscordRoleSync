@@ -17,7 +17,11 @@ public class XboxAPI {
     public UserSearchResult searchName(String name) throws IOException {
         URL reqUrl;
         try {
-            reqUrl = new URI("https://api.geysermc.org/v2/xbox/xuid/" + name).toURL();
+            String xboxName = name
+                    .replace("_", "%20") // Geyser replaces xbox spaces with underscores
+                    .replace(".", ""); // remove the dot added by Geyser
+
+            reqUrl = new URI("https://api.geysermc.org/v2/xbox/xuid/" + xboxName).toURL();
         } catch (URISyntaxException e) {
             throw new IOException("Incorrectly formatted name");
         }
@@ -49,7 +53,7 @@ public class XboxAPI {
         String uuid = String.format("%032X", body.getLong("xuid"));
 
         return new UserSearchResult(
-                "." + name,
+                name,
                 uuidAddDashes(uuid)
         );
     }

@@ -19,6 +19,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fixed compatibility with Java versions before Java 21 when using the PlaceholderAPI integration added in 2.1.0
 
+### Fixed
+- Fixed a bug with the Geyser/Floodgate integration that prevented Xbox usernames with spaces to be linked.
+
 ## [2.1.1](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/2.1.1) - 2024-07-07
 
 ### Fixed
