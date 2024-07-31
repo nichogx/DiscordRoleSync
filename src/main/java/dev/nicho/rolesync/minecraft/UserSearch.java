@@ -1,5 +1,6 @@
 package dev.nicho.rolesync.minecraft;
 
+import dev.nicho.rolesync.RoleSync;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
@@ -10,7 +11,7 @@ import java.util.UUID;
 
 public class UserSearch {
 
-    private final JavaPlugin plugin;
+    private final RoleSync plugin;
 
     private final MojangAPI mojangAPI;
     private final XboxAPI xboxAPI;
@@ -19,56 +20,53 @@ public class UserSearch {
      * Creates MojangAPI with an alternative server.
      * If the URL is invalid or empty, the default server will be used.
      *
-     * @param plugin a reference to the JavaPlugin so we can extract configs
+     * @param plugin a reference to the RoleSync so we can extract configs
      */
-    public UserSearch(JavaPlugin plugin) {
+    public UserSearch(RoleSync plugin) {
         this.plugin = plugin;
         this.mojangAPI = new MojangAPI(plugin);
         this.xboxAPI = new XboxAPI();
     }
 
     /**
-     * Defines which type of UUID we should use for this Minecraft name.
-     *
-     * @param name the Minecraft name
-     * @return the UUIDType
-     */
-    public UUIDType UUIDTypeForName(String name) {
-        if (name.startsWith(".") && plugin.getConfig().getBoolean("experimental.geyser.enableGeyserSupport", false)) {
-            return UUIDType.BEDROCK;
-        }
-
-        if (!Bukkit.getOnlineMode() && !plugin.getConfig().getBoolean("alwaysOnlineMode"))
-            return UUIDType.NOT_AUTHENTICATED;
-
-        return UUIDType.AUTHENTICATED;
-    }
-
-    /**
      * Converts a username to a UUID - online or offline, depending on server mode
      *
-     * @param name the username
+     * @param name          the username
+     * @param manualOffline if this request should be treated as offline when in manual mode
      * @return a MojangSearchResult with the name and the uuid. All properties will be null if not found.
      * The name will have the correct capitalization if running on online mode
      * @throws IOException if an error occurs while looking for user
      */
-    public @Nullable UserSearchResult nameToUUID(String name) throws IOException {
-        UUIDType uuidType = UUIDTypeForName(name);
-
-        if (uuidType == UUIDType.NOT_AUTHENTICATED) {
-            return new UserSearchResult(
-                    name,
-                    UUID.nameUUIDFromBytes(("OfflinePlayer:" + name).getBytes(StandardCharsets.UTF_8)).toString()
-            );
-        }
-
-        if (uuidType == UUIDType.BEDROCK) {
-            // Experimental! Geyser support
+    public @Nullable UserSearchResult nameToUUID(String name, boolean manualOffline) throws IOException {
+        // Experimental! Geyser support
+        if (name.startsWith(".") &&
+                plugin.getConfig().getBoolean("experimental.geyser.enableGeyserSupport", false)) {
             return xboxAPI.searchName(name);
         }
 
-        // Authenticated
-        return mojangAPI.searchName(name);
+        UUIDMode mode = UUIDMode.fromCaseInsensitive(plugin.getConfig().getString("userUUIDMode"));
+        boolean useOnline = false;
+        if (mode == UUIDMode.DEFAULT) {
+            useOnline = Bukkit.getOnlineMode();
+        } else if (mode == UUIDMode.ONLINE) {
+            useOnline = true;
+        } else if (mode == UUIDMode.MANUAL) {
+            useOnline = !manualOffline;
+        }
+
+        if (useOnline || mode == UUIDMode.FALLBACK) {
+            UserSearchResult onlineResult = mojangAPI.searchName(name);
+
+            // For fallback mode, if something was found here, return it. Otherwise,
+            // fallback to the offline result below.
+            if (useOnline || onlineResult != null) return onlineResult;
+        }
+
+        // Offline result
+        return new UserSearchResult(
+                name,
+                UUID.nameUUIDFromBytes(("OfflinePlayer:" + name).getBytes(StandardCharsets.UTF_8)).toString()
+        );
     }
 
     /**

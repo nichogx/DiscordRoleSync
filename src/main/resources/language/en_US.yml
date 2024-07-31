@@ -58,6 +58,7 @@ commandArguments:
     info: "The Discord user to get info for"
     admlink: "The Discord user to link"
   verificationCode: "The verification code obtained in Minecraft"
+  offlineMode: "If this username is an offline username, not an official Mojang account"
 
 fullLinkedTo: "Discord user $discord_user$ is linked to Minecraft user $minecraft_user$"
 

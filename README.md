@@ -136,6 +136,6 @@ If needed, you can reach me via [GitLab](https://gitlab.com/nichogx/DiscordRoleS
 ### Offline Server Mode
 Please node that in offline mode servers, linking usernames is **case-sensitive**.
 
-While this plugin works with offline servers, it might conflict with "login plugins" that change a user's UUID after they join. Usage with these plugins is not supported yet. Please let me know via Discord or a GitLab issue if you'd like support for this to be added.
+While this plugin works with offline servers, it might conflict with "login plugins" that change a user's UUID after they join. Please try the `userUUIDMode` `FALLBACK` or `MANUAL` options if you use login plugins.
 
-If you swap between offline and online (or vice-versa), you'll need to delete the database. If you are using SQLite, just delete the database.db file. If you are using MySQL, execute `DROP TABLE syncbot_discordmcusers;`, replacing `syncbot` with the prefix in your config.yml file if you have changed it.
+If you swap between offline and online (or vice-versa), either via the UUID mode config or server mode change, you'll need to delete the database. If you are using SQLite, just delete the database.db file. If you are using MySQL, execute `DROP TABLE syncbot_discordmcusers;`, replacing `syncbot` with the prefix in your config.yml file if you have changed it.

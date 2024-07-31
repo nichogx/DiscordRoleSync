@@ -1,6 +1,7 @@
 package dev.nicho.rolesync.config.linter;
 
 import dev.nicho.rolesync.RoleSync;
+import dev.nicho.rolesync.minecraft.UUIDMode;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
 
@@ -204,6 +205,19 @@ public class ConfigLinter {
                                     result.add(String.format("Color '%s' is not valid in field 'embed.colors.%s'", color, key));
                                 }
                             }
+                        }
+
+                        return result;
+                    }),
+            new LintRule("Validate userUUIDMode",
+                    c -> {
+                        List<String> result = new ArrayList<>();
+
+                        String mode = c.getString("userUUIDMode");
+                        try {
+                            UUIDMode.fromCaseInsensitive(mode);
+                        } catch (IllegalArgumentException e) {
+                            result.add(String.format("Value '%s' is not valid for property userUUIDMode. Please read the field's documentation for valid values.", mode));
                         }
 
                         return result;

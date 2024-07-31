@@ -5,12 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.2.0](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/2.2.0) - unreleased
+## [2.2.0](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/2.2.0) - 2024-07-30
 
 ### Added
 - You can now configure the bot to send command replies publicly in the channel, instead of privately (that only the sender can see). This is configurable per command.
 - You can now specify a list of roles in which its members will not be renamed by this bot.
 - You can now specify a template for renaming Discord users, supporting PlaceholderAPI and the player's Minecraft username.
+- Added an option to configure how the plugin will choose to operate with online or offline UUIDs. Online and offline modes can now both be forced or manually set in each command, and there's a fallback mode that will use the offline UUID if the online UUID does not exist. This improves compatibility with login plugins in offline mode.
 
 ### Changed
 - The placeholder `discord_nick` was broken, and has been replaced with `discord_display_name` which is now correct.

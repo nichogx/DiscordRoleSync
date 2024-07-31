@@ -11,6 +11,7 @@ import dev.nicho.rolesync.db.SQLiteHandler;
 import dev.nicho.rolesync.integrations.placeholders.RoleSyncPlaceholderExpansion;
 import dev.nicho.rolesync.listeners.PlayerJoinListener;
 import dev.nicho.rolesync.listeners.WhitelistLoginListener;
+import dev.nicho.rolesync.minecraft.UUIDMode;
 import dev.nicho.rolesync.util.caching.MetricCacher;
 import dev.nicho.rolesync.util.plugin_meta.PluginVersion;
 import dev.nicho.rolesync.util.vault.VaultAPI;
@@ -240,6 +241,9 @@ public class RoleSync extends JavaPlugin {
 
         metrics.addCustomChart(new SimplePie("message_feedback",
                 () -> String.valueOf(getConfig().getBoolean("messageFeedback"))));
+
+        metrics.addCustomChart(new SimplePie("user_uuid_mode",
+                () -> UUIDMode.fromCaseInsensitive(getConfig().getString("userUUIDMode")).toString()));
 
         metrics.addCustomChart(new SimplePie("change_nicknames", () -> {
             if (!getConfig().getString("discordRename.template").isEmpty()) {

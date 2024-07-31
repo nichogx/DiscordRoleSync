@@ -1,6 +1,7 @@
 package dev.nicho.rolesync.config.linter;
 
 import dev.nicho.rolesync.config.ConfigReader;
+import dev.nicho.rolesync.minecraft.UUIDMode;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.MemoryConfiguration;
 import org.junit.jupiter.api.Test;
@@ -272,6 +273,29 @@ class ConfigLinterTest {
         assertContainsError(result, "Validate embed config", "Color 'fuchsia' is not valid in field 'embed.colors.INFO'");
     }
 
+    @Test
+    void testValidateUUIDMode() {
+        ConfigLinter linter = new ConfigLinter();
+        Configuration testConfig = newBasicValidConfig();
+        LintResult result;
+
+        // Works for all types
+        for (UUIDMode mode : UUIDMode.values()) {
+            testConfig.set("userUUIDMode", mode.toString());
+            assertEmpty(linter.run(testConfig));
+        }
+
+        // Works for lowercase
+        testConfig.set("userUUIDMode", "deFaUlt");
+        assertEmpty(linter.run(testConfig));
+
+        // Doesn't work for a random string
+        testConfig.set("userUUIDMode", "bla");
+        result = linter.run(testConfig);
+        assertEquals(1, result.asMap().size());
+        assertContainsError(result, "Validate userUUIDMode", "Value 'bla' is not valid for property userUUIDMode. Please read the field's documentation for valid values.");
+    }
+
     private void assertContainsError(LintResult result, String ruleName, String error) {
         List<String> ruleResult = result.asMap().get(ruleName);
         if (ruleResult != null) for (String err : ruleResult) {
@@ -288,7 +312,7 @@ class ConfigLinterTest {
     private Configuration newBasicValidConfig() {
         final Configuration config;
         try {
-            config =ConfigReader.getConfigFromResource("config.yml");
+            config = ConfigReader.getConfigFromResource("config.yml");
         } catch (Exception e) {
             throw new RuntimeException("Unable to read resource config.yml for creating test config");
         }

@@ -113,11 +113,21 @@ chatPrefix:
 # Leave blank to use default Mojang one.
 alternativeServer: ""
 
-# BungeeCord servers run in offline mode but need the plugin to
-# run in online mode (this was a request). Put the following to true
-# if you want the plugin to run in ONLINE mode even if the server
-# is in offline mode.
-alwaysOnlineMode: false
+# The default mode should work for most users.
+# This will define how the plugin transforms Minecraft usernames given in their commands (/link, /info, /admlink) to UUIDs.
+# By default, this will respect the mode the server is running one (official/online vs offline). Users using login plugins or
+# proxys such as BungeeCord might need this behavior to be changed.
+# Valid options are:
+#   DEFAULT - the plugin will use online (official Mojang) UUIDs if the server runs in online mode, offline if offline mode
+#   ONLINE - the plugin will always use online UUIDs -- this is useful for some BungeeCord setups where the node servers run in offline mode
+#            but the UUIDs are online.
+#   OFFLINE - the plugin will always use offline UUIDs
+#   FALLBACK - the plugin will try to use online UUIDs if the username exists, and use offline UUIDs if it cannot find it. This is useful for
+#              servers that use login plugins that change the user to an online UUID if their chosen username has an official Mojang account
+#   MANUAL - All relevant commands will have a new argument (use_offline_mode), which users will have to set to `true` when calling the command
+#            if their account is unofficial/offline.
+# MODIFYING THIS OPTION MAY REQUIRE UNLINKING AND RELINKING USERS, OR DELETING YOUR DATABASE. SEE THE PLUGIN DESCRIPTION FOR MORE INFORMATION.
+userUUIDMode: DEFAULT
 
 botActivity:
   # Whether the bot should show an activity status

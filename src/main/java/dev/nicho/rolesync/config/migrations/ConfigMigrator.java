@@ -48,6 +48,13 @@ public class ConfigMigrator {
 
             return "";
         });
+        v3to4.function("userUUIDMode", (oldCfg) -> {
+            if (oldCfg.getBoolean("alwaysOnlineMode")) {
+                return "ONLINE";
+            }
+
+            return "DEFAULT";
+        });
         migrations.add(v3to4);
 
         try {

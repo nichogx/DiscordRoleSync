@@ -6,6 +6,7 @@ import dev.nicho.rolesync.bot.discord.DiscordCommand;
 import dev.nicho.rolesync.bot.discord.ReplyType;
 import dev.nicho.rolesync.bot.exceptions.UserErrorException;
 import dev.nicho.rolesync.db.DatabaseHandler;
+import dev.nicho.rolesync.minecraft.UUIDMode;
 import dev.nicho.rolesync.minecraft.UUIDType;
 import dev.nicho.rolesync.minecraft.UserSearch;
 import dev.nicho.rolesync.minecraft.UserSearchResult;
@@ -49,9 +50,9 @@ public class SlashCommandListener extends ListenerAdapter {
         String link = plugin.getConfig().getString("commandNames.link", "link");
         this.commands.put(link, new DiscordCommand(link,
                 plugin.getLanguage().getString("commandDescriptions.link"),
-                cmd -> cmd.setGuildOnly(true)
+                cmd -> maybeAddOfflineModeArgument(cmd.setGuildOnly(true)
                         .addOption(OptionType.STRING, "minecraft_username",
-                                plugin.getLanguage().getString("commandArguments.minecraftUsername.link"), true),
+                                plugin.getLanguage().getString("commandArguments.minecraftUsername.link"), true)),
                 event -> {
                     boolean ephemeral = !plugin.getConfig().getBoolean("publicReplies.link", false);
                     event.deferReply(ephemeral).queue();
@@ -61,7 +62,8 @@ public class SlashCommandListener extends ListenerAdapter {
 
                     String mcUsername = Objects.requireNonNull(event.getOption("minecraft_username")).getAsString();
                     try {
-                        this.linkUser(Objects.requireNonNull(event.getMember()).getId(), mcUsername);
+                        OptionMapping manualUseOffline = event.getOption("offline_mode");
+                        this.linkUser(Objects.requireNonNull(event.getMember()).getId(), mcUsername, manualUseOffline != null && manualUseOffline.getAsBoolean());
                     } catch (IOException | SQLException e) {
                         discordAgent.buildReply(hook, ReplyType.ERROR, plugin.getLanguage().getString("commandError")).queue();
                         plugin.getLogger().severe("An error occurred while trying to link the user.\n" +
@@ -139,12 +141,12 @@ public class SlashCommandListener extends ListenerAdapter {
         String unlink = plugin.getConfig().getString("commandNames.unlink", "unlink");
         this.commands.put(unlink, new DiscordCommand(unlink,
                 plugin.getLanguage().getString("commandDescriptions.unlink"),
-                cmd -> cmd.setGuildOnly(true)
+                cmd -> maybeAddOfflineModeArgument(cmd.setGuildOnly(true)
                         .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_ROLES))
                         .addOption(OptionType.STRING, "minecraft_username",
                                 plugin.getLanguage().getString("commandArguments.minecraftUsername.unlink"))
                         .addOption(OptionType.USER, "discord_user",
-                                plugin.getLanguage().getString("commandArguments.discordUser.unlink")),
+                                plugin.getLanguage().getString("commandArguments.discordUser.unlink"))),
                 event -> {
                     boolean ephemeral = !plugin.getConfig().getBoolean("publicReplies.unlink", false);
                     event.deferReply(ephemeral).queue();
@@ -154,6 +156,7 @@ public class SlashCommandListener extends ListenerAdapter {
 
                     OptionMapping mcUser = event.getOption("minecraft_username");
                     OptionMapping discordUser = event.getOption("discord_user");
+                    OptionMapping manualUseOffline = event.getOption("offline_mode");
                     if ((mcUser == null) == (discordUser == null)) {
                         // Will be true only if mcUser and discordUser
                         // are both specified or both not specified
@@ -166,7 +169,7 @@ public class SlashCommandListener extends ListenerAdapter {
                         if (discordUser != null) {
                             userInfo = plugin.getDb().getLinkedUserInfo(discordUser.getAsUser().getId());
                         } else { // try minecraft nick
-                            UserSearchResult uuidSearch = mojang.nameToUUID(mcUser.getAsString());
+                            UserSearchResult uuidSearch = mojang.nameToUUID(mcUser.getAsString(), manualUseOffline != null && manualUseOffline.getAsBoolean());
                             if (uuidSearch != null) userInfo = plugin.getDb().getLinkedUserInfo(uuidSearch.uuid);
                         }
 
@@ -204,12 +207,12 @@ public class SlashCommandListener extends ListenerAdapter {
         String info = plugin.getConfig().getString("commandNames.info", "info");
         this.commands.put(info, new DiscordCommand(info,
                 plugin.getLanguage().getString("commandDescriptions.info"),
-                cmd -> cmd.setGuildOnly(true)
+                cmd -> maybeAddOfflineModeArgument(cmd.setGuildOnly(true)
                         .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_ROLES))
                         .addOption(OptionType.STRING, "minecraft_username",
                                 plugin.getLanguage().getString("commandArguments.minecraftUsername.info"))
                         .addOption(OptionType.USER, "discord_user",
-                                plugin.getLanguage().getString("commandArguments.discordUser.info")),
+                                plugin.getLanguage().getString("commandArguments.discordUser.info"))),
                 event -> {
                     boolean ephemeral = !plugin.getConfig().getBoolean("publicReplies.info", false);
                     event.deferReply(ephemeral).queue();
@@ -219,6 +222,7 @@ public class SlashCommandListener extends ListenerAdapter {
 
                     OptionMapping mcUser = event.getOption("minecraft_username");
                     OptionMapping discordUser = event.getOption("discord_user");
+                    OptionMapping manualUseOffline = event.getOption("offline_mode");
                     if ((mcUser == null) == (discordUser == null)) {
                         // Will be true only if mcUser and discordUser
                         // are both specified or both not specified
@@ -231,8 +235,9 @@ public class SlashCommandListener extends ListenerAdapter {
                         if (discordUser != null) {
                             userInfo = plugin.getDb().getLinkedUserInfo(discordUser.getAsUser().getId());
                         } else { // try minecraft nick
-                            UserSearchResult userSearchResult = mojang.nameToUUID(mcUser.getAsString());
-                            if (userSearchResult != null) userInfo = plugin.getDb().getLinkedUserInfo(userSearchResult.uuid);
+                            UserSearchResult userSearchResult = mojang.nameToUUID(mcUser.getAsString(), manualUseOffline != null && manualUseOffline.getAsBoolean());
+                            if (userSearchResult != null)
+                                userInfo = plugin.getDb().getLinkedUserInfo(userSearchResult.uuid);
                         }
 
                         if (userInfo == null) {
@@ -265,12 +270,12 @@ public class SlashCommandListener extends ListenerAdapter {
         String admlink = plugin.getConfig().getString("commandNames.admlink", "admlink");
         this.commands.put(admlink, new DiscordCommand(admlink,
                 plugin.getLanguage().getString("commandDescriptions.admlink"),
-                cmd -> cmd.setGuildOnly(true)
+                cmd -> maybeAddOfflineModeArgument(cmd.setGuildOnly(true)
                         .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_ROLES))
                         .addOption(OptionType.STRING, "minecraft_username",
                                 plugin.getLanguage().getString("commandArguments.minecraftUsername.admlink"), true)
                         .addOption(OptionType.USER, "discord_user",
-                                plugin.getLanguage().getString("commandArguments.discordUser.admlink"), true),
+                                plugin.getLanguage().getString("commandArguments.discordUser.admlink"), true)),
                 event -> {
                     boolean ephemeral = !plugin.getConfig().getBoolean("publicReplies.admlink", false);
                     event.deferReply(ephemeral).queue();
@@ -281,7 +286,8 @@ public class SlashCommandListener extends ListenerAdapter {
                     String mcUser = Objects.requireNonNull(event.getOption("minecraft_username")).getAsString();
                     User discordUser = Objects.requireNonNull(event.getOption("discord_user")).getAsUser();
                     try {
-                        this.linkUser(discordUser.getId(), mcUser);
+                        OptionMapping manualUseOffline = event.getOption("offline_mode");
+                        this.linkUser(discordUser.getId(), mcUser, manualUseOffline != null && manualUseOffline.getAsBoolean());
                     } catch (IOException | SQLException e) {
                         discordAgent.buildReply(hook, ReplyType.ERROR, plugin.getLanguage().getString("commandError")).queue();
                         plugin.getLogger().severe("An error occurred while trying to link the user.\n" +
@@ -297,6 +303,15 @@ public class SlashCommandListener extends ListenerAdapter {
                     discordAgent.buildReply(hook, ReplyType.SUCCESS, plugin.getLanguage().getString("successLink")).queue();
                 }
         ));
+    }
+
+    private SlashCommandData maybeAddOfflineModeArgument(SlashCommandData cmd) {
+        if (UUIDMode.fromCaseInsensitive(plugin.getConfig().getString("userUUIDMode")) == UUIDMode.MANUAL) {
+            return cmd.addOption(OptionType.BOOLEAN, "offline_mode",
+                    plugin.getLanguage().getString("commandArguments.offlineMode"));
+        }
+
+        return cmd;
     }
 
     @Override
@@ -325,13 +340,13 @@ public class SlashCommandListener extends ListenerAdapter {
         return commandData;
     }
 
-    private void linkUser(String discordId, String mcUsername) throws IOException, SQLException, UserErrorException {
+    private void linkUser(String discordId, String mcUsername, boolean manualUseOffline) throws IOException, SQLException, UserErrorException {
         DatabaseHandler.LinkedUserInfo userInfo = plugin.getDb().getLinkedUserInfo(discordId);
         if (userInfo != null) {
             throw new UserErrorException(plugin.getLanguage().getString("discordAlreadyLinked"));
         }
 
-        UserSearchResult result = mojang.nameToUUID(mcUsername);
+        UserSearchResult result = mojang.nameToUUID(mcUsername, manualUseOffline);
         if (result == null) {
             throw new UserErrorException(plugin.getLanguage().getString("minecraftUserNotFound"));
         }

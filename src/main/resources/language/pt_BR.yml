@@ -58,6 +58,7 @@ commandArguments:
     info: "O usuário do Discor para obter informação"
     admlink: "O usuário do Discor para vincular"
   verificationCode: "O código de verificação obtido no Mineraft"
+  offlineMode: "Se este nome de usuário é um nome de usuário offline, não uma conta oficial da Mojang"
 
 fullLinkedTo: "Usuário $discord_user$ está vinculado à conta do Minecraft $minecraft_user$"
 
