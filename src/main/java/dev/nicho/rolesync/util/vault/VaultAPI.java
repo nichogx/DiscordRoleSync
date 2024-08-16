@@ -31,17 +31,41 @@ public class VaultAPI {
      * Sets a user's groups to the ones in the list, removing any managed groups
      * that are not in the list.
      *
-     * @param uuid the UUID of the user to manage permissions
+     * @param uuid   the UUID of the user to manage permissions
      * @param groups the list of groups to set or null to remove all managed
      */
     public void setGroups(String uuid, @Nullable List<String> groups) {
         OfflinePlayer player = Bukkit.getOfflinePlayer(UUID.fromString(uuid));
 
+        // Remove groups that shouldn't be there
         for (String managedPerm : getManagedGroups()) {
-            permProvider.playerRemoveGroup(null, player, managedPerm);
+            if (groups == null || !groups.contains(managedPerm)) {
+                removeGroup(player, managedPerm);
+            }
         }
 
-        if (groups != null) groups.forEach(perm -> permProvider.playerAddGroup(null, player, perm));
+        // Add groups that should be there
+        if (groups != null) groups.forEach(group -> addGroup(player, group));
+    }
+
+    /**
+     * Adds a group to a player.
+     */
+    private void addGroup(OfflinePlayer player, String group) {
+        if (!permProvider.playerInGroup(null, player, group)) {
+            plugin.debugLog("Adding group %s to player %s", group, player.getName());
+            permProvider.playerAddGroup(null, player, group);
+        }
+    }
+
+    /**
+     * Removes a group from a player.
+     */
+    private void removeGroup(OfflinePlayer player, String group) {
+        if (permProvider.playerInGroup(null, player, group)) {
+            plugin.debugLog("Removing group %s from player %s", group, player.getName());
+            permProvider.playerRemoveGroup(null, player, group);
+        }
     }
 
     /**

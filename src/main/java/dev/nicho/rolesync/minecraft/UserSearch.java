@@ -2,7 +2,6 @@ package dev.nicho.rolesync.minecraft;
 
 import dev.nicho.rolesync.RoleSync;
 import org.bukkit.Bukkit;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;

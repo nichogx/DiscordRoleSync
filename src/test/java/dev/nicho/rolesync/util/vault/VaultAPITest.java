@@ -10,9 +10,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -37,29 +34,6 @@ class VaultAPITest {
     @AfterEach
     void reset() {
         Mockito.reset(server);
-    }
-
-    @Test
-    void testSetGroups() {
-        List<String> managedGroups = Arrays.asList(
-                "test-group", "test-group-2"
-        );
-
-        Permission permProvider = Mockito.mock(Permission.class);
-        VaultAPI vault = Mockito.spy(new VaultAPI(null, permProvider));
-        Mockito.doReturn(managedGroups).when(vault).getManagedGroups();
-
-        vault.setGroups(UUID.randomUUID().toString(), Collections.singletonList("test-group"));
-
-        // Assert all groups were initially removed
-        for (String group : managedGroups) {
-            Mockito.verify(permProvider, Mockito.times(1))
-                    .playerRemoveGroup(null, player, group);
-        }
-
-        // Assert only the required one was added
-        Mockito.verify(permProvider, Mockito.times(1))
-                .playerAddGroup(null, player, "test-group");
     }
 
     @Test

@@ -31,6 +31,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.intellij.lang.annotations.PrintFormat;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -565,15 +566,16 @@ public class RoleSync extends JavaPlugin {
      * Apparently, Bukkit does not let you change the level of the default plugin logger, so I guess
      * we'll do this...
      *
-     * @param msg The message to log
+     * @param format The message to log. Supports String.format() syntax
+     * @param args The String.format() args
      */
-    public void debugLog(String msg) {
+    public void debugLog(@PrintFormat String format, Object... args) {
         // Enable debug logging
         String installedVersion = getDescription().getVersion();
         PluginVersion.VersionType versionType = PluginVersion.getVersionType(installedVersion);
         boolean isDevVersion = versionType != PluginVersion.VersionType.RELEASE && versionType != PluginVersion.VersionType.RELEASE_CANDIDATE;
         if (isDevVersion || getConfig().getBoolean("enableDebugLogging", false)) {
-            getLogger().warning("[DEBUG] " + msg);
+            getLogger().warning(String.format("[DEBUG] " + format, args));
         }
     }
 }
