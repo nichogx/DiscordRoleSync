@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fixed a potential race condition when processing user groups that could cause groups to not be added correctly, or to be incorrectly removed. This also improves performance on large servers.
 
+### Changed
+- Improved the error shown to users when a Geyser user is not found in geysermc's cache.
+
+As a reminder, Geyser support is still experimental.
+
 ## [2.2.0](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/2.2.0) - 2024-07-30
 
 ### Added

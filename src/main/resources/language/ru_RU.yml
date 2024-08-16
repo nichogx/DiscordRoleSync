@@ -75,6 +75,7 @@ verification:
   notLinked: "You have not linked your accounts yet. Please use /$link_command_name$ first."
 
 minecraftUserNotFound: "This Minecraft user does not exist."
+geyserUserNotFound: "Could not find this Geyser user. If the user exists, try joining a Geyser server such as `test.geysermc.org` and running the command again."
 
 linkStatus:
   linked: "Linked"

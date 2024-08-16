@@ -79,3 +79,5 @@ linkStatus:
 # was written. Please make a merge request or contact me to update these to your language!
 # If there's nothing below this line, this file has been fully translated!
 ##
+
+geyserUserNotFound: "Could not find this Geyser user. If the user exists, try joining a Geyser server such as `test.geysermc.org` and running the command again."

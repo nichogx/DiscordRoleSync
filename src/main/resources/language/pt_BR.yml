@@ -70,6 +70,7 @@ verification:
   notLinked: "Você ainda não vinculou suas contas. Use /$link_command_name$ primeiro."
 
 minecraftUserNotFound: "Este usuário do Minecraft não existe."
+geyserUserNotFound: "Este usuário do Geyser não foi encontrado. Se o usuário existe, tente entrar em um servidor Geyser como `test.geysermc.org` e executar o comando novamente."
 
 linkStatus:
   linked: "Vinculado"

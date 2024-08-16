@@ -34,7 +34,7 @@ public class SlashCommandListener extends ListenerAdapter {
     private final JDA jda;
 
     private final DiscordAgent discordAgent;
-    private final UserSearch mojang;
+    private final UserSearch userSearch;
 
     private final Map<String, DiscordCommand> commands;
 
@@ -43,7 +43,7 @@ public class SlashCommandListener extends ListenerAdapter {
         this.jda = jda;
 
         this.discordAgent = new DiscordAgent(plugin);
-        this.mojang = new UserSearch(plugin);
+        this.userSearch = new UserSearch(plugin);
 
         this.commands = new HashMap<>();
 
@@ -169,7 +169,7 @@ public class SlashCommandListener extends ListenerAdapter {
                         if (discordUser != null) {
                             userInfo = plugin.getDb().getLinkedUserInfo(discordUser.getAsUser().getId());
                         } else { // try minecraft nick
-                            UserSearchResult uuidSearch = mojang.nameToUUID(mcUser.getAsString(), manualUseOffline != null && manualUseOffline.getAsBoolean());
+                            UserSearchResult uuidSearch = userSearch.nameToUUID(mcUser.getAsString(), manualUseOffline != null && manualUseOffline.getAsBoolean());
                             if (uuidSearch != null) userInfo = plugin.getDb().getLinkedUserInfo(uuidSearch.uuid);
                         }
 
@@ -235,7 +235,7 @@ public class SlashCommandListener extends ListenerAdapter {
                         if (discordUser != null) {
                             userInfo = plugin.getDb().getLinkedUserInfo(discordUser.getAsUser().getId());
                         } else { // try minecraft nick
-                            UserSearchResult userSearchResult = mojang.nameToUUID(mcUser.getAsString(), manualUseOffline != null && manualUseOffline.getAsBoolean());
+                            UserSearchResult userSearchResult = userSearch.nameToUUID(mcUser.getAsString(), manualUseOffline != null && manualUseOffline.getAsBoolean());
                             if (userSearchResult != null)
                                 userInfo = plugin.getDb().getLinkedUserInfo(userSearchResult.uuid);
                         }
@@ -346,8 +346,12 @@ public class SlashCommandListener extends ListenerAdapter {
             throw new UserErrorException(plugin.getLanguage().getString("discordAlreadyLinked"));
         }
 
-        UserSearchResult result = mojang.nameToUUID(mcUsername, manualUseOffline);
+        UserSearchResult result = userSearch.nameToUUID(mcUsername, manualUseOffline);
         if (result == null) {
+            if (userSearch.isGeyser(mcUsername)) {
+                throw new UserErrorException(plugin.getLanguage().getString("geyserUserNotFound"));
+            }
+
             throw new UserErrorException(plugin.getLanguage().getString("minecraftUserNotFound"));
         }
 

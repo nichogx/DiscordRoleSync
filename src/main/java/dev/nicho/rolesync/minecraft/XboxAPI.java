@@ -31,7 +31,7 @@ public class XboxAPI {
 
         c.connect();
         int responseCode = c.getResponseCode();
-        if (responseCode == 404) {
+        if (isNotFound(c)) {
             return null;
         }
 
@@ -41,13 +41,7 @@ public class XboxAPI {
             ));
         }
 
-        JSONObject body;
-        try (
-                InputStream response = c.getInputStream();
-                Scanner scanner = new Scanner(response)
-        ) {
-            body = new JSONObject(scanner.useDelimiter("\\A").next());
-        }
+        JSONObject body = getJSONBody(c);
 
         // The Geyser UUID is the hex XUID, with all leading zeros
         String uuid = String.format("%032X", body.getLong("xuid"));
@@ -56,5 +50,30 @@ public class XboxAPI {
                 name,
                 uuidAddDashes(uuid)
         );
+    }
+
+    private boolean isNotFound(HttpURLConnection c) throws IOException {
+        if (c.getResponseCode() == 404) return true;
+
+        // Geyser's API returns 503 when it cannot find the user...
+        return c.getResponseCode() == 503
+                && getJSONBody(c).getString("message").contains("Unable to find user in our cache");
+    }
+
+    private JSONObject getJSONBody(HttpURLConnection c) throws IOException {
+        try (
+                InputStream response = getErrorOrInputStream(c);
+                Scanner scanner = new Scanner(response)
+        ) {
+            return new JSONObject(scanner.useDelimiter("\\A").next());
+        }
+    }
+
+    private InputStream getErrorOrInputStream(HttpURLConnection c) throws IOException {
+        if (c.getResponseCode() < HttpURLConnection.HTTP_BAD_REQUEST) {
+            return c.getInputStream();
+        }
+
+        return c.getErrorStream();
     }
 }

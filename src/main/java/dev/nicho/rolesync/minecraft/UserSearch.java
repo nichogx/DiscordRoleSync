@@ -28,6 +28,16 @@ public class UserSearch {
     }
 
     /**
+     *
+     * @param name the Minecraft username
+     * @return true if the user should be treated as a Geyser user, false otherwise
+     */
+    public boolean isGeyser(String name) {
+        return name.startsWith(".") &&
+                plugin.getConfig().getBoolean("experimental.geyser.enableGeyserSupport", false);
+    }
+
+    /**
      * Converts a username to a UUID - online or offline, depending on server mode
      *
      * @param name          the username
@@ -38,8 +48,7 @@ public class UserSearch {
      */
     public @Nullable UserSearchResult nameToUUID(String name, boolean manualOffline) throws IOException {
         // Experimental! Geyser support
-        if (name.startsWith(".") &&
-                plugin.getConfig().getBoolean("experimental.geyser.enableGeyserSupport", false)) {
+        if (isGeyser(name)) {
             return xboxAPI.searchName(name);
         }
 
