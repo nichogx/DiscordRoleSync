@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.1](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/2.2.1) - unreleased
+
+### Fixed
+- Fixed a potential race condition when processing user groups that could cause groups to not be added correctly, or to be incorrectly removed. This also improves performance on large servers.
+
 ## [2.2.0](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/2.2.0) - 2024-07-30
 
 ### Added
@@ -19,8 +24,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Fixed compatibility with Java versions before Java 21 when using the PlaceholderAPI integration added in 2.1.0
-
-### Fixed
 - Fixed a bug with the Geyser/Floodgate integration that prevented Xbox usernames with spaces to be linked.
 
 ## [2.1.1](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/2.1.1) - 2024-07-07
