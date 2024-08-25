@@ -34,11 +34,6 @@ current: "Version utilisée:"
 
 reloadComplete: "Redémarrage completé!"
 
-# Translation needed! Everything below this line was added after this translation
-# was written. Please make a merge request or contact me to update these to your language!
-# If there's nothing below this line, this file has been fully translated!
-##
-
 nonReleaseVersion:
   running:
     UNKNOWN: "Vous exécutez une version de développement de DiscordRoleSync. Aucun support n'est fourni. Veuillez mettre à jour vers la dernière version supportée à moins que vous ne sachiez ce que vous faites."
@@ -75,8 +70,13 @@ verification:
   notLinked: "Vous n'avez pas encore lié vos comptes. Veuillez d'abord utiliser /$link_command_name$."
 
 minecraftUserNotFound: "Cet utilisateur Minecraft n'existe pas."
-geyserUserNotFound: "mpossible de trouver cet utilisateur Geyser. Si l'utilisateur existe, essayez de rejoindre un serveur Geyser tel que `test.geysermc.org` et exécutez à nouveau la commande."
+geyserUserNotFound: "Impossible de trouver cet utilisateur Geyser. Si l'utilisateur existe, essayez de rejoindre un serveur Geyser tel que `test.geysermc.org` et exécutez à nouveau la commande."
 
 linkStatus:
   linked: "Lié"
   notLinked: "Non lié"
+
+# Translation needed! Everything below this line was added after this translation
+# was written. Please make a merge request or contact me to update these to your language!
+# If there's nothing below this line, this file has been fully translated!
+##
