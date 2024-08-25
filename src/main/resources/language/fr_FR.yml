@@ -4,15 +4,15 @@ linkedTo: "Lié à"
 unknownUser: "Utilisateur inconnu"
 discordAlreadyLinked: "Ton compte Discord a déjà été lié à un compte Minecraft"
 minecraftAlreadyLinked: "Ton compte Minecraft a déjà été lié à un compte Discord"
-successLink: "You have successfully linked your accounts"
-successUnlink: "You have successfully unlinked the accounts"
-successVerify: "You have successfully verified this account"
+successLink: "Vous avez réussi à relier vos comptes"
+successUnlink: "Vous avez réussi à dissocier les comptes"
+successVerify: "Vous avez vérifié ce compte avec succès"
 
-userNotLinked: "This user is not linked"
+userNotLinked: "Cet utilisateur n'est pas lié"
 
 noPermissionError: "Vous n'avez pas la permission d'utiliser cette commande."
 commandError: "Il y a eu un problème pendant l'execution de cette commande. Vérifiez les erreurs dans la Console."
-incorrectCommandFormat: "The command is formatted incorrectly."
+incorrectCommandFormat: "La commande est mal formatée."
 
 usage: "Utilisation:"
 drsReloadDescription: "Les fichiers de langage et config ont été récharché."
@@ -41,42 +41,42 @@ reloadComplete: "Redémarrage completé!"
 
 nonReleaseVersion:
   running:
-    UNKNOWN: "You are running a development build of DiscordRoleSync. No support is provided. Please update to the latest supported version unless you know what you are doing."
-    DEVELOPMENT_PREVIEW: "You are running a development preview version of DiscordRoleSync. This is unsupported and might contain bugs. Please update to the latest supported version unless you know what you are doing."
-    RELEASE_CANDIDATE: "You are running a beta/release candidate version of DiscordRoleSync. You might encounter bugs. Please report any issues to the developer via GitLab or Discord, so they can be fixed for the release."
+    UNKNOWN: "Vous exécutez une version de développement de DiscordRoleSync. Aucun support n'est fourni. Veuillez mettre à jour vers la dernière version supportée à moins que vous ne sachiez ce que vous faites."
+    DEVELOPMENT_PREVIEW: "Vous utilisez une version de développement de DiscordRoleSync. Cette version n'est pas supportée et peut contenir des bugs. Veuillez mettre à jour vers la dernière version supportée à moins que vous ne sachiez ce que vous faites."
+    RELEASE_CANDIDATE: "Vous utilisez une version bêta/officielle de DiscordRoleSync. Il est possible que vous rencontriez des bugs. Veuillez signaler tout problème au développeur via GitLab ou Discord, afin qu'il puisse être corrigé lors de la sortie de la version."
 
 commandDescriptions:
-  link: "Links your Discord account to a Minecraft username"
-  verify: "Verifies your Minecraft account as being owned by your Discord account"
-  unlink: "Unlinks a user's Discord account or Minecraft username"
-  admlink: "Force-links a user's Discord account to a Minecraft username"
-  info: "Gets link information about a Discord account or a Minecraft username"
+  link: "Relie votre compte Discord à un nom d'utilisateur Minecraft"
+  verify: "Vérifie que votre compte Minecraft appartient bien à votre compte Discord."
+  unlink: "Déconnecte le compte Discord ou le nom d'utilisateur Minecraft d'un utilisateur."
+  admlink: "Lier de force le compte Discord d'un utilisateur à son nom d'utilisateur Minecraft"
+  info: "Obtient des informations sur le lien d'un compte Discord ou d'un nom d'utilisateur Minecraft."
 
 commandArguments:
   minecraftUsername:
-    link: "The Minecraft username to link to"
-    unlink: "The Minecraft username to unlink"
-    info: "The Minecraft username to get info for"
-    admlink: "The Minecraft username to link"
+    link: "Le nom d'utilisateur Minecraft à lier"
+    unlink: "Le nom d'utilisateur Minecraft à déconnecter"
+    info: "Le nom d'utilisateur Minecraft pour lequel obtenir des informations"
+    admlink: "Le nom d'utilisateur Minecraft à lier"
   discordUser:
-    unlink: "The Discord user to unlink"
-    info: "The Discord user to get info for"
-    admlink: "The Discord user to link"
-  verificationCode: "The verification code obtained in Minecraft"
-  offlineMode: "If this username is an offline username, not an official Mojang account"
+    unlink: "L'utilisateur Discord à déconnecter"
+    info: "L'utilisateur Discord pour lequel obtenir des informations"
+    admlink: "L'utilisateur Discord à relier"
+  verificationCode: "Le code de vérification obtenu dans Minecraft"
+  offlineMode: "Si ce nom d'utilisateur est un nom d'utilisateur hors ligne, et non un compte officiel de Mojang"
 
-fullLinkedTo: "Discord user $discord_user$ is linked to Minecraft user $minecraft_user$"
+fullLinkedTo: "L'utilisateur Discord $discord_user$ est lié à l'utilisateur Minecraft $minecraft_user$."
 
 verification:
-  instructions: "Please verify your account using /$verify_command_name$ on Discord. Your verification code is: $verification_code$"
+  instructions: "Veuillez vérifier votre compte en utilisant /$verify_command_name$ sur Discord. Votre code de vérification est : $verification_code$"
   alreadyVerified: "Compte déjà vérifié!"
-  wrongDigits: "Verification code must be %d digits long."
-  wrongCode: "Incorrect verification code. Please try verifying again"
-  notLinked: "You have not linked your accounts yet. Please use /$link_command_name$ first."
+  wrongDigits: "Le code de vérification doit être composé de %d chiffres."
+  wrongCode: "Code de vérification incorrect. Veuillez essayer de vérifier à nouveau"
+  notLinked: "Vous n'avez pas encore lié vos comptes. Veuillez d'abord utiliser /$link_command_name$."
 
-minecraftUserNotFound: "This Minecraft user does not exist."
-geyserUserNotFound: "Could not find this Geyser user. If the user exists, try joining a Geyser server such as `test.geysermc.org` and running the command again."
+minecraftUserNotFound: "Cet utilisateur Minecraft n'existe pas."
+geyserUserNotFound: "mpossible de trouver cet utilisateur Geyser. Si l'utilisateur existe, essayez de rejoindre un serveur Geyser tel que `test.geysermc.org` et exécutez à nouveau la commande."
 
 linkStatus:
-  linked: "Linked"
-  notLinked: "Not Linked"
+  linked: "Lié"
+  notLinked: "Non lié"
