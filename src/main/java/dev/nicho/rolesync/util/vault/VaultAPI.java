@@ -52,10 +52,8 @@ public class VaultAPI {
      * Adds a group to a player.
      */
     private void addGroup(OfflinePlayer player, String group) {
-        if (!permProvider.playerInGroup(null, player, group)) {
-            plugin.debugLog("Adding group %s to player %s", group, player.getName());
-            permProvider.playerAddGroup(null, player, group);
-        }
+        plugin.debugLog("Adding group %s to player %s", group, player.getName());
+        permProvider.playerAddGroup(null, player, group);
     }
 
     /**

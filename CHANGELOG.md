@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Updated French translation
 
+### Fixed
+- Fixed issue where users would not get a group added if they already had a group that inherited from that group, when using LuckPerms.
+
 ## [2.2.1](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/2.2.1) - 2024-08-18
 
 ### Fixed

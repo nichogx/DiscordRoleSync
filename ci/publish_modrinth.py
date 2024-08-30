@@ -88,4 +88,11 @@ if __name__ == "__main__":
     if not desc_r.ok:
         raise Exception(f"Error updating Modrinth description: HTTP {desc_r.status_code} {desc_r.text}")
 
+    if release_type == ReleaseType.RELEASE:
+        print("Unfeaturing old versions...")
+
+        # list versions
+
+        # for each version, https://docs.modrinth.com/#tag/versions/operation/modifyVersion
+
     print("DONE!")
