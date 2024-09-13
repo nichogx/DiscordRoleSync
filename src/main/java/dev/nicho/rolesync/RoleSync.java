@@ -228,9 +228,6 @@ public class RoleSync extends JavaPlugin {
         metrics.addCustomChart(new SimplePie("whitelist_enabled",
                 () -> String.valueOf(getConfig().getBoolean("manageWhitelist"))));
 
-        metrics.addCustomChart(new SimplePie("delete_commands",
-                () -> String.valueOf(getConfig().getBoolean("bot.legacyOptions.commandDeletion.enable"))));
-
         metrics.addCustomChart(new SimplePie("linked_role",
                 () -> String.valueOf(getConfig().getBoolean("giveLinkedRole"))));
 
@@ -239,9 +236,6 @@ public class RoleSync extends JavaPlugin {
 
         metrics.addCustomChart(new SimplePie("require_verification",
                 () -> String.valueOf(getConfig().getBoolean("requireVerification"))));
-
-        metrics.addCustomChart(new SimplePie("message_feedback",
-                () -> String.valueOf(getConfig().getBoolean("messageFeedback"))));
 
         metrics.addCustomChart(new SimplePie("user_uuid_mode",
                 () -> UUIDMode.fromCaseInsensitive(getConfig().getString("userUUIDMode")).toString()));
