@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/unreleased) - unreleased
 
+## [2.2.2](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/2.2.2) - 2024-10-25
+
 ### Changed
 - Updated French translation
 
