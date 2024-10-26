@@ -91,8 +91,33 @@ if __name__ == "__main__":
     if release_type == ReleaseType.RELEASE:
         print("Unfeaturing old versions...")
 
-        # list versions
+        # list versions (returns a JSON array)
+        versions_r = requests.get(f"https://api.modrinth.com/v2/project/{PROJECT_ID}/version?featured=true", headers={
+            "Authorization": MODRINTH_API_KEY,
+            "User-Agent": user_agent,
+        })
 
-        # for each version, https://docs.modrinth.com/#tag/versions/operation/modifyVersion
+        if not versions_r.ok:
+            print(f"Error checking versions. Not unfeaturing: HTTP {desc_r.status_code} {desc_r.text}")
+        else:
+            versions = versions_r.json()
+
+            # for each version, unfeature it if it's not the current one
+            for version in versions:
+                if version['version_number'] != CI_COMMIT_TAG:
+                    print(f"Unfeaturing {version['version_number']} (id: {version['id']})")
+                    unf_r = requests.patch(f"https://api.modrinth.com/v2/version/{version['id']}", headers={
+                        "Authorization": MODRINTH_API_KEY,
+                        "User-Agent": user_agent,
+
+                        "Content-Type": "application/json",
+                    }, json={
+                        "featured": False,
+                    })
+
+                    if not unf_r.ok:
+                        print(f"Error unfeaturing {version['version_number']}: HTTP {unf_r.status_code} {unf_r.text}. Skipping.")
+                    else:
+                        print(f"Unfeatured {version['version_number']}")
 
     print("DONE!")
