@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/ci/ci.iml" filepath="$PROJECT_DIR$/ci/ci.iml" />
+      <module fileurl="file://$PROJECT_DIR$/discord_role_sync.iml" filepath="$PROJECT_DIR$/discord_role_sync.iml" />
+      <module fileurl="file://$PROJECT_DIR$/src/test/language_validator/language_validator.iml" filepath="$PROJECT_DIR$/src/test/language_validator/language_validator.iml" />
+      <module fileurl="file://$PROJECT_DIR$/spigot_page/spigot_page.iml" filepath="$PROJECT_DIR$/spigot_page/spigot_page.iml" />
+    </modules>
+  </component>
+</project>

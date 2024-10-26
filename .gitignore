@@ -6,9 +6,6 @@ test_server/
 *.bbcode
 
 # Intellij
-.idea/
-*.iml
-*.iws
 venv/
 
 # Mac
