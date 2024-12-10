@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/unreleased) - unreleased
 
+## [2.2.3](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/2.2.3) - 2024-12-09
+
+### Fixed
+- Fixed the message that's shown to a user when they're denied entry because they're not verified and the whitelist feature is enabled.
+
 ## [2.2.2](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/2.2.2) - 2024-10-25
 
 ### Changed
