@@ -25,7 +25,6 @@ drsVerifyDescription: "Discordアカウントのリンク"
 pleaseLink: "Discordサーバーでアカウントをリンクしてください:"
 
 whitelistErrorKickMsg: "ホワイトリストに登録されているかどうかの確認中にエラーが発生しました。サーバー管理者にお問い合わせください。"
-whitelistNotVerifiedKickMsg: "あなたはリンクされていません。このコードをDiscordボットのダイレクトメッセージに送ってください:"
 notWhitelistedKickMsg: "あなたはこのサーバーでホワイトリストに登録されていません"
 
 notLatestVersion: "DiscordRoleSyncの最新バージョンを使用していません"

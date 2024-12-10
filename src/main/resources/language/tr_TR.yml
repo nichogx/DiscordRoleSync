@@ -25,7 +25,6 @@ drsVerifyDescription: "Discord hesabınızı onaylayın."
 pleaseLink: "Lütfen hesabınızı Discord sunucumuza bağlayın:"
 
 whitelistErrorKickMsg: "Beyaz liste kontrol edilirken bir hata oluştu. Lütfen sunucu yöneticisine danışın."
-whitelistNotVerifiedKickMsg: "Henüz onaylanmadınız. Lütfen bu kodu Discord bot'una özel mesaj yoluyla gönderin:"
 notWhitelistedKickMsg: "Beyaz listede ekli değilsiniz."
 
 notLatestVersion: "DiscordRoleSync eklentisinin son sürümünü kullanmıyorsunuz."

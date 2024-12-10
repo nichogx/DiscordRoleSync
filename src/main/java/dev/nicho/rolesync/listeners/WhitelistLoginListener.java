@@ -36,8 +36,9 @@ public class WhitelistLoginListener implements Listener {
             event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST, plugin.getLanguage().getString("pleaseLink")
                     + " " + plugin.getConfig().getString("discordUrl"));
         } else if (plugin.getConfig().getBoolean("requireVerification") && !usrInfo.verified) {
-            event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST, plugin.getLanguage().getString("whitelistNotVerifiedKickMsg")
-                    + " " + ChatColor.AQUA + usrInfo.code);
+            event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST, plugin.getLanguage().getString("verification.instructions")
+                    .replace("$verify_command_name$", plugin.getConfig().getString("commandNames.verify", "verify"))
+                    .replace("$verification_code$", ChatColor.AQUA + String.valueOf(usrInfo.code) + ChatColor.RESET));
         } else if (!usrInfo.whitelisted) {
             event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST, plugin.getLanguage().getString("notWhitelistedKickMsg"));
         }

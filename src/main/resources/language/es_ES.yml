@@ -25,7 +25,6 @@ drsVerifyDescription: "Verifica tu cuenta de Discord"
 pleaseLink: "Por favor, conecta tu cuenta en nuestro servidor de Discord:"
 
 whitelistErrorKickMsg: "Un error ha ocurrido mientras comprobábamos si estabas en la whitelist. Por favor contacta con el administrador del servidor."
-whitelistNotVerifiedKickMsg: "No estás verificado. Por favor envía este código por mensaje privado al bot de Discord:"
 notWhitelistedKickMsg: "No estás en la whitelist (lista de jugadores admitidos) del servidor"
 
 notLatestVersion: "No estás ejecutando la última versión de DiscordRoleSync."

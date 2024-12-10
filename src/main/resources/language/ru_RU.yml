@@ -25,7 +25,6 @@ drsVerifyDescription: "Подтвердить Discord аккаунт"
 pleaseLink: "Привяжите Ваш аккаунт на нашем Discord сервере:"
 
 whitelistErrorKickMsg: "Возникла ошибка во время проверки whitelist. Обратитесь к администратору"
-whitelistNotVerifiedKickMsg: "Вы не верифицированы. Отправьте следующий код Discord боту в личные сообщения:"
 notWhitelistedKickMsg: "Вас нет в whitelist'е этого сервера"
 
 notLatestVersion: "Установлена старая версия плагина DiscordRoleSync."
