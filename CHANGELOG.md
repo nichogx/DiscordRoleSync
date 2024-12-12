@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/unreleased) - unreleased
 
+## [2.2.4](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/2.2.4) - 2024-12-12
+
+### Fixed
+- Fixed a bug in which a user would get the linked role assigned before they were fully verified.
+
 ## [2.2.3](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/2.2.3) - 2024-12-09
 
 ### Fixed

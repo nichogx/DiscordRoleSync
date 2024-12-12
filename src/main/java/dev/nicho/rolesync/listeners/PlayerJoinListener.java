@@ -35,19 +35,22 @@ public class PlayerJoinListener implements Listener {
             try {
                 LinkedUserInfo usrInfo = plugin.getDb().getLinkedUserInfo(uuid);
                 if (usrInfo != null) {
-                    Guild guild = plugin.getBot().getJDA().getGuildById(plugin.getConfig().getString("bot.server"));
-                    if (guild != null) guild.retrieveMemberById(usrInfo.discordId).queue(member -> {
-                        if (member == null) return;
-
-                        plugin.getBot().getAgent().giveRoleAndNickname(member, username, uuid);
-                    });
-
                     if (!username.equals(usrInfo.username)) {
                         plugin.getLogger().info(
                                 String.format("User with UUID %s has changed names from '%s' to '%s', updating in the database...", uuid, usrInfo.username, username)
                         );
                         plugin.getDb().updateUsername(uuid, username);
                     }
+
+                    // Only proceed and give the linked role if the user is verified
+                    if (plugin.getConfig().getBoolean("requireVerification") && !usrInfo.verified) return;
+
+                    Guild guild = plugin.getBot().getJDA().getGuildById(plugin.getConfig().getString("bot.server"));
+                    if (guild != null) guild.retrieveMemberById(usrInfo.discordId).queue(member -> {
+                        if (member == null) return;
+
+                        plugin.getBot().getAgent().giveRoleAndNickname(member, username, uuid);
+                    });
                 }
             } catch (SQLException e) {
                 plugin.getLogger().severe("Error while checking/updating newly joined user's username.\n" +
