@@ -2,11 +2,14 @@ package dev.nicho.rolesync.listeners;
 
 import dev.nicho.rolesync.RoleSync;
 import dev.nicho.rolesync.db.DatabaseHandler;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.sql.SQLException;
 
@@ -19,7 +22,14 @@ public class WhitelistLoginListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onPlayerLogin(AsyncPlayerPreLoginEvent event) {
+    public void onPlayerLogin(@NotNull AsyncPlayerPreLoginEvent event) {
+        plugin.debugLog("Player %s (%s) is attempting to login.", event.getName(), event.getUniqueId());
+        OfflinePlayer player = Bukkit.getOfflinePlayer(event.getUniqueId());
+        if (player != null && plugin.getVault().hasPermission(player, "discordrolesync.bypasswhitelist")) {
+            plugin.getLogger().info(String.format("Player %s (%s) has bypass whitelist permission, allowing login.", event.getName(), event.getUniqueId()));
+            return;
+        }
+
         DatabaseHandler.LinkedUserInfo usrInfo;
         try {
             usrInfo = plugin.getDb().getLinkedUserInfo(event.getUniqueId().toString());

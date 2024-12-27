@@ -11,6 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * VaultAPI is a class responsible for managing permissions and groups for players
+ * using the Vault permissions API. It integrates with a specified Permission provider
+ * to manage group assignments and permissions for players.
+ */
 public class VaultAPI {
 
     private final Permission permProvider;
@@ -64,6 +69,17 @@ public class VaultAPI {
             plugin.debugLog("Removing group %s from player %s", group, player.getName());
             permProvider.playerRemoveGroup(null, player, group);
         }
+    }
+
+    /**
+     * Checks if the specified player has the given permission.
+     *
+     * @param player the OfflinePlayer whose permission is to be checked
+     * @param permission the permission node to check for the player
+     * @return true if the player has the permission, false otherwise
+     */
+    public boolean hasPermission(OfflinePlayer player, String permission) {
+        return permProvider.playerHas(null, player, permission);
     }
 
     /**

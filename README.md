@@ -96,6 +96,7 @@ A note on PermissionsEx: I do not recommend using PermissionsEx as it is depreca
 - `discordrolesync.reload`: Use the /drs reload command
 - `discordrolesync.botrestart`: Use the /drs botrestart command
 - `discordrolesync.notifyupdates`: Users with this permission will be notified when they join if an update is available.
+- `discordrolesync.bypasswhitelist`: Users with this permission will always be admitted when the whitelist is enabled, even if they're not linked. Note that for most permissions plugins, to add a permission to the user they must first attempt to join.
 
 All users are permitted to use the /drs verify command
 

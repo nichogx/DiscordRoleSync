@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/unreleased) - unreleased
 
+## [2.3.0](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/2.3.0) - 2024-12-27
+
+### Added
+- You can now add the permission `discordrolesync.bypasswhitelist` for a user to be whitelisted even when not linked, if the plugin's whitelist is enabled. Note that for most permissions plugins, to add a permission to the user they must first attempt to join.
+
 ## [2.2.4](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/2.2.4) - 2024-12-12
 
 ### Fixed
