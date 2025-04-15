@@ -27,7 +27,7 @@ include:
 language-linter:
   stage: lint
 
-  image: python:3.12-alpine
+  image: python:3.13-alpine
   before_script:
     - cd src/test/language_validator
     - pip install -r requirements.txt
@@ -40,7 +40,7 @@ language-linter:
 python-infra-test:
   stage: test
 
-  image: python:3.12-alpine
+  image: python:3.13-alpine
   before_script:
     - cd spigot_page
     - pip install -r requirements.txt
@@ -108,7 +108,7 @@ gitlab-registry:
 publish-gitlab:
   stage: publish
 
-  image: python:3.12-alpine
+  image: python:3.13-alpine
   rules:
     - if: $CI_COMMIT_TAG
   before_script:
@@ -120,7 +120,7 @@ publish-gitlab:
 publish-modrinth:
   stage: publish
 
-  image: python:3.12-alpine
+  image: python:3.13-alpine
   rules:
     - if: $CI_COMMIT_TAG
   before_script:
@@ -132,7 +132,7 @@ publish-modrinth:
 publish-hangar:
   stage: publish
 
-  image: python:3.12-alpine
+  image: python:3.13-alpine
   rules:
     - if: $CI_COMMIT_TAG
   before_script:
@@ -147,7 +147,7 @@ publish-hangar:
 generate-spigot-description:
   stage: build
 
-  image: python:3.12-alpine
+  image: python:3.13-alpine
   before_script:
     - cd spigot_page
     - pip install -r requirements.txt
