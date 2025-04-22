@@ -45,6 +45,8 @@ public class RoleSync extends JavaPlugin {
     private static final String defaultLanguage = "en_US";
 
     private YamlConfiguration language = null;
+
+    private String configError = null;
     private boolean configLoaded = false;
 
     private DatabaseHandler db = null;
@@ -122,8 +124,8 @@ public class RoleSync extends JavaPlugin {
 
             loadLang();
         } catch (InvalidConfigurationException e) {
-            getLogger().severe("One of the yml files is invalid.\n" +
-                    e.getMessage());
+            this.configError = "One of the yml files is invalid.\n" + e.getMessage();
+            getLogger().severe(this.configError);
             this.setEnabled(false);
             return;
         } catch (IOException e) {
@@ -142,6 +144,14 @@ public class RoleSync extends JavaPlugin {
         if (!this.configLoaded) {
             getLogger().severe("Not enabling DiscordRoleSync since the config files failed to load. " +
                     "Make sure no errors are shown when loading the config and language files.");
+
+            // This error has already been printed, but people don't scroll up enough
+            // and end up asking why the plugin is not enabled. Print it again here as
+            // it's the most common reason the plugin is disabled
+            if (this.configError != null) {
+                getLogger().severe(this.configError);
+            }
+
             this.setEnabled(false);
 
             return;

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/unreleased) - unreleased
 
+### Changed
+- Updated versions of many dependencies
+- Better surface configuration errors when the plugin fails loading
+
 ## [2.3.0](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/2.3.0) - 2024-12-27
 
 ### Added
