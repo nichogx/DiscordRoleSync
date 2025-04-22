@@ -37,7 +37,9 @@ Publishing will be done by the maintainer, once changes warrant a new release.
 
 Release candidates are uploaded to Modrinth and Hangar. Only full releases are uploaded to Spigot.
 
-Once a version is tagged, the release is built and must be uploaded to the places this plugin is distributed at.
+Once a version is tagged, the release is built automatically and must be uploaded to the places this plugin 
+is distributed at. Some of this is done by CI. Before tagging, CHANGELOG.md must be up to date and the new
+version number that will be tagged must be added.
 
 ### [GitLab](https://gitlab.com/nichogx/DiscordRoleSync/-/releases)
 
