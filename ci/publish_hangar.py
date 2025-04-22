@@ -11,6 +11,9 @@ from common import (
 )
 
 if __name__ == "__main__":
+    # Hangar does not list every 1.8 version.
+    SUPPORTED_VERSIONS_HANGAR = [v for v in SUPPORTED_VERSIONS if not v.startswith("1.8.")]
+
     CI_COMMIT_TAG = os.getenv("CI_COMMIT_TAG")
     if not CI_COMMIT_TAG:
         raise Exception("CI_COMMIT_TAG not set. Will not upload version.")
@@ -65,7 +68,7 @@ if __name__ == "__main__":
                         }],
                     },
                     "platformDependencies": {
-                        "PAPER": SUPPORTED_VERSIONS,
+                        "PAPER": SUPPORTED_VERSIONS_HANGAR,
                     },
                     "description": get_changelog(CI_COMMIT_TAG),
                     "files": [{
