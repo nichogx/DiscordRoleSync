@@ -196,7 +196,7 @@
             <!-- Bundled with Paper/Spigot -->
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>32.1.3-jre</version>
+            <version>33.4.8-jre</version>
             <scope>provided</scope>
         </dependency>
 
