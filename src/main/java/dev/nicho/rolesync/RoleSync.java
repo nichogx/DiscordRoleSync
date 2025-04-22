@@ -312,6 +312,9 @@ public class RoleSync extends JavaPlugin {
      */
     private void checkLatestVersion() throws IOException {
         String installedVersion = getDescription().getVersion();
+        PluginVersion v = new PluginVersion(this);
+        String latestVersion = v.getLatestVersion();
+
         PluginVersion.VersionType versionType = PluginVersion.getVersionType(installedVersion);
         if (versionType != PluginVersion.VersionType.RELEASE) {
             // Server is running an unsupported version. Alert the user.
@@ -320,8 +323,6 @@ public class RoleSync extends JavaPlugin {
         }
 
         // Server is running a release version. Check for updates and send if available.
-        PluginVersion v = new PluginVersion();
-        String latestVersion = v.getLatestVersion();
         if (v.isOldRelease(installedVersion)) {
             getLogger().warning(String.format(
                     "%s %s %s, %s %s",

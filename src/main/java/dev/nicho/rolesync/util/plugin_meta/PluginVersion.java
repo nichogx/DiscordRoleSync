@@ -1,6 +1,9 @@
 package dev.nicho.rolesync.util.plugin_meta;
 
+import dev.nicho.rolesync.RoleSync;
 import org.jetbrains.annotations.TestOnly;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,12 +16,24 @@ import java.util.regex.Pattern;
 public class PluginVersion {
 
     private String latestVersion;
+    private final RoleSync plugin;
+
+    public PluginVersion() {
+        this(null);
+    }
+
+    public PluginVersion(RoleSync plugin) {
+        this.plugin = plugin;
+    }
 
     public String getLatestVersion() throws IOException {
         if (latestVersion == null) {
             this.refreshLatestVersion();
         }
 
+        if (plugin != null) {
+            plugin.debugLog("getLatestVersion: %s", latestVersion);
+        }
         return latestVersion;
     }
 
@@ -38,24 +53,34 @@ public class PluginVersion {
      * @throws IOException if an error occurs while connecting to the API
      */
     public void refreshLatestVersion() throws IOException {
-        URL reqUrl = new URL("https://api.spigotmc.org/legacy/update.php?resource=78829");
+        URL reqUrl = new URL("https://api.modrinth.com/v2/project/discordrolesync/version");
 
         HttpURLConnection c = (HttpURLConnection) reqUrl.openConnection();
         c.setRequestMethod("GET");
-        InputStream response = c.getInputStream();
         c.connect();
 
         if (c.getResponseCode() != 200) {
-            throw new IOException("Error getting latest version from Spigot.");
+            throw new IOException("Error getting latest version from Modrinth.");
         }
 
-        Scanner scanner = new Scanner(response);
+        JSONArray body;
+        try (
+                InputStream response = c.getInputStream();
+                Scanner scanner = new Scanner(response)
+        ) {
+            body = new JSONArray(scanner.useDelimiter("\\A").next());
+        }
 
-        String latestVersion = scanner.next().trim();
-        scanner.close();
-        response.close();
+        if (body.isEmpty()) {
+            throw new IOException("No versions found on Modrinth.");
+        }
 
-        this.latestVersion = latestVersion;
+        JSONObject latestVersion = body.getJSONObject(0);
+        this.latestVersion = latestVersion.getString("version_number");
+
+        if (plugin != null) {
+            plugin.debugLog("refreshed latest version: %s", this.latestVersion);
+        }
     }
 
     /**

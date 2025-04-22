@@ -73,7 +73,7 @@ public class PlayerJoinListener implements Listener {
 
             plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
                 // Server is running a release version. Check for updates and send if available.
-                PluginVersion v = new PluginVersion();
+                PluginVersion v = new PluginVersion(this.plugin);
                 boolean isOldVersion;
                 String latestVersion;
                 try {
