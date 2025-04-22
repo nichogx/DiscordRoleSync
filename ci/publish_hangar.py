@@ -4,16 +4,18 @@ import requests
 import os
 
 from common import (
-    SUPPORTED_VERSIONS,
     ReleaseType,
     get_changelog,
     get_readme,
 )
 
-if __name__ == "__main__":
-    # Hangar does not list every 1.8 version.
-    SUPPORTED_VERSIONS_HANGAR = [v for v in SUPPORTED_VERSIONS if not v.startswith("1.8.")]
+SUPPORTED_GAME_VERSIONS = [
+    "1.8", # Hangar does not list all 1.8 versions
+    "1.9.x", "1.10.x", "1.11.x", "1.12.x", "1.13.x", "1.14.x", "1.15.x", "1.16.x", "1.17.x",
+    "1.18.x", "1.19.x", "1.20.x", "1.21.x",
+]
 
+if __name__ == "__main__":
     CI_COMMIT_TAG = os.getenv("CI_COMMIT_TAG")
     if not CI_COMMIT_TAG:
         raise Exception("CI_COMMIT_TAG not set. Will not upload version.")
@@ -68,7 +70,7 @@ if __name__ == "__main__":
                         }],
                     },
                     "platformDependencies": {
-                        "PAPER": SUPPORTED_VERSIONS_HANGAR,
+                        "PAPER": SUPPORTED_GAME_VERSIONS,
                     },
                     "description": get_changelog(CI_COMMIT_TAG),
                     "files": [{
