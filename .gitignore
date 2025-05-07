@@ -14,3 +14,7 @@ venv/
 # Maven
 log/
 target/
+
+# Python
+__pycache__/
+*.pyc
