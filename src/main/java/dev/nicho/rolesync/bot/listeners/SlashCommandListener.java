@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.InteractionContextType;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -50,7 +51,7 @@ public class SlashCommandListener extends ListenerAdapter {
         String link = plugin.getConfig().getString("commandNames.link", "link");
         this.commands.put(link, new DiscordCommand(link,
                 plugin.getLanguage().getString("commandDescriptions.link"),
-                cmd -> maybeAddOfflineModeArgument(cmd.setGuildOnly(true)
+                cmd -> maybeAddOfflineModeArgument(cmd.setContexts(InteractionContextType.GUILD)
                         .addOption(OptionType.STRING, "minecraft_username",
                                 plugin.getLanguage().getString("commandArguments.minecraftUsername.link"), true)),
                 event -> {
@@ -84,7 +85,7 @@ public class SlashCommandListener extends ListenerAdapter {
         String verify = plugin.getConfig().getString("commandNames.verify", "verify");
         if (plugin.getConfig().getBoolean("requireVerification")) this.commands.put(verify, new DiscordCommand(verify,
                 plugin.getLanguage().getString("commandDescriptions.verify"),
-                cmd -> cmd.setGuildOnly(true)
+                cmd -> cmd.setContexts(InteractionContextType.GUILD)
                         .addOption(OptionType.INTEGER, "verification_code",
                                 plugin.getLanguage().getString("commandArguments.verificationCode"), true),
                 event -> {
@@ -141,7 +142,7 @@ public class SlashCommandListener extends ListenerAdapter {
         String unlink = plugin.getConfig().getString("commandNames.unlink", "unlink");
         this.commands.put(unlink, new DiscordCommand(unlink,
                 plugin.getLanguage().getString("commandDescriptions.unlink"),
-                cmd -> maybeAddOfflineModeArgument(cmd.setGuildOnly(true)
+                cmd -> maybeAddOfflineModeArgument(cmd.setContexts(InteractionContextType.GUILD)
                         .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_ROLES))
                         .addOption(OptionType.STRING, "minecraft_username",
                                 plugin.getLanguage().getString("commandArguments.minecraftUsername.unlink"))
@@ -207,7 +208,7 @@ public class SlashCommandListener extends ListenerAdapter {
         String info = plugin.getConfig().getString("commandNames.info", "info");
         this.commands.put(info, new DiscordCommand(info,
                 plugin.getLanguage().getString("commandDescriptions.info"),
-                cmd -> maybeAddOfflineModeArgument(cmd.setGuildOnly(true)
+                cmd -> maybeAddOfflineModeArgument(cmd.setContexts(InteractionContextType.GUILD)
                         .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_ROLES))
                         .addOption(OptionType.STRING, "minecraft_username",
                                 plugin.getLanguage().getString("commandArguments.minecraftUsername.info"))
@@ -270,7 +271,7 @@ public class SlashCommandListener extends ListenerAdapter {
         String admlink = plugin.getConfig().getString("commandNames.admlink", "admlink");
         this.commands.put(admlink, new DiscordCommand(admlink,
                 plugin.getLanguage().getString("commandDescriptions.admlink"),
-                cmd -> maybeAddOfflineModeArgument(cmd.setGuildOnly(true)
+                cmd -> maybeAddOfflineModeArgument(cmd.setContexts(InteractionContextType.GUILD)
                         .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_ROLES))
                         .addOption(OptionType.STRING, "minecraft_username",
                                 plugin.getLanguage().getString("commandArguments.minecraftUsername.admlink"), true)
