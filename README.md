@@ -27,7 +27,7 @@ Some features are optional and can be opted in or out from the config file.
 - Integration with PlaceholderAPI
 
 ## Installation
-You should first install [Vault](https://www.spigotmc.org/resources/vault.34315/) as this plugin will not work without it.
+You should first install [Vault](https://www.spigotmc.org/resources/vault.34315/) as this plugin will not work without it. You should also install a permissions plugin such as LuckPerms or another alternative compatible with Vault.
 
 This plugin targets Java 11, however it has been reported working with Java 8. No support is provided with Java versions below 11.
 
