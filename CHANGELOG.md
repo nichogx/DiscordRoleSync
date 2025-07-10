@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/unreleased) - unreleased
 
+## [2.3.3](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/2.3.3) - 2025-07-09
+
+### Added
+- Official support for 1.21.6 and 1.21.7
+
+## Changes
+- Updated dependencies
+
 ## [2.3.2](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/2.3.2) - 2025-04-22
 
 ### Added
