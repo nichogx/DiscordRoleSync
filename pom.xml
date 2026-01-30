@@ -156,7 +156,7 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>5.6.1</version>
+            <version>6.3.0</version>
             <!-- Disables audio natives, to reduce .jar size. -->
             <exclusions>
                 <exclusion>
