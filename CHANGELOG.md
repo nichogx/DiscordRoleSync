@@ -8,7 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [unreleased](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/unreleased) - unreleased
 
 ### Changed
-- Updated dependencies
+- Updated dependencies, including the Discord library (JDA)
+- Slightly smaller plugin JAR, as compile-time-only annotations are no longer bundled
+- Stricter build checks to keep the plugin compatible with servers running Java 8
+- Housekeeping: CI and build improvements
 
 ## [2.3.3](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/2.3.3) - 2025-07-09
 
