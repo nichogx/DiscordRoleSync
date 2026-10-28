@@ -4,6 +4,15 @@ from enum import Enum
 # (connect, read) timeout in seconds for all HTTP requests
 REQUEST_TIMEOUT = (10, 120)
 
+# Hangar does not accept .jars bigger than 10MB.
+# Also checked in the maven-package job in .gitlab-ci.yml.
+MAX_JAR_SIZE = 10_000_000
+
+
+def get_jar_path(version):
+    return f"../target/discord_role_sync-{version}.jar"
+
+
 class ReleaseType(Enum):
     UNKNOWN = 1
     RELEASE = 2

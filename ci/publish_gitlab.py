@@ -53,6 +53,12 @@ if __name__ == "__main__":
         },
     )
 
+    if r.status_code == 409:
+        # Release already exists, e.g. when retrying the job
+        print(f"Release '{CI_COMMIT_TAG}' already exists on GitLab. Skipping.")
+        print("DONE!")
+        exit(0)
+
     if not r.ok:
         raise Exception(f"Error uploading to GitLab: HTTP {r.status_code} {r.text}")
 

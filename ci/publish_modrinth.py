@@ -7,6 +7,7 @@ from common import (
     REQUEST_TIMEOUT,
     ReleaseType,
     get_changelog,
+    get_jar_path,
     get_readme,
 )
 
@@ -52,44 +53,54 @@ if __name__ == "__main__":
         print("Not publishing version to Modrinth, as it's not a release or release candidate.")
         exit(0)
 
-    # Publish artifact
-    print(f"Publishing new version '{CI_COMMIT_TAG}' to Modrinth channel '{channel}'...")
-    file_path = f"../target/discord_role_sync-{CI_COMMIT_TAG}.jar"
-    with open(file_path, "rb") as file:
-        r = requests.post(
-            "https://api.modrinth.com/v2/version",
-            timeout=REQUEST_TIMEOUT,
-            headers={
-                "Authorization": MODRINTH_API_KEY,
-                "User-Agent": user_agent,
-            },
-            files={
-                f"discord_role_sync-{CI_COMMIT_TAG}.jar": file,
-            },
-            data={
-                "data": json.dumps({
-                    "name": CI_COMMIT_TAG,
-                    "version_number": CI_COMMIT_TAG,
-                    "changelog": get_changelog(CI_COMMIT_TAG),
+    # Check if the version was already published, e.g. when retrying the job
+    existing_r = requests.get(f"https://api.modrinth.com/v2/project/{PROJECT_ID}/version/{CI_COMMIT_TAG}", timeout=REQUEST_TIMEOUT, headers={
+        "Authorization": MODRINTH_API_KEY,
+        "User-Agent": user_agent,
+    })
 
-                    # Modrinth only allows dependencies to other Modrinth plugin, and Vault is not on Modrinth
-                    "dependencies": [],
+    if existing_r.ok:
+        print(f"Version '{CI_COMMIT_TAG}' already exists on Modrinth. Skipping upload.")
+    elif existing_r.status_code != 404:
+        raise Exception(f"Error checking for existing Modrinth version: HTTP {existing_r.status_code} {existing_r.text}")
+    else:
+        # Publish artifact
+        print(f"Publishing new version '{CI_COMMIT_TAG}' to Modrinth channel '{channel}'...")
+        with open(get_jar_path(CI_COMMIT_TAG), "rb") as file:
+            r = requests.post(
+                "https://api.modrinth.com/v2/version",
+                timeout=REQUEST_TIMEOUT,
+                headers={
+                    "Authorization": MODRINTH_API_KEY,
+                    "User-Agent": user_agent,
+                },
+                files={
+                    f"discord_role_sync-{CI_COMMIT_TAG}.jar": file,
+                },
+                data={
+                    "data": json.dumps({
+                        "name": CI_COMMIT_TAG,
+                        "version_number": CI_COMMIT_TAG,
+                        "changelog": get_changelog(CI_COMMIT_TAG),
 
-                    "game_versions": SUPPORTED_GAME_VERSIONS,
-                    "version_type": channel,
-                    "loaders": ["paper", "spigot", "bukkit", "purpur", "folia"],
-                    "featured": release_type == ReleaseType.RELEASE,
+                        # Modrinth only allows dependencies to other Modrinth plugin, and Vault is not on Modrinth
+                        "dependencies": [],
 
-                    "project_id": PROJECT_ID,
-                    "file_parts": [f"discord_role_sync-{CI_COMMIT_TAG}.jar"],
-                })
-            },
-        )
+                        "game_versions": SUPPORTED_GAME_VERSIONS,
+                        "version_type": channel,
+                        "loaders": ["paper", "spigot", "bukkit", "purpur", "folia"],
+                        "featured": release_type == ReleaseType.RELEASE,
 
-    if not r.ok:
-        raise Exception(f"Error uploading to Modrinth: HTTP {r.status_code} {r.text}")
+                        "project_id": PROJECT_ID,
+                        "file_parts": [f"discord_role_sync-{CI_COMMIT_TAG}.jar"],
+                    })
+                },
+            )
 
-    print("Version has been uploaded!")
+        if not r.ok:
+            raise Exception(f"Error uploading to Modrinth: HTTP {r.status_code} {r.text}")
+
+        print("Version has been uploaded!")
 
     # Update description from readme (only for releases)
     if release_type != ReleaseType.RELEASE:

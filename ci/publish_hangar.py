@@ -4,9 +4,11 @@ import requests
 import os
 
 from common import (
+    MAX_JAR_SIZE,
     REQUEST_TIMEOUT,
     ReleaseType,
     get_changelog,
+    get_jar_path,
     get_readme,
 )
 
@@ -36,8 +38,8 @@ if __name__ == "__main__":
         exit(0)
 
     # Ensure artifact size
-    file_path = f"../target/discord_role_sync-{CI_COMMIT_TAG}.jar"
-    if os.path.getsize(file_path) > 10_000_000:
+    file_path = get_jar_path(CI_COMMIT_TAG)
+    if os.path.getsize(file_path) > MAX_JAR_SIZE:
         raise Exception(f"Hangar does not accept .jars bigger than 10MB")
 
     # Authenticate with Hangar
@@ -49,44 +51,55 @@ if __name__ == "__main__":
     jwt = auth_r.json()["token"]
     print("Authenticated!")
 
-    # Publish artifact
-    print(f"Publishing new version '{CI_COMMIT_TAG}' to Hangar channel '{channel}'...")
-    with open(file_path, "rb") as file:
-        r = requests.post(
-            "https://hangar.papermc.io/api/v1/projects/nichogx/DiscordRoleSync/upload",
-            timeout=REQUEST_TIMEOUT,
-            headers={
-                "Accept": "application/json",
-                "Authorization": f"Bearer {jwt}",
-            },
-            files={
-                "files": (f"discord_role_sync-{CI_COMMIT_TAG}.jar", file, "application/octet-stream"),
-                "versionUpload": (None, json.dumps({
-                    "version": CI_COMMIT_TAG,
-                    "pluginDependencies": {
-                        "PAPER": [{
-                            "name": "Vault",
-                            "required": True,
-                            "externalUrl": "https://www.spigotmc.org/resources/vault.34315/",
-                            "platform": "PAPER",
+    # Check if the version was already published, e.g. when retrying the job
+    existing_r = requests.get(f"https://hangar.papermc.io/api/v1/projects/DiscordRoleSync/versions/{CI_COMMIT_TAG}", timeout=REQUEST_TIMEOUT, headers={
+        "Accept": "application/json",
+        "Authorization": f"Bearer {jwt}",
+    })
+
+    if existing_r.ok:
+        print(f"Version '{CI_COMMIT_TAG}' already exists on Hangar. Skipping upload.")
+    elif existing_r.status_code != 404:
+        raise Exception(f"Error checking for existing Hangar version: HTTP {existing_r.status_code} {existing_r.text}")
+    else:
+        # Publish artifact
+        print(f"Publishing new version '{CI_COMMIT_TAG}' to Hangar channel '{channel}'...")
+        with open(file_path, "rb") as file:
+            r = requests.post(
+                "https://hangar.papermc.io/api/v1/projects/nichogx/DiscordRoleSync/upload",
+                timeout=REQUEST_TIMEOUT,
+                headers={
+                    "Accept": "application/json",
+                    "Authorization": f"Bearer {jwt}",
+                },
+                files={
+                    "files": (f"discord_role_sync-{CI_COMMIT_TAG}.jar", file, "application/octet-stream"),
+                    "versionUpload": (None, json.dumps({
+                        "version": CI_COMMIT_TAG,
+                        "pluginDependencies": {
+                            "PAPER": [{
+                                "name": "Vault",
+                                "required": True,
+                                "externalUrl": "https://www.spigotmc.org/resources/vault.34315/",
+                                "platform": "PAPER",
+                            }],
+                        },
+                        "platformDependencies": {
+                            "PAPER": SUPPORTED_GAME_VERSIONS,
+                        },
+                        "description": get_changelog(CI_COMMIT_TAG),
+                        "files": [{
+                            "platforms": ["PAPER"],
                         }],
-                    },
-                    "platformDependencies": {
-                        "PAPER": SUPPORTED_GAME_VERSIONS,
-                    },
-                    "description": get_changelog(CI_COMMIT_TAG),
-                    "files": [{
-                        "platforms": ["PAPER"],
-                    }],
-                    "channel": channel,
-                }), "application/json"),
-            },
-        )
+                        "channel": channel,
+                    }), "application/json"),
+                },
+            )
 
-    if not r.ok:
-        raise Exception(f"Error uploading to Hangar: HTTP {r.status_code} {r.text}")
+        if not r.ok:
+            raise Exception(f"Error uploading to Hangar: HTTP {r.status_code} {r.text}")
 
-    print("Version has been uploaded!")
+        print("Version has been uploaded!")
 
     # Update description from readme (only for releases)
     if release_type != ReleaseType.RELEASE:
