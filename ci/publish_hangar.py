@@ -4,6 +4,7 @@ import requests
 import os
 
 from common import (
+    REQUEST_TIMEOUT,
     ReleaseType,
     get_changelog,
     get_readme,
@@ -41,7 +42,7 @@ if __name__ == "__main__":
 
     # Authenticate with Hangar
     print("Authenticating with Hangar...")
-    auth_r = requests.post(f"https://hangar.papermc.io/api/v1/authenticate?apiKey={HANGAR_API_KEY}")
+    auth_r = requests.post(f"https://hangar.papermc.io/api/v1/authenticate?apiKey={HANGAR_API_KEY}", timeout=REQUEST_TIMEOUT)
     if not auth_r.ok:
         raise Exception(f"Failed to authenticate with Hangar: HTTP {auth_r.status_code} {auth_r.text}")
 
@@ -53,6 +54,7 @@ if __name__ == "__main__":
     with open(file_path, "rb") as file:
         r = requests.post(
             "https://hangar.papermc.io/api/v1/projects/nichogx/DiscordRoleSync/upload",
+            timeout=REQUEST_TIMEOUT,
             headers={
                 "Accept": "application/json",
                 "Authorization": f"Bearer {jwt}",
@@ -93,7 +95,7 @@ if __name__ == "__main__":
 
     # Update description from readme
     print("Updating description...")
-    desc_r = requests.patch("https://hangar.papermc.io/api/v1/pages/editmain/DiscordRoleSync", headers={
+    desc_r = requests.patch("https://hangar.papermc.io/api/v1/pages/editmain/DiscordRoleSync", timeout=REQUEST_TIMEOUT, headers={
         "Authorization": f"Bearer {jwt}",
 
         "Content-Type": "application/json",

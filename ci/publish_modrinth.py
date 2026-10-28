@@ -4,6 +4,7 @@ import requests
 import os
 
 from common import (
+    REQUEST_TIMEOUT,
     ReleaseType,
     get_changelog,
     get_readme,
@@ -25,7 +26,7 @@ SUPPORTED_GAME_VERSIONS = [
     "1.18", "1.18.1", "1.18.2",
     "1.19", "1.19.1", "1.19.2", "1.19.3", "1.19.4",
     "1.20", "1.20.1", "1.20.2", "1.20.3", "1.20.4", "1.20.5", "1.20.6",
-    "1.21", "1.21.1", "1.21.2", "1.21.3", "1.21.4", "1.21.5", "1.21.6", "1.21.7", "1.21.8", "1.21.8", "1.21.9", "1.21.10", "1.21.11",
+    "1.21", "1.21.1", "1.21.2", "1.21.3", "1.21.4", "1.21.5", "1.21.6", "1.21.7", "1.21.8", "1.21.9", "1.21.10", "1.21.11",
     "26.1", "26.1.1", "26.1.2",
 ]
 
@@ -57,6 +58,7 @@ if __name__ == "__main__":
     with open(file_path, "rb") as file:
         r = requests.post(
             "https://api.modrinth.com/v2/version",
+            timeout=REQUEST_TIMEOUT,
             headers={
                 "Authorization": MODRINTH_API_KEY,
                 "User-Agent": user_agent,
@@ -95,7 +97,7 @@ if __name__ == "__main__":
         exit(0)
 
     print("Updating description...")
-    desc_r = requests.patch(f"https://api.modrinth.com/v2/project/{PROJECT_ID}", headers={
+    desc_r = requests.patch(f"https://api.modrinth.com/v2/project/{PROJECT_ID}", timeout=REQUEST_TIMEOUT, headers={
         "Authorization": MODRINTH_API_KEY,
         "User-Agent": user_agent,
 
@@ -109,13 +111,13 @@ if __name__ == "__main__":
         print("Unfeaturing old versions...")
 
         # list versions (returns a JSON array)
-        versions_r = requests.get(f"https://api.modrinth.com/v2/project/{PROJECT_ID}/version?featured=true", headers={
+        versions_r = requests.get(f"https://api.modrinth.com/v2/project/{PROJECT_ID}/version?featured=true", timeout=REQUEST_TIMEOUT, headers={
             "Authorization": MODRINTH_API_KEY,
             "User-Agent": user_agent,
         })
 
         if not versions_r.ok:
-            print(f"Error checking versions. Not unfeaturing: HTTP {desc_r.status_code} {desc_r.text}")
+            print(f"Error checking versions. Not unfeaturing: HTTP {versions_r.status_code} {versions_r.text}")
         else:
             versions = versions_r.json()
 
@@ -123,7 +125,7 @@ if __name__ == "__main__":
             for version in versions:
                 if version['version_number'] != CI_COMMIT_TAG:
                     print(f"Unfeaturing {version['version_number']} (id: {version['id']})")
-                    unf_r = requests.patch(f"https://api.modrinth.com/v2/version/{version['id']}", headers={
+                    unf_r = requests.patch(f"https://api.modrinth.com/v2/version/{version['id']}", timeout=REQUEST_TIMEOUT, headers={
                         "Authorization": MODRINTH_API_KEY,
                         "User-Agent": user_agent,
 

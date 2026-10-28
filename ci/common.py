@@ -1,6 +1,9 @@
 import re
 from enum import Enum
 
+# (connect, read) timeout in seconds for all HTTP requests
+REQUEST_TIMEOUT = (10, 120)
+
 class ReleaseType(Enum):
     UNKNOWN = 1
     RELEASE = 2
@@ -57,10 +60,14 @@ def get_changelog(version):
                 if is_in_changelog:
                     if line.startswith(f"## "):
                         # Found next version
-                        return changelog.strip()
+                        break
 
                     changelog += line
 
-            return changelog.strip()
+        changelog = changelog.strip()
+        if not changelog:
+            raise Exception(f"No changelog found for version {version} in CHANGELOG.md")
+
+        return changelog
 
     raise Exception("Cannot get changelog for unknown version type")

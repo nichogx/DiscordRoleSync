@@ -4,6 +4,7 @@ import requests
 import os
 
 from common import (
+    REQUEST_TIMEOUT,
     ReleaseType,
     get_changelog,
 )
@@ -34,6 +35,7 @@ if __name__ == "__main__":
     print(f"Publishing new version '{CI_COMMIT_TAG}' to GitLab Releases...")
     r = requests.post(
         f"{CI_API_V4_URL}/projects/{CI_PROJECT_ID}/releases",
+        timeout=REQUEST_TIMEOUT,
         headers={
             "JOB-TOKEN": CI_JOB_TOKEN,
         },
