@@ -1,0 +1,19 @@
+# Linting for the Python scripts (CI, Spigot page, language validator)
+target-version = "py312"
+line-length = 120
+# So imports of local modules (e.g. ci/common.py) are sorted as first-party
+src = [".", "ci"]
+
+[lint]
+select = [
+    "E", "W",   # pycodestyle
+    "F",        # Pyflakes
+    "I",        # isort
+    "B",        # flake8-bugbear
+    "UP",       # pyupgrade
+    "SIM",      # flake8-simplify
+    "PLR1722",  # use sys.exit() instead of exit()
+]
+ignore = [
+    "E501",     # long lines, mostly URLs
+]

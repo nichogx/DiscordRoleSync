@@ -1,5 +1,6 @@
 import os
 import re
+import sys
 import zipfile
 
 from common import (
@@ -48,6 +49,6 @@ if __name__ == "__main__":
         for error in errors:
             print(f"\t- {error}")
 
-        exit(1)
+        sys.exit(1)
 
     print(f"Release '{CI_COMMIT_TAG}' is valid.")

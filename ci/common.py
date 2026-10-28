@@ -31,11 +31,7 @@ class ReleaseType(Enum):
 
 include_badges = ["Discord", "GitLab Issues"]
 def should_include_badge(line):
-    for badge in include_badges:
-        if line.startswith(f"[![{badge}"):
-            return True
-
-    return False
+    return any(line.startswith(f"[![{badge}") for badge in include_badges)
 
 def get_readme():
     description = ""
@@ -67,7 +63,7 @@ def get_changelog(version):
                     continue
 
                 if is_in_changelog:
-                    if line.startswith(f"## "):
+                    if line.startswith("## "):
                         # Found next version
                         break
 

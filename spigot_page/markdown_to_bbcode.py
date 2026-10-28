@@ -1,5 +1,6 @@
 import argparse
 import re
+import sys
 
 
 def __replace_list(match, ordered=False):
@@ -78,13 +79,11 @@ if __name__ == "__main__":
 
     if not args.file.endswith(".md"):
         print("Extension must be .md")
-        exit(1)
+        sys.exit(1)
 
-    file = open(args.file)
-    bbcode = convert(file.read())
-    file.close()
+    with open(args.file) as file:
+        bbcode = convert(file.read())
 
     out_name = args.out if args.out else args.file.replace(".md", ".bb")
-    out = open(out_name, "w")
-    out.write(bbcode)
-    out.close()
+    with open(out_name, "w") as out:
+        out.write(bbcode)

@@ -1,7 +1,8 @@
 import json
+import os
+import sys
 
 import requests
-import os
 
 from common import (
     REQUEST_TIMEOUT,
@@ -51,7 +52,7 @@ if __name__ == "__main__":
         channel = "beta"
     else:
         print("Not publishing version to Modrinth, as it's not a release or release candidate.")
-        exit(0)
+        sys.exit(0)
 
     # Check if the version was already published, e.g. when retrying the job
     existing_r = requests.get(f"https://api.modrinth.com/v2/project/{PROJECT_ID}/version/{CI_COMMIT_TAG}", timeout=REQUEST_TIMEOUT, headers={
@@ -105,7 +106,7 @@ if __name__ == "__main__":
     # Update description from readme (only for releases)
     if release_type != ReleaseType.RELEASE:
         print("Not updating description since this is not a full release.")
-        exit(0)
+        sys.exit(0)
 
     print("Updating description...")
     desc_r = requests.patch(f"https://api.modrinth.com/v2/project/{PROJECT_ID}", timeout=REQUEST_TIMEOUT, headers={

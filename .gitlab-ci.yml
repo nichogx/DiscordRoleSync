@@ -32,6 +32,20 @@ changelog-linter:
   script:
     - python validate_changelog.py
 
+python-linter:
+  stage: lint
+
+  image: ghcr.io/astral-sh/ruff:0.17.3-alpine
+  script:
+    # Report for the MR widget, then fail the job with readable output if there are errors
+    - ruff check --exit-zero --output-format=gitlab --output-file=gl-code-quality-report.json
+    - ruff check
+  artifacts:
+    when: always
+    expire_in: 30 days
+    reports:
+      codequality: gl-code-quality-report.json
+
 ## Test & Build
 ###
 
@@ -63,6 +77,22 @@ python-infra-test:
       - spigot_page/report.xml
     reports:
       junit: spigot_page/report.xml
+
+python-ci-test:
+  stage: test
+
+  image: python:3.15-alpine
+  before_script:
+    - cd ci
+    - pip install -r requirements-dev.txt
+  script:
+    - pytest --junitxml=report.xml
+  artifacts:
+    expire_in: 30 days
+    paths:
+      - ci/report.xml
+    reports:
+      junit: ci/report.xml
 
 maven-test:
   stage: test

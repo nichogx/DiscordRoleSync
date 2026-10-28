@@ -1,7 +1,8 @@
 import json
+import os
+import sys
 
 import requests
-import os
 
 from common import (
     MAX_JAR_SIZE,
@@ -35,12 +36,12 @@ if __name__ == "__main__":
         channel = "Beta"
     else:
         print("Not publishing version to Hangar, as it's not a release or release candidate.")
-        exit(0)
+        sys.exit(0)
 
     # Ensure artifact size
     file_path = get_jar_path(CI_COMMIT_TAG)
     if os.path.getsize(file_path) > MAX_JAR_SIZE:
-        raise Exception(f"Hangar does not accept .jars bigger than 10MB")
+        raise Exception("Hangar does not accept .jars bigger than 10MB")
 
     # Authenticate with Hangar
     print("Authenticating with Hangar...")
@@ -104,7 +105,7 @@ if __name__ == "__main__":
     # Update description from readme (only for releases)
     if release_type != ReleaseType.RELEASE:
         print("Not updating description since this is not a full release.")
-        exit(0)
+        sys.exit(0)
 
     # Update description from readme
     print("Updating description...")

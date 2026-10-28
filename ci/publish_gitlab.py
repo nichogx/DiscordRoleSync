@@ -1,7 +1,7 @@
-import json
+import os
+import sys
 
 import requests
-import os
 
 from common import (
     REQUEST_TIMEOUT,
@@ -29,7 +29,7 @@ if __name__ == "__main__":
     release_type = ReleaseType.get_release_type(CI_COMMIT_TAG)
     if release_type != ReleaseType.RELEASE:
         print("Not publishing version to Gitlab Releases, as it's not a full release.")
-        exit(0)
+        sys.exit(0)
 
     # Publish artifact
     print(f"Publishing new version '{CI_COMMIT_TAG}' to GitLab Releases...")
@@ -57,7 +57,7 @@ if __name__ == "__main__":
         # Release already exists, e.g. when retrying the job
         print(f"Release '{CI_COMMIT_TAG}' already exists on GitLab. Skipping.")
         print("DONE!")
-        exit(0)
+        sys.exit(0)
 
     if not r.ok:
         raise Exception(f"Error uploading to GitLab: HTTP {r.status_code} {r.text}")

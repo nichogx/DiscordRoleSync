@@ -1,6 +1,7 @@
 import argparse
 import os
 import re
+import sys
 from collections.abc import MutableMapping
 
 import yaml
@@ -47,11 +48,11 @@ if __name__ == "__main__":
 
     if main_language_file is None:
         print("Couldn't find main language file")
-        exit(1)
+        sys.exit(1)
 
     if len(to_validate) == 0:
         print("Nothing to validate")
-        exit(0)
+        sys.exit(0)
 
     print(f"Validating against {main_language_file}: {to_validate}")
 
@@ -80,7 +81,7 @@ if __name__ == "__main__":
 
     if len(errors) == 0:
         print("All files validated successfully.")
-        exit(0)
+        sys.exit(0)
 
     print("Some files failed to validate:")
     for file in errors:
@@ -88,4 +89,4 @@ if __name__ == "__main__":
         for error in file["errors"]:
             print(f"\t\t- {error}")
 
-    exit(1)
+    sys.exit(1)
