@@ -41,8 +41,8 @@ language-linter:
 ###
 
 .maven:
-  # Use Java 11 to guarantee compatibility with servers using old Java
-  image: maven:3-eclipse-temurin-11
+  # Use the oldest supported Java version to guarantee compatibility
+  image: maven:3-eclipse-temurin-17
   variables:
     MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
     MAVEN_CLI_OPTS: "--batch-mode --no-transfer-progress"

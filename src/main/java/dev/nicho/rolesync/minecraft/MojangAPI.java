@@ -6,7 +6,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.*;
-import java.util.Scanner;
+import java.nio.charset.StandardCharsets;
 
 import static dev.nicho.rolesync.minecraft.UserSearch.uuidAddDashes;
 
@@ -67,11 +67,8 @@ public class MojangAPI {
         }
 
         JSONObject body;
-        try (
-                InputStream response = c.getInputStream();
-                Scanner scanner = new Scanner(response)
-        ) {
-            body = new JSONObject(scanner.useDelimiter("\\A").next());
+        try (InputStream response = c.getInputStream()) {
+            body = new JSONObject(new String(response.readAllBytes(), StandardCharsets.UTF_8));
         }
 
         return new UserSearchResult(

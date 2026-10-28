@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Scanner;
+import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -64,11 +64,8 @@ public class PluginVersion {
         }
 
         JSONArray body;
-        try (
-                InputStream response = c.getInputStream();
-                Scanner scanner = new Scanner(response)
-        ) {
-            body = new JSONArray(scanner.useDelimiter("\\A").next());
+        try (InputStream response = c.getInputStream()) {
+            body = new JSONArray(new String(response.readAllBytes(), StandardCharsets.UTF_8));
         }
 
         if (body.isEmpty()) {

@@ -8,10 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [unreleased](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/unreleased) - unreleased
 
 ### Changed
+- **Breaking:** Java 17 or newer is now required. Servers running Java 8 or 11 must upgrade Java before updating the plugin
 - Updated JDA (the Discord library) to 6.7.0, which supports Discord's channel obfuscation, mandatory from November 16, 2026
 - Updated dependencies
 - Slightly smaller plugin JAR, as compile-time-only annotations are no longer bundled
-- Stricter build checks to keep the plugin compatible with servers running Java 8
 - Housekeeping: CI and build improvements
 
 ### Fixed

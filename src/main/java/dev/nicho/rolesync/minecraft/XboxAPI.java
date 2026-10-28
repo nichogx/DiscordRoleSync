@@ -8,7 +8,7 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Scanner;
+import java.nio.charset.StandardCharsets;
 
 import static dev.nicho.rolesync.minecraft.UserSearch.uuidAddDashes;
 
@@ -61,11 +61,8 @@ public class XboxAPI {
     }
 
     private JSONObject getJSONBody(HttpURLConnection c) throws IOException {
-        try (
-                InputStream response = getErrorOrInputStream(c);
-                Scanner scanner = new Scanner(response)
-        ) {
-            return new JSONObject(scanner.useDelimiter("\\A").next());
+        try (InputStream response = getErrorOrInputStream(c)) {
+            return new JSONObject(new String(response.readAllBytes(), StandardCharsets.UTF_8));
         }
     }
 

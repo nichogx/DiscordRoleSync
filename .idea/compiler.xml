@@ -10,8 +10,8 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="discord_role_sync.main" target="1.8" />
-      <module name="discord_role_sync.test" target="1.8" />
+      <module name="discord_role_sync.main" target="17" />
+      <module name="discord_role_sync.test" target="17" />
     </bytecodeTargetLevel>
   </component>
 </project>

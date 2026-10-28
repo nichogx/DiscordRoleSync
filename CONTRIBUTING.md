@@ -18,7 +18,7 @@ Please make sure you practice good code hygiene. Make a descriptive merge reques
 
 ## Structure
 
-This project is built with Maven, targeting Java 11. While we officially support Java 11 only (as that's what we run in CI), please do not use any APIs that are not available in Java 8 if possible. This plugin is fairly simple and I want to keep support for as many users as possible. This means everything Java 8+ and MC 1.8.8+.
+This project is built with Maven, targeting Java 17. Please do not use any APIs that are not available in Java 17. This plugin is fairly simple and I want to keep support for as many users as possible. This means everything Java 17+ and MC 1.8.8+.
 
 There are a few Python scripts, mainly for CI, but these are not packaged as part of the final release.
 

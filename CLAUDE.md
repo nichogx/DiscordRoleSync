@@ -39,7 +39,7 @@ Local builds use version `develop`. CI sets versions from tags/branches.
 - **Shaded JDA:** JDA is relocated to `DiscordRoleSync.net.dv8tion`, so IDE import paths won't match runtime paths.
 
 ### Version Support
-- **Java:** Must stay Java 8 API compatible (enforced by `maven.compiler.release=8`).
+- **Java:** Must stay Java 17 API compatible (enforced by `maven.compiler.release=17`).
 - **Minecraft:** Supports 1.8.8 to 1.21+, compiled against Spigot API 1.12.2. Be careful with APIs that don't exist on 1.8.8.
 
 ## Config Changes
