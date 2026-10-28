@@ -95,12 +95,13 @@ maven-package:
       else
         PACKAGE_VERSION=branch-${CI_COMMIT_SHORT_SHA}
       fi
-    - mvn $MAVEN_CLI_OPTS package -Dpackage_version=${PACKAGE_VERSION}
+    # Tests already ran in maven-test
+    - mvn $MAVEN_CLI_OPTS package -DskipTests -Dpackage_version=${PACKAGE_VERSION}
 
   artifacts:
     expire_in: 30 days
     paths:
-      - target/
+      - target/discord_role_sync-*.jar
 
 ## Publish
 ###
