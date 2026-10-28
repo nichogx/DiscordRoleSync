@@ -166,7 +166,7 @@ This is a no-op release due to the migration to GitLab for builds and tracking.
 
 ## [1.2.1](https://github.com/nichogx/DiscordRoleSync/releases/tag/1.2.1) - 2022-12-05
 
-### Adds
+### Added
 
 - A config option to use embeds instead of regular messages (disabled by default)
 - Config options to change the Discord commands

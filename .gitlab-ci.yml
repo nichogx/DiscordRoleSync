@@ -37,6 +37,15 @@ language-linter:
   script:
     - python validate.py en_US.yml ../../main/resources/language
 
+changelog-linter:
+  stage: lint
+
+  image: python:3.15-alpine
+  before_script:
+    - cd ci
+  script:
+    - python validate_changelog.py
+
 ## Test & Build
 ###
 
