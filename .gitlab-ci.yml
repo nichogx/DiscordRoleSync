@@ -39,6 +39,19 @@ language-linter:
 ## Test & Build
 ###
 
+.maven:
+  # Use Java 11 to guarantee compatibility with servers using old Java
+  image: maven:3-eclipse-temurin-11
+  variables:
+    MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+    MAVEN_CLI_OPTS: "--batch-mode --no-transfer-progress"
+  cache:
+    key:
+      files:
+        - pom.xml
+    paths:
+      - .m2/repository/
+
 python-infra-test:
   stage: test
 
@@ -57,11 +70,10 @@ python-infra-test:
 
 maven-test:
   stage: test
+  extends: .maven
 
-  # Use Java 11 to guarantee compatibility with servers using old Java
-  image: maven:3-eclipse-temurin-11
   script:
-    - mvn test -Dpackage_version=ci-test
+    - mvn $MAVEN_CLI_OPTS test -Dpackage_version=ci-test
 
   artifacts:
     expire_in: 30 days
@@ -72,9 +84,8 @@ maven-test:
 
 maven-package:
   stage: build
+  extends: .maven
 
-  # Use Java 11 to guarantee compatibility with servers using old Java
-  image: maven:3-eclipse-temurin-11
   script:
     - |
       if [[ -n "$CI_COMMIT_TAG" ]]; then
@@ -84,7 +95,7 @@ maven-package:
       else
         PACKAGE_VERSION=branch-${CI_COMMIT_SHORT_SHA}
       fi
-    - mvn package -Dpackage_version=${PACKAGE_VERSION}
+    - mvn $MAVEN_CLI_OPTS package -Dpackage_version=${PACKAGE_VERSION}
 
   artifacts:
     expire_in: 30 days
