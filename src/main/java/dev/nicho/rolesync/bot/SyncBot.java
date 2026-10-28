@@ -177,8 +177,8 @@ public class SyncBot extends ListenerAdapter {
             };
 
             for (Permission p : requiredPermissions) {
-                if (!guild.getSelfMember().hasPermission()) {
-                    plugin.getLogger().severe("Bot does not have required permission" + p + ". This plugin will not work correctly.");
+                if (!guild.getSelfMember().hasPermission(p)) {
+                    plugin.getLogger().severe("Bot does not have required permission " + p.getName() + ". This plugin will not work correctly.");
                 }
             }
         }

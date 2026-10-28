@@ -14,6 +14,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Stricter build checks to keep the plugin compatible with servers running Java 8
 - Housekeeping: CI and build improvements
 
+### Fixed
+- The startup warning for a bot missing the Manage Roles permission now actually appears
+
 ## [2.3.3](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/2.3.3) - 2025-07-09
 
 ### Added
