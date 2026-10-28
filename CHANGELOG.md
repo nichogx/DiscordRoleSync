@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - The startup warning for a bot missing the Manage Roles permission now actually appears
+- Modrinth no longer lists Folia as a supported platform, as the plugin does not run on Folia
 
 ## [2.3.3](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/2.3.3) - 2025-07-09
 

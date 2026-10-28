@@ -88,7 +88,7 @@ if __name__ == "__main__":
 
                         "game_versions": SUPPORTED_GAME_VERSIONS,
                         "version_type": channel,
-                        "loaders": ["paper", "spigot", "bukkit", "purpur", "folia"],
+                        "loaders": ["paper", "spigot", "bukkit", "purpur"],
                         "featured": release_type == ReleaseType.RELEASE,
 
                         "project_id": PROJECT_ID,
