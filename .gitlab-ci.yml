@@ -72,6 +72,11 @@ python-infra-test:
 maven-test:
   stage: test
   extends: .maven
+  # Also test on the Java versions most servers run, to catch runtime differences
+  image: maven:3-eclipse-temurin-${JAVA_VERSION}
+  parallel:
+    matrix:
+      - JAVA_VERSION: ["17", "21", "25"]
 
   script:
     - mvn $MAVEN_CLI_OPTS test -Dpackage_version=ci-test
