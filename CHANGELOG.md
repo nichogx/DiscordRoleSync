@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `/drs reload` now validates config.yml and keeps the previous config if it is invalid, instead of loading it and breaking linking and the whitelist
 - The startup warning for a bot missing the Manage Roles permission now actually appears
 - Modrinth no longer lists Folia as a supported platform, as the plugin does not run on Folia
+- Accented characters in built-in translations (e.g. Portuguese) no longer show up garbled on servers whose system encoding isn't UTF-8, such as many Windows servers
 
 ## [2.3.3](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/2.3.3) - 2025-07-09
 

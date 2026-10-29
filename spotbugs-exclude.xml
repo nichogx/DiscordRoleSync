@@ -20,15 +20,6 @@
         <Bug pattern="OBL_UNSATISFIED_OBLIGATION,ODR_OPEN_DATABASE_RESOURCE"/>
     </Match>
 
-    <!-- Files are read with the platform's default charset instead of UTF-8 -->
-    <Match>
-        <Or>
-            <Class name="dev.nicho.rolesync.RoleSync"/>
-            <Class name="dev.nicho.rolesync.config.ConfigReader"/>
-        </Or>
-        <Bug pattern="DM_DEFAULT_ENCODING"/>
-    </Match>
-
     <!-- Catches Exception where only IOException is declared -->
     <Match>
         <Class name="dev.nicho.rolesync.RoleSync"/>

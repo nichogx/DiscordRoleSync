@@ -463,7 +463,7 @@ public class RoleSync extends JavaPlugin {
         YamlConfiguration english;
         try (
                 InputStream stream = getResource(String.format("language/%s.yml", defaultLanguage));
-                Reader reader = new InputStreamReader(stream)
+                Reader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)
         ) {
             english = YamlConfiguration.loadConfiguration(reader);
         } catch (Exception e) {
@@ -543,7 +543,7 @@ public class RoleSync extends JavaPlugin {
 
         try (
                 InputStream stream = getResource(String.format("language/%s.yml", language));
-                Reader reader = new InputStreamReader(stream)
+                Reader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)
         ) {
             return YamlConfiguration.loadConfiguration(reader);
         } catch (Exception e) {
