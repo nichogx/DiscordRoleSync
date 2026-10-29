@@ -103,13 +103,21 @@ maven-test:
 
   script:
     - mvn $MAVEN_CLI_OPTS test -Dpackage_version=ci-test
+    # Total line coverage, for the coverage regex below
+    - |
+      awk -F, 'NR > 1 { missed += $8; covered += $9 } END { printf "Line coverage: %.2f%%\n", 100 * covered / (missed + covered) }' target/site/jacoco/jacoco.csv
+  coverage: '/Line coverage: \d+\.\d+%/'
 
   artifacts:
     expire_in: 30 days
     paths:
       - target/surefire-reports/
+      - target/site/jacoco/
     reports:
       junit: target/surefire-reports/*.xml
+      coverage_report:
+        coverage_format: jacoco
+        path: target/site/jacoco/jacoco.xml
 
 maven-package:
   stage: build
