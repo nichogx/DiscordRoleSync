@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Modrinth no longer lists Folia as a supported platform, as the plugin does not run on Folia
 - Accented characters in built-in translations (e.g. Portuguese) no longer show up garbled on servers whose system encoding isn't UTF-8, such as many Windows servers
 - Linked members who leave, are kicked or are banned from the Discord server are now removed from the whitelist even if the bot hadn't cached them yet
+- Discord link and lookup commands no longer hang forever when the Mojang or GeyserMC API stops responding. They now give up after 10 seconds and show an error
 
 ## [2.3.3](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/2.3.3) - 2025-07-09
 

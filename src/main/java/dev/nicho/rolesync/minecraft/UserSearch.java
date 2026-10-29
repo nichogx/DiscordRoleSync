@@ -5,6 +5,7 @@ import org.bukkit.Bukkit;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
@@ -81,6 +82,17 @@ public class UserSearch {
                 name,
                 UUID.nameUUIDFromBytes(("OfflinePlayer:" + name).getBytes(StandardCharsets.UTF_8)).toString()
         );
+    }
+
+    /**
+     * Sets connect and read timeouts on a connection to a username lookup API,
+     * so a slow or unresponsive API can't hang the lookup forever.
+     *
+     * @param c the connection
+     */
+    static void setTimeouts(URLConnection c) {
+        c.setConnectTimeout(10_000);
+        c.setReadTimeout(10_000);
     }
 
     /**

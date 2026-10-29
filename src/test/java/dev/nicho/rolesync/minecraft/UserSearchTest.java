@@ -6,9 +6,12 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URLConnection;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class UserSearchTest {
 
@@ -25,6 +28,17 @@ class UserSearchTest {
         assertEquals("%2E%2E%2F%2E%2E%2Fevil", UserSearch.encodePathSegment("../../evil"));
         assertEquals("name%3Fx%3D1%23y", UserSearch.encodePathSegment("name?x=1#y"));
         assertEquals("n%C3%A4me", UserSearch.encodePathSegment("näme"));
+    }
+
+    @Test
+    void testSetTimeouts() throws IOException {
+        URLConnection c = URI.create("https://example.com").toURL().openConnection();
+        assertEquals(0, c.getConnectTimeout());
+        assertEquals(0, c.getReadTimeout());
+
+        UserSearch.setTimeouts(c);
+        assertTrue(c.getConnectTimeout() > 0);
+        assertTrue(c.getReadTimeout() > 0);
     }
 
     @Test

@@ -10,6 +10,7 @@ import java.net.*;
 import java.nio.charset.StandardCharsets;
 
 import static dev.nicho.rolesync.minecraft.UserSearch.encodePathSegment;
+import static dev.nicho.rolesync.minecraft.UserSearch.setTimeouts;
 import static dev.nicho.rolesync.minecraft.UserSearch.uuidAddDashes;
 
 public class MojangAPI {
@@ -70,6 +71,7 @@ public class MojangAPI {
         URL reqUrl = new URL(getMojangApiUrl(), "users/profiles/minecraft/" + encodePathSegment(name));
         HttpURLConnection c = (HttpURLConnection) reqUrl.openConnection();
         c.setRequestMethod("GET");
+        setTimeouts(c);
 
         c.connect();
         int responseCode = c.getResponseCode();

@@ -11,6 +11,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 import static dev.nicho.rolesync.minecraft.UserSearch.encodePathSegment;
+import static dev.nicho.rolesync.minecraft.UserSearch.setTimeouts;
 import static dev.nicho.rolesync.minecraft.UserSearch.uuidAddDashes;
 
 public class XboxAPI {
@@ -38,6 +39,7 @@ public class XboxAPI {
 
         HttpURLConnection c = (HttpURLConnection) reqUrl.openConnection();
         c.setRequestMethod("GET");
+        setTimeouts(c);
 
         c.connect();
         int responseCode = c.getResponseCode();
