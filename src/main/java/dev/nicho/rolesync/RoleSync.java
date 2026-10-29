@@ -461,13 +461,16 @@ public class RoleSync extends JavaPlugin {
     private int updateLangFiles() {
         // Get all keys that are supposed to exist, from en_US in the .jar
         YamlConfiguration english;
-        try (
-                InputStream stream = getResource(String.format("language/%s.yml", defaultLanguage));
-                Reader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)
-        ) {
-            english = YamlConfiguration.loadConfiguration(reader);
-        } catch (Exception e) {
-            throw new RuntimeException("Default language file not found in the .jar: " + e.getMessage());
+        try (InputStream stream = getResource(String.format("language/%s.yml", defaultLanguage))) {
+            if (stream == null) {
+                throw new IllegalStateException("Default language file not found in the .jar");
+            }
+
+            try (Reader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
+                english = YamlConfiguration.loadConfiguration(reader);
+            }
+        } catch (IOException e) {
+            throw new UncheckedIOException("Failed to read the default language file from the .jar", e);
         }
 
         Set<String> keys = english.getKeys(true);
@@ -503,7 +506,7 @@ public class RoleSync extends JavaPlugin {
             try (InputStream resourceStream = getResource(languageResource)) {
                 if (resourceStream == null)
                     languageResource = "language/en_US.yml";
-            } catch (Exception e) {
+            } catch (IOException e) {
                 languageResource = "language/en_US.yml";
             }
 
@@ -541,24 +544,27 @@ public class RoleSync extends JavaPlugin {
             return YamlConfiguration.loadConfiguration(langFile);
         }
 
-        try (
-                InputStream stream = getResource(String.format("language/%s.yml", language));
-                Reader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)
-        ) {
-            return YamlConfiguration.loadConfiguration(reader);
-        } catch (Exception e) {
-            if (language.equals(defaultLanguage)) {
-                throw new IllegalStateException(
-                        String.format("%s.yml is the default language and was not found. This is a bug. " +
-                                "Please contact the developer.", defaultLanguage)
-                );
+        try (InputStream stream = getResource(String.format("language/%s.yml", language))) {
+            if (stream != null) {
+                try (Reader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
+                    return YamlConfiguration.loadConfiguration(reader);
+                }
             }
-
-            getLogger().warning(
-                    String.format("Language file %s.yml does not exist in jar or in custom translation folder" +
-                            ". Is it supported? Defaulting to %s.", language, defaultLanguage));
-            return loadLangFile(defaultLanguage);
+        } catch (IOException e) {
+            // Fall through and treat it as not found
         }
+
+        if (language.equals(defaultLanguage)) {
+            throw new IllegalStateException(
+                    String.format("%s.yml is the default language and was not found. This is a bug. " +
+                            "Please contact the developer.", defaultLanguage)
+            );
+        }
+
+        getLogger().warning(
+                String.format("Language file %s.yml does not exist in jar or in custom translation folder" +
+                        ". Is it supported? Defaulting to %s.", language, defaultLanguage));
+        return loadLangFile(defaultLanguage);
     }
 
     private void startBot() {

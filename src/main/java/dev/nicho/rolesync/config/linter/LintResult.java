@@ -46,15 +46,14 @@ public class LintResult {
         }
 
         StringBuilder mainBuilder = new StringBuilder(
-                String.format("%d config rule%s had errors.\n", result.size(), result.size() == 1 ? "" : "s")
-        );
+                String.format("%d config rule%s had errors.", result.size(), result.size() == 1 ? "" : "s")
+        ).append("\n");
 
-        for (String rule : result.keySet()) {
+        for (Map.Entry<String, List<String>> entry : result.entrySet()) {
             StringBuilder builder = new StringBuilder()
-                    .append(String.format("Config lint rule \"%s\" had errors:", rule));
+                    .append(String.format("Config lint rule \"%s\" had errors:", entry.getKey()));
 
-            List<String> errors = result.get(rule);
-            for (String err : errors) {
+            for (String err : entry.getValue()) {
                 builder.append("\n")
                         .append("\t- ")
                         .append(err);
