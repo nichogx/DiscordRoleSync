@@ -11,7 +11,6 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.SQLException;
-import java.util.Objects;
 
 public class MemberEventsListener extends ListenerAdapter {
 
@@ -51,13 +50,13 @@ public class MemberEventsListener extends ListenerAdapter {
     @Override
     public void onGuildMemberRemove(@NotNull GuildMemberRemoveEvent event) {
         try {
-            DatabaseHandler.LinkedUserInfo userInfo = plugin.getDb().getLinkedUserInfo(Objects.requireNonNull(event.getMember()).getId());
+            DatabaseHandler.LinkedUserInfo userInfo = plugin.getDb().getLinkedUserInfo(event.getUser().getId());
             if (userInfo != null) {
                 plugin.getDb().removeFromWhitelist(userInfo.uuid);
 
                 discordAgent.setPermissions(userInfo.uuid, null);
             }
-        } catch (SQLException | NullPointerException e) {
+        } catch (SQLException e) {
             plugin.getLogger().severe("An error occurred while removing kicked/banned/left member from whitelist.\n" +
                     e.getMessage());
         }
