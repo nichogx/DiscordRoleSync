@@ -20,7 +20,7 @@ import java.util.function.Function;
  * - Same key with different types
  * - Reusing key names (renaming "a" to "b" and adding a new "a")
  */
-public class ConfigMigration {
+public final class ConfigMigration {
 
     private final int fromVersion;
     private final String resourcePath;

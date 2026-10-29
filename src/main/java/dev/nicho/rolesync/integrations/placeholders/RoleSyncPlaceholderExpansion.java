@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -56,6 +57,14 @@ public class RoleSyncPlaceholderExpansion extends PlaceholderExpansion {
     @Override
     public @NotNull String getVersion() {
         return plugin.getDescription().getVersion();
+    }
+
+    /**
+     * PlaceholderExpansion defines a final equals() using these fields, but no hashCode()
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(getIdentifier(), getAuthor(), getVersion());
     }
 
     @Override

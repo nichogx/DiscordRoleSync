@@ -12,11 +12,6 @@
         <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
     </Match>
 
-    <!-- Finalizer attacks are not a concern, as no untrusted code subclasses these classes -->
-    <Match>
-        <Bug pattern="CT_CONSTRUCTOR_THROW"/>
-    </Match>
-
     <!-- The table name comes from database.tablePrefix in the admin's config. All user input uses parameters -->
     <Match>
         <Class name="dev.nicho.rolesync.db.DatabaseHandler"/>
@@ -36,18 +31,6 @@
             <Class name="dev.nicho.rolesync.minecraft.XboxAPI"/>
         </Or>
         <Bug pattern="URLCONNECTION_SSRF_FD"/>
-    </Match>
-
-    <!-- configLoaded is written in onLoad and read in onEnable, both of which Bukkit calls on the main thread -->
-    <Match>
-        <Class name="dev.nicho.rolesync.RoleSync"/>
-        <Bug pattern="AT_STALE_THREAD_WRITE_OF_PRIMITIVE"/>
-    </Match>
-
-    <!-- equals() without hashCode() is inherited from PlaceholderAPI's PlaceholderExpansion -->
-    <Match>
-        <Class name="dev.nicho.rolesync.integrations.placeholders.RoleSyncPlaceholderExpansion"/>
-        <Bug pattern="HE_INHERITS_EQUALS_USE_HASHCODE"/>
     </Match>
 
     <!-- Existing issues, ignored so new ones fail CI. Remove each entry when it's fixed -->

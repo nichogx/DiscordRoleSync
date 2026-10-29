@@ -6,7 +6,7 @@ import org.apache.commons.dbcp.BasicDataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public class MySQLHandler extends DatabaseHandler {
+public final class MySQLHandler extends DatabaseHandler {
 
     private final BasicDataSource ds;
 

@@ -47,7 +47,7 @@ public class RoleSync extends JavaPlugin {
     private YamlConfiguration language = null;
 
     private String configError = null;
-    private boolean configLoaded = false;
+    private volatile boolean configLoaded = false;
 
     private DatabaseHandler db = null;
     private SyncBot bot = null;

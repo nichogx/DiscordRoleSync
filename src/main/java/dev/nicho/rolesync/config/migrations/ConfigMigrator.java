@@ -12,7 +12,7 @@ import java.util.List;
  * ConfigMigrator will attempt to update the existing config.yml file
  * to a newer format. Will sequentially update from v1 to the latest version.
  */
-public class ConfigMigrator {
+public final class ConfigMigrator {
     private final List<ConfigMigration> migrations = new ArrayList<>();
     private final int latestVersion;
 

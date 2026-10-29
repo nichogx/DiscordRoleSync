@@ -8,7 +8,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class SQLiteHandler extends DatabaseHandler {
+public final class SQLiteHandler extends DatabaseHandler {
 
     private final File db;
     private Connection connection;

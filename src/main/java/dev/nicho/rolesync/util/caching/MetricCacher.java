@@ -5,7 +5,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.util.concurrent.Callable;
 
-public class MetricCacher<T> {
+public final class MetricCacher<T> {
 
     private final long interval;
     private final JavaPlugin plugin;
