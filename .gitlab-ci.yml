@@ -159,6 +159,17 @@ maven-package:
 ## Publish
 ###
 
+# The publish jobs skip anything already published, so they are safe to retry
+# when the runner or GitLab fails, rather than the job itself.
+.retry-on-infra-failure:
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - stuck_or_timeout_failure
+      - api_failure
+      - scheduler_failure
+
 validate-release:
   stage: validate-release
   extends: .python
@@ -178,6 +189,7 @@ gitlab-registry:
   image: curlimages/curl:latest
   rules:
     - if: $CI_COMMIT_TAG
+  retry: !reference [.retry-on-infra-failure, retry]
   script:
     - |
       PACKAGE_URL=${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/discord_role_sync/${CI_COMMIT_TAG}/discord_role_sync-${CI_COMMIT_TAG}.jar
@@ -198,6 +210,7 @@ publish-gitlab:
 
   rules:
     - if: $CI_COMMIT_TAG
+  retry: !reference [.retry-on-infra-failure, retry]
   before_script:
     - cd ci
     - pip install -r requirements.txt
@@ -211,6 +224,7 @@ publish-modrinth:
 
   rules:
     - if: $CI_COMMIT_TAG
+  retry: !reference [.retry-on-infra-failure, retry]
   before_script:
     - cd ci
     - pip install -r requirements.txt
@@ -224,6 +238,7 @@ publish-hangar:
 
   rules:
     - if: $CI_COMMIT_TAG
+  retry: !reference [.retry-on-infra-failure, retry]
   before_script:
     - cd ci
     - pip install -r requirements.txt
