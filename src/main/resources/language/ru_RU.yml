@@ -79,3 +79,5 @@ geyserUserNotFound: "Could not find this Geyser user. If the user exists, try jo
 linkStatus:
   linked: "Linked"
   notLinked: "Not Linked"
+
+reloadFailed: "Reload failed: config.yml is invalid, so the previous config is still in use. Check the console for details."

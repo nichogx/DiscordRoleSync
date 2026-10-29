@@ -13,6 +13,12 @@ public class ConfigLinter {
 
     private static final String discordIdRegex = "^\\d{16,}$";
     private static final String placeholderAPIRegex = "%\\w+%";
+
+    /** Valid table prefixes. Must be safe to add directly to SQL queries. Can be empty. */
+    private static final String tablePrefixRegex = "^[A-Za-z0-9_]*$";
+
+    /** Valid language names. Must be safe to use as a file name. */
+    private static final String languageRegex = "^[A-Za-z0-9_-]+$";
     private final RoleSync plugin;
 
     /**
@@ -42,6 +48,17 @@ public class ConfigLinter {
 
                         if (!c.isInt("configVersion")) {
                             result.add("configVersion is set incorrectly. Please do not modify this field.");
+                        }
+
+                        return result;
+                    }),
+            new LintRule("Validate language",
+                    c -> {
+                        List<String> result = new ArrayList<>();
+
+                        String language = c.getString("language");
+                        if (language == null || !language.matches(languageRegex)) {
+                            result.add(String.format("Invalid language '%s', must only contain letters, numbers, underscores and dashes", language));
                         }
 
                         return result;
@@ -108,6 +125,11 @@ public class ConfigLinter {
                             }
                         } else if (!dbType.equalsIgnoreCase("sqlite")) {
                             result.add(String.format("Invalid database type '%s', must be mysql or sqlite", dbType));
+                        }
+
+                        String tablePrefix = c.getString("database.tablePrefix");
+                        if (tablePrefix == null || !tablePrefix.matches(tablePrefixRegex)) {
+                            result.add(String.format("Invalid database.tablePrefix '%s', must only contain letters, numbers and underscores", tablePrefix));
                         }
 
                         return result;

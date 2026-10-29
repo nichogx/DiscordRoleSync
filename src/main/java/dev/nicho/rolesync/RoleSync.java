@@ -15,6 +15,7 @@ import dev.nicho.rolesync.minecraft.UUIDMode;
 import dev.nicho.rolesync.util.caching.MetricCacher;
 import dev.nicho.rolesync.util.plugin_meta.PluginVersion;
 import dev.nicho.rolesync.util.vault.VaultAPI;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import net.dv8tion.jda.api.exceptions.InvalidTokenException;
 import net.milkbowl.vault.permission.Permission;
 import org.apache.commons.io.FileUtils;
@@ -34,6 +35,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.intellij.lang.annotations.PrintFormat;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.SQLException;
@@ -56,6 +58,7 @@ public class RoleSync extends JavaPlugin {
     private String chatPrefix = null;
 
     @Override
+    @SuppressFBWarnings(value = "PATH_TRAVERSAL_IN", justification = "Paths are constants inside the plugin's data folder")
     public void onLoad() {
         try {
             // Delete old libraries that were downloaded with DependencyManager
@@ -353,6 +356,15 @@ public class RoleSync extends JavaPlugin {
                 return false;
             }
 
+            // Validate before reloading, so an invalid config never replaces the one in use
+            LintResult lintResult = lintConfigFile();
+            if (!lintResult.isValid()) {
+                getLogger().severe("config.yml failed to validate, keeping the previous config: " + lintResult);
+                sender.sendMessage(ChatColor.BLUE + chatPrefix + ChatColor.RED + language.getString("reloadFailed"));
+
+                return true;
+            }
+
             reloadConfig();
             loadLang();
 
@@ -404,6 +416,27 @@ public class RoleSync extends JavaPlugin {
         return true;
     }
 
+    /**
+     * Validates config.yml on disk, without loading it into the plugin.
+     * Defaults from the .jar are applied, the same way reloadConfig() does.
+     *
+     * @return the lint result
+     */
+    private LintResult lintConfigFile() {
+        YamlConfiguration config = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "config.yml"));
+
+        InputStream defaults = getResource("config.yml");
+        if (defaults != null) {
+            try (Reader reader = new InputStreamReader(defaults, StandardCharsets.UTF_8)) {
+                config.setDefaults(YamlConfiguration.loadConfiguration(reader));
+            } catch (IOException e) {
+                getLogger().warning("Could not read the default config.yml from the .jar.\n" + e.getMessage());
+            }
+        }
+
+        return new ConfigLinter(this).run(config);
+    }
+
     private void loadLang() {
         getLogger().info("Updating custom translation files");
 
@@ -424,6 +457,7 @@ public class RoleSync extends JavaPlugin {
      *
      * @return how many files were updated
      */
+    @SuppressFBWarnings(value = "PATH_TRAVERSAL_IN", justification = "File names come from listing the translations folder")
     private int updateLangFiles() {
         // Get all keys that are supposed to exist, from en_US in the .jar
         YamlConfiguration english;
@@ -498,6 +532,7 @@ public class RoleSync extends JavaPlugin {
      * @param language the language filename to use (without the extension).
      * @return the found or newly created file (extracted from the .jar)
      */
+    @SuppressFBWarnings(value = "PATH_TRAVERSAL_IN", justification = "The language name is validated by ConfigLinter")
     private YamlConfiguration loadLangFile(String language) {
         File langFile = new File(getDataFolder(), String.format("translations/%s.yml", language));
 

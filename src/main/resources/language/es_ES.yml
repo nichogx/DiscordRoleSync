@@ -79,3 +79,5 @@ linkStatus:
 # was written. Please make a merge request or contact me to update these to your language!
 # If there's nothing below this line, this file has been fully translated!
 ##
+
+reloadFailed: "Reload failed: config.yml is invalid, so the previous config is still in use. Check the console for details."

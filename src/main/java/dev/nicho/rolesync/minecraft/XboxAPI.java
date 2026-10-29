@@ -1,30 +1,40 @@
 package dev.nicho.rolesync.minecraft;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
+import static dev.nicho.rolesync.minecraft.UserSearch.encodePathSegment;
 import static dev.nicho.rolesync.minecraft.UserSearch.uuidAddDashes;
 
 public class XboxAPI {
 
+    /**
+     * Searches for a Bedrock user through GeyserMC's API.
+     *
+     * @param name the Geyser username, including the prefix added by Geyser
+     * @return the user, or null if not found
+     * @throws IOException if an error occurs while contacting the API
+     */
+    @SuppressFBWarnings(
+            value = "URLCONNECTION_SSRF_FD",
+            justification = "The host is hardcoded, and the name is percent-encoded so it can only change the last path segment"
+    )
     public UserSearchResult searchName(String name) throws IOException {
-        URL reqUrl;
-        try {
-            String xboxName = name
-                    .replace("_", "%20") // Geyser replaces xbox spaces with underscores
-                    .replace(".", ""); // remove the dot added by Geyser
-
-            reqUrl = new URI("https://api.geysermc.org/v2/xbox/xuid/" + xboxName).toURL();
-        } catch (URISyntaxException e) {
-            throw new IOException("Incorrectly formatted name");
+        String gamertag = name
+                .replace("_", " ") // Geyser replaces xbox spaces with underscores
+                .replace(".", ""); // remove the dot added by Geyser
+        if (gamertag.isBlank()) {
+            return null;
         }
+
+        URL reqUrl = URI.create("https://api.geysermc.org/v2/xbox/xuid/" + encodePathSegment(gamertag)).toURL();
 
         HttpURLConnection c = (HttpURLConnection) reqUrl.openConnection();
         c.setRequestMethod("GET");

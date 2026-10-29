@@ -126,6 +126,43 @@ class ConfigLinterTest {
 
         testConfig.set("database.mysql.disableSSL", true);
         assertEmpty(linter.run(testConfig));
+
+        testConfig.set("database.tablePrefix", "My_Prefix_2");
+        assertEmpty(linter.run(testConfig));
+
+        testConfig.set("database.tablePrefix", "");
+        assertEmpty(linter.run(testConfig));
+
+        for (String prefix : new String[]{"prefix; DROP TABLE x", "pre-fix", "pre`fix"}) {
+            testConfig.set("database.tablePrefix", prefix);
+            result = linter.run(testConfig);
+            assertEquals(1, result.asMap().size());
+            assertContainsError(result, "Validate database config", String.format("Invalid database.tablePrefix '%s', must only contain letters, numbers and underscores", prefix));
+        }
+
+        testConfig.set("database.tablePrefix", null);
+        result = linter.run(testConfig);
+        assertEquals(1, result.asMap().size());
+        assertContainsError(result, "Validate database config", "Invalid database.tablePrefix 'null', must only contain letters, numbers and underscores");
+    }
+
+    @Test
+    void testValidateLanguage() {
+        ConfigLinter linter = new ConfigLinter();
+        Configuration testConfig = newBasicValidConfig();
+        LintResult result;
+
+        for (String language : new String[]{"en_US", "pt_BR", "my-custom-lang"}) {
+            testConfig.set("language", language);
+            assertEmpty(linter.run(testConfig));
+        }
+
+        for (String language : new String[]{"", "../en_US", "sub/en_US", "en_US.yml"}) {
+            testConfig.set("language", language);
+            result = linter.run(testConfig);
+            assertEquals(1, result.asMap().size());
+            assertContainsError(result, "Validate language", String.format("Invalid language '%s', must only contain letters, numbers, underscores and dashes", language));
+        }
     }
 
     @Test

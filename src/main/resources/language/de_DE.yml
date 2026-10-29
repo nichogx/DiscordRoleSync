@@ -80,3 +80,5 @@ linkStatus:
 ##
 
 geyserUserNotFound: "Could not find this Geyser user. If the user exists, try joining a Geyser server such as `test.geysermc.org` and running the command again."
+
+reloadFailed: "Reload failed: config.yml is invalid, so the previous config is still in use. Check the console for details."

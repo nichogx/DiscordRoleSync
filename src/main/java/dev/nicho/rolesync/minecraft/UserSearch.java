@@ -5,6 +5,7 @@ import org.bukkit.Bukkit;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
@@ -42,11 +43,16 @@ public class UserSearch {
      *
      * @param name          the username
      * @param manualOffline if this request should be treated as offline when in manual mode
-     * @return a MojangSearchResult with the name and the uuid. All properties will be null if not found.
+     * @return a MojangSearchResult with the name and the uuid, or null if not found or the name is blank.
      * The name will have the correct capitalization if running on online mode
      * @throws IOException if an error occurs while looking for user
      */
     public @Nullable UserSearchResult nameToUUID(String name, boolean manualOffline) throws IOException {
+        // Otherwise, an offline UUID could be created for an empty name
+        if (name.isBlank()) {
+            return null;
+        }
+
         // Experimental! Geyser support
         if (isGeyser(name)) {
             return xboxAPI.searchName(name);
@@ -75,6 +81,19 @@ public class UserSearch {
                 name,
                 UUID.nameUUIDFromBytes(("OfflinePlayer:" + name).getBytes(StandardCharsets.UTF_8)).toString()
         );
+    }
+
+    /**
+     * Percent-encodes a value to be used as a single URL path segment.
+     * Slashes and dots are encoded too, so the value can't change the rest of the path.
+     *
+     * @param segment the value to encode
+     * @return the encoded value
+     */
+    static String encodePathSegment(String segment) {
+        return URLEncoder.encode(segment, StandardCharsets.UTF_8)
+                .replace("+", "%20")
+                .replace(".", "%2E");
     }
 
     /**

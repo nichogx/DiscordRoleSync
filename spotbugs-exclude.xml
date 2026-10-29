@@ -12,27 +12,6 @@
         <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
     </Match>
 
-    <!-- The table name comes from database.tablePrefix in the admin's config. All user input uses parameters -->
-    <Match>
-        <Class name="dev.nicho.rolesync.db.DatabaseHandler"/>
-        <Bug pattern="SQL_INJECTION_JDBC"/>
-    </Match>
-
-    <!-- File paths come from the plugin's data folder and the admin's config -->
-    <Match>
-        <Class name="dev.nicho.rolesync.RoleSync"/>
-        <Bug pattern="PATH_TRAVERSAL_IN"/>
-    </Match>
-
-    <!-- The username from /link is appended to the URL path, but can't change the host the request goes to -->
-    <Match>
-        <Or>
-            <Class name="dev.nicho.rolesync.minecraft.MojangAPI"/>
-            <Class name="dev.nicho.rolesync.minecraft.XboxAPI"/>
-        </Or>
-        <Bug pattern="URLCONNECTION_SSRF_FD"/>
-    </Match>
-
     <!-- Existing issues, ignored so new ones fail CI. Remove each entry when it's fixed -->
 
     <!-- Connections, statements and result sets are not closed if a query throws -->

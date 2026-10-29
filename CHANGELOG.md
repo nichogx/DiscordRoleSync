@@ -12,9 +12,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated JDA (the Discord library) to 6.7.0, which supports Discord's channel obfuscation, mandatory from November 16, 2026
 - Updated dependencies
 - Slightly smaller plugin JAR, as compile-time-only annotations are no longer bundled
+- Config validation now rejects a `database.tablePrefix` with characters other than letters, numbers and underscores, and a `language` with characters other than letters, numbers, underscores and dashes
 - Housekeeping: CI and build improvements
 
 ### Fixed
+- `/drs reload` now validates config.yml and keeps the previous config if it is invalid, instead of loading it and breaking linking and the whitelist
 - The startup warning for a bot missing the Manage Roles permission now actually appears
 - Modrinth no longer lists Folia as a supported platform, as the plugin does not run on Folia
 

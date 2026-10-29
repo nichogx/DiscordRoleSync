@@ -1,5 +1,6 @@
 package dev.nicho.rolesync.minecraft;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.json.JSONObject;
 
@@ -8,6 +9,7 @@ import java.io.InputStream;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 
+import static dev.nicho.rolesync.minecraft.UserSearch.encodePathSegment;
 import static dev.nicho.rolesync.minecraft.UserSearch.uuidAddDashes;
 
 public class MojangAPI {
@@ -49,8 +51,23 @@ public class MojangAPI {
         return null;
     }
 
+    /**
+     * Searches for a Java Edition user by name.
+     *
+     * @param name the username to search for
+     * @return the user, or null if not found
+     * @throws IOException if an error occurs while contacting the API
+     */
+    @SuppressFBWarnings(
+            value = "URLCONNECTION_SSRF_FD",
+            justification = "The host comes from the admin's config, and the name is percent-encoded so it can only change the last path segment"
+    )
     public UserSearchResult searchName(String name) throws IOException {
-        URL reqUrl = new URL(getMojangApiUrl(), "users/profiles/minecraft/" + name);
+        if (name.isEmpty()) {
+            return null;
+        }
+
+        URL reqUrl = new URL(getMojangApiUrl(), "users/profiles/minecraft/" + encodePathSegment(name));
         HttpURLConnection c = (HttpURLConnection) reqUrl.openConnection();
         c.setRequestMethod("GET");
 

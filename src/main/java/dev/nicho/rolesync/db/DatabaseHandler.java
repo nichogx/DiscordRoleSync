@@ -1,6 +1,7 @@
 package dev.nicho.rolesync.db;
 
 import dev.nicho.rolesync.RoleSync;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.bukkit.Bukkit;
 
 import java.security.SecureRandom;
@@ -26,6 +27,16 @@ public abstract class DatabaseHandler {
     }
 
     /**
+     * Gets the name of the table, from database.tablePrefix in the config.
+     * The table name is added to queries directly. It is validated by ConfigLinter.
+     *
+     * @return the table name
+     */
+    private String getTableName() {
+        return plugin.getConfig().getString("database.tablePrefix") + "_discordmcusers";
+    }
+
+    /**
      * Gets a connection for querying
      *
      * @return the connection
@@ -46,10 +57,11 @@ public abstract class DatabaseHandler {
      *
      * @throws SQLException if an SQL error occurs
      */
+    @SuppressFBWarnings(value = "SQL_INJECTION_JDBC", justification = "The table prefix is validated by ConfigLinter. All other values use parameters")
     protected void initialize() throws SQLException {
         Connection c = this.getConnection();
         PreparedStatement ps = c.prepareStatement(
-                "CREATE TABLE IF NOT EXISTS `" + plugin.getConfig().getString("database.tablePrefix") + "_discordmcusers` ("
+                "CREATE TABLE IF NOT EXISTS `" + getTableName() + "` ("
                         + "`discord_id` varchar(24) NOT NULL,"
                         + "`minecraft_uuid` varchar(36) NOT NULL,"
                         + "`whitelisted` boolean NOT NULL DEFAULT false,"
@@ -70,12 +82,13 @@ public abstract class DatabaseHandler {
      * @return the number of linked users
      * @throws SQLException if an SQL error occurs
      */
+    @SuppressFBWarnings(value = "SQL_INJECTION_JDBC", justification = "The table prefix is validated by ConfigLinter. All other values use parameters")
     public int getLinkedUserCount() throws SQLException {
         checkAsync();
 
         Connection c = this.getConnection();
         PreparedStatement ps = c.prepareStatement("SELECT COUNT(*) FROM "
-                + plugin.getConfig().getString("database.tablePrefix") + "_discordmcusers");
+                + getTableName());
 
         ResultSet res = ps.executeQuery();
         int ret = 0;
@@ -93,15 +106,14 @@ public abstract class DatabaseHandler {
      * @param minecraftUUID the Minecraft UUID of the user
      * @throws SQLException if an SQL error occurs
      */
+    @SuppressFBWarnings(value = "SQL_INJECTION_JDBC", justification = "The table prefix is validated by ConfigLinter. All other values use parameters")
     public void linkUser(String discordID, String minecraftUUID) throws SQLException {
         checkAsync();
 
         Connection c = this.getConnection();
         PreparedStatement ps = c.prepareStatement(
-                "INSERT INTO " + plugin.getConfig().getString("database.tablePrefix") +
-                        "_discordmcusers (discord_id, minecraft_uuid, verification_code) SELECT ?, ?, ? FROM (SELECT 1) " +
-                        "as A WHERE NOT EXISTS(SELECT * FROM " + plugin.getConfig().getString("database.tablePrefix") +
-                        "_discordmcusers WHERE minecraft_uuid = ?);"
+                "INSERT INTO " + getTableName() + " (discord_id, minecraft_uuid, verification_code) SELECT ?, ?, ? FROM (SELECT 1) " +
+                        "as A WHERE NOT EXISTS(SELECT * FROM " + getTableName() + " WHERE minecraft_uuid = ?);"
         );
 
         ps.setString(1, discordID);
@@ -121,12 +133,13 @@ public abstract class DatabaseHandler {
      * @param minecraftUsername the Minecraft username of the user
      * @throws SQLException if an SQL error occurs
      */
+    @SuppressFBWarnings(value = "SQL_INJECTION_JDBC", justification = "The table prefix is validated by ConfigLinter. All other values use parameters")
     public void updateUsername(String identifier, String minecraftUsername) throws SQLException {
         checkAsync();
 
         Connection c = this.getConnection();
         PreparedStatement ps = c.prepareStatement("UPDATE "
-                + plugin.getConfig().getString("database.tablePrefix") + "_discordmcusers "
+                + getTableName() + " "
                 + "SET username_when_linked = ? WHERE discord_id = ? OR minecraft_uuid = ?"
         );
 
@@ -145,12 +158,13 @@ public abstract class DatabaseHandler {
      * @param uuid the UUID of the user to whitelist.
      * @throws SQLException if an SQL error occurs
      */
+    @SuppressFBWarnings(value = "SQL_INJECTION_JDBC", justification = "The table prefix is validated by ConfigLinter. All other values use parameters")
     public void addToWhitelist(String uuid) throws SQLException {
         checkAsync();
 
         Connection c = this.getConnection();
         PreparedStatement ps = c.prepareStatement(
-                "UPDATE " + plugin.getConfig().getString("database.tablePrefix") + "_discordmcusers " +
+                "UPDATE " + getTableName() + " " +
                         "SET whitelisted = 1 WHERE minecraft_uuid = ?");
 
         ps.setString(1, uuid);
@@ -166,12 +180,13 @@ public abstract class DatabaseHandler {
      * @param uuid the UUID of the user to unwhitelist.
      * @throws SQLException if an SQL error occurs
      */
+    @SuppressFBWarnings(value = "SQL_INJECTION_JDBC", justification = "The table prefix is validated by ConfigLinter. All other values use parameters")
     public void removeFromWhitelist(String uuid) throws SQLException {
         checkAsync();
 
         Connection c = this.getConnection();
         PreparedStatement ps = c.prepareStatement(
-                "UPDATE " + plugin.getConfig().getString("database.tablePrefix") + "_discordmcusers " +
+                "UPDATE " + getTableName() + " " +
                         "SET whitelisted = 0 WHERE minecraft_uuid = ?");
 
         ps.setString(1, uuid);
@@ -187,12 +202,13 @@ public abstract class DatabaseHandler {
      * @param uuid the UUID of the user to unlink
      * @throws SQLException if an SQL error occurs
      */
+    @SuppressFBWarnings(value = "SQL_INJECTION_JDBC", justification = "The table prefix is validated by ConfigLinter. All other values use parameters")
     public void unlink(String uuid) throws SQLException {
         checkAsync();
 
         Connection c = this.getConnection();
         PreparedStatement ps = c.prepareStatement("DELETE FROM "
-                + plugin.getConfig().getString("database.tablePrefix") + "_discordmcusers WHERE minecraft_uuid = ?");
+                + getTableName() + " WHERE minecraft_uuid = ?");
 
         ps.setString(1, uuid);
 
@@ -209,12 +225,13 @@ public abstract class DatabaseHandler {
      * @param callback the callback. Receives a LinkedUserInfo object.
      * @throws SQLException if an SQL error occurs
      */
+    @SuppressFBWarnings(value = "SQL_INJECTION_JDBC", justification = "The table prefix is validated by ConfigLinter. All other values use parameters")
     public void forAllLinkedUsers(Consumer<LinkedUserInfo> callback) throws SQLException {
         checkAsync();
 
         Connection c = this.getConnection();
         PreparedStatement ps = c.prepareStatement("SELECT discord_id, minecraft_uuid, whitelisted, verification_code, verified, username_when_linked FROM "
-                + plugin.getConfig().getString("database.tablePrefix") + "_discordmcusers");
+                + getTableName());
 
         ResultSet rs = ps.executeQuery();
         while (rs.next()) {
@@ -238,12 +255,13 @@ public abstract class DatabaseHandler {
      * @return A LinkedUserInfo object with information about the user
      * @throws SQLException if an SQL error occurs
      */
+    @SuppressFBWarnings(value = "SQL_INJECTION_JDBC", justification = "The table prefix is validated by ConfigLinter. All other values use parameters")
     public LinkedUserInfo getLinkedUserInfo(String identifier) throws SQLException {
         checkAsync();
 
         Connection c = this.getConnection();
         PreparedStatement ps = c.prepareStatement("SELECT discord_id, minecraft_uuid, whitelisted, verification_code, verified, username_when_linked FROM "
-                + plugin.getConfig().getString("database.tablePrefix") + "_discordmcusers "
+                + getTableName() + " "
                 + "WHERE discord_id = ? OR minecraft_uuid = ?"
         );
 
@@ -280,7 +298,7 @@ public abstract class DatabaseHandler {
 
                 ps.close();
                 ps = c.prepareStatement("UPDATE "
-                        + plugin.getConfig().getString("database.tablePrefix") + "_discordmcusers "
+                        + getTableName() + " "
                         + "SET verification_code = ? WHERE discord_id = ? OR minecraft_uuid = ?"
                 );
 
@@ -305,6 +323,7 @@ public abstract class DatabaseHandler {
      * @return true if the verification was successful or false otherwise (user not linked or code incorrect)
      * @throws SQLException if an SQL error occurs
      */
+    @SuppressFBWarnings(value = "SQL_INJECTION_JDBC", justification = "The table prefix is validated by ConfigLinter. All other values use parameters")
     public boolean verify(String identifier, int verificationCode) throws SQLException {
         LinkedUserInfo userInfo = getLinkedUserInfo(identifier);
         if (userInfo == null) return false;
@@ -314,7 +333,7 @@ public abstract class DatabaseHandler {
         Connection c = this.getConnection();
 
         PreparedStatement ps = c.prepareStatement("UPDATE "
-                + plugin.getConfig().getString("database.tablePrefix") + "_discordmcusers "
+                + getTableName() + " "
                 + "SET verified = ? WHERE discord_id = ? OR minecraft_uuid = ?"
         );
 
