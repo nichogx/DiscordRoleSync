@@ -11,6 +11,7 @@ DiscordRoleSync is a Minecraft plugin (Spigot/Paper) that does one-way sync of D
 ```bash
 mvn package   # Build; output in target/discord_role_sync-{version}.jar
 mvn test      # Java tests
+mvn compile spotbugs:check   # Static analysis; ignored findings are in spotbugs-exclude.xml
 
 # Python tests
 cd ci && pip install -r requirements-dev.txt && pytest   # publishing scripts

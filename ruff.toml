@@ -13,7 +13,13 @@ select = [
     "UP",       # pyupgrade
     "SIM",      # flake8-simplify
     "PLR1722",  # use sys.exit() instead of exit()
+    "S",        # flake8-bandit (security)
 ]
 ignore = [
     "E501",     # long lines, mostly URLs
+]
+
+[lint.per-file-ignores]
+"**/test_*.py" = [
+    "S101",     # pytest uses assert
 ]
