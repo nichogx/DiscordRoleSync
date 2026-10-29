@@ -6,6 +6,18 @@ stages:
   - pre-publish
   - publish
 
+workflow:
+  auto_cancel:
+    # A new commit on the same branch cancels the old pipeline's interruptible jobs
+    on_new_commit: interruptible
+
+default:
+  # Jobs that publish set this to false, so a release is never cancelled halfway
+  interruptible: true
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
 include:
   - project: "renovate-bot/renovate-runner"
     file: "/templates/renovate-config-validator.gitlab-ci.yml"
@@ -13,10 +25,17 @@ include:
 ## Linting
 ###
 
+.python:
+  image: python:3.15-alpine
+  cache:
+    key: pip-$CI_JOB_NAME_SLUG
+    paths:
+      - .cache/pip/
+
 language-linter:
   stage: lint
+  extends: .python
 
-  image: python:3.15-alpine
   before_script:
     - cd src/test/language_validator
     - pip install -r requirements.txt
@@ -64,8 +83,8 @@ python-linter:
 
 python-infra-test:
   stage: test
+  extends: .python
 
-  image: python:3.15-alpine
   before_script:
     - cd spigot_page
     - pip install -r requirements.txt
@@ -80,8 +99,8 @@ python-infra-test:
 
 python-ci-test:
   stage: test
+  extends: .python
 
-  image: python:3.15-alpine
   before_script:
     - cd ci
     - pip install -r requirements-dev.txt
@@ -147,8 +166,8 @@ maven-package:
 
 validate-release:
   stage: validate-release
+  extends: .python
 
-  image: python:3.15-alpine
   rules:
     - if: $CI_COMMIT_TAG
   before_script:
@@ -159,6 +178,7 @@ validate-release:
 
 gitlab-registry:
   stage: pre-publish
+  interruptible: false
 
   image: curlimages/curl:latest
   rules:
@@ -178,8 +198,9 @@ gitlab-registry:
 
 publish-gitlab:
   stage: publish
+  extends: .python
+  interruptible: false
 
-  image: python:3.15-alpine
   rules:
     - if: $CI_COMMIT_TAG
   before_script:
@@ -190,8 +211,9 @@ publish-gitlab:
 
 publish-modrinth:
   stage: publish
+  extends: .python
+  interruptible: false
 
-  image: python:3.15-alpine
   rules:
     - if: $CI_COMMIT_TAG
   before_script:
@@ -202,8 +224,9 @@ publish-modrinth:
 
 publish-hangar:
   stage: publish
+  extends: .python
+  interruptible: false
 
-  image: python:3.15-alpine
   rules:
     - if: $CI_COMMIT_TAG
   before_script:
@@ -217,8 +240,8 @@ publish-hangar:
 
 generate-spigot-description:
   stage: build
+  extends: .python
 
-  image: python:3.15-alpine
   before_script:
     - cd spigot_page
     - pip install -r requirements.txt
