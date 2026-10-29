@@ -14,7 +14,6 @@ mvn test      # Java tests
 
 # Python tests
 cd ci && pip install -r requirements-dev.txt && pytest   # publishing scripts
-cd spigot_page && pip install -r requirements.txt && pytest
 
 # Lint Python scripts (config in ruff.toml)
 ruff check .

@@ -76,4 +76,4 @@ As far as I can tell, Spigot does not have an API for automatic uploads.
   - Publish a new version with the .jar direct download link from the GitLab release
   - The version's changelog needs to be **manually** translated from CHANGELOG.md to Spigot's format
     - The translation script can also be run locally
-  - The description is automatically generated to bbcode in an artifact, but must be **manually** updated. Badges must be **manually** removed.
+  - The description is automatically generated to bbcode in an artifact (with Pandoc and `spigot_page/spigot_bbcode.lua`), but must be **manually** updated.

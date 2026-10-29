@@ -81,22 +81,6 @@ python-linter:
     paths:
       - .m2/repository/
 
-python-infra-test:
-  stage: test
-  extends: .python
-
-  before_script:
-    - cd spigot_page
-    - pip install -r requirements.txt
-  script:
-    - pytest --junitxml=report.xml
-  artifacts:
-    expire_in: 30 days
-    paths:
-      - spigot_page/report.xml
-    reports:
-      junit: spigot_page/report.xml
-
 python-ci-test:
   stage: test
   extends: .python
@@ -250,13 +234,12 @@ publish-hangar:
 
 generate-spigot-description:
   stage: build
-  extends: .python
+  image:
+    name: pandoc/core:3.11
+    entrypoint: [""]
 
-  before_script:
-    - cd spigot_page
-    - pip install -r requirements.txt
   script:
-    - python markdown_to_bbcode.py ../README.md --out ./spigot_page.bb
+    - pandoc -f gfm -t bbcode_xenforo --lua-filter spigot_page/spigot_bbcode.lua README.md -o spigot_page/spigot_page.bb
   artifacts:
     expire_in: 30 days
     paths:
