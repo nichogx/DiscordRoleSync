@@ -2,7 +2,6 @@ test_server/
 
 *.jar
 *.class
-*.bb
 *.bbcode
 
 # Intellij

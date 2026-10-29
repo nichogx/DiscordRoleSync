@@ -175,17 +175,11 @@ gitlab-registry:
     - if: $CI_COMMIT_TAG
   retry: !reference [.retry-on-infra-failure, retry]
   script:
-    - |
-      PACKAGE_URL=${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/discord_role_sync/${CI_COMMIT_TAG}/discord_role_sync-${CI_COMMIT_TAG}.jar
-      # Skip if already uploaded, e.g. when retrying the job
-      if curl --fail --silent --output /dev/null --header "JOB-TOKEN: ${CI_JOB_TOKEN}" "$PACKAGE_URL"; then
-        echo "Package already exists. Skipping upload."
-        exit 0
-      fi
-      curl --fail-with-body \
-        --header "JOB-TOKEN: ${CI_JOB_TOKEN}" \
-        --upload-file target/discord_role_sync-${CI_COMMIT_TAG}.jar \
-        "$PACKAGE_URL"
+    # The Spigot files are linked in the GitLab release, for the manual Spigot upload
+    - ./ci/upload_package.sh
+      target/discord_role_sync-${CI_COMMIT_TAG}.jar
+      spigot_page/spigot_page.bbcode
+      spigot_page/spigot_changelog.bbcode
 
 publish-gitlab:
   stage: publish
@@ -229,7 +223,7 @@ publish-hangar:
   script:
     - python publish_hangar.py
 
-## Generate Spigot page description
+## Generate Spigot page description and changelog
 ###
 
 generate-spigot-description:
@@ -239,8 +233,15 @@ generate-spigot-description:
     entrypoint: [""]
 
   script:
-    - pandoc -f gfm -t bbcode_xenforo --lua-filter spigot_page/spigot_bbcode.lua README.md -o spigot_page/spigot_page.bb
+    - pandoc -f gfm -t bbcode_xenforo --lua-filter spigot_page/spigot_bbcode.lua README.md -o spigot_page/spigot_page.bbcode
+    - |
+      if [ -n "$CI_COMMIT_TAG" ]; then
+        apk add --no-cache python3
+        (cd ci && python3 export_changelog.py "$CI_COMMIT_TAG" --out ../spigot_page/spigot_changelog.md)
+        pandoc -f gfm -t bbcode_xenforo --lua-filter spigot_page/spigot_bbcode.lua spigot_page/spigot_changelog.md -o spigot_page/spigot_changelog.bbcode
+      fi
   artifacts:
     expire_in: 30 days
     paths:
-      - spigot_page/spigot_page.bb
+      - spigot_page/spigot_page.bbcode
+      - spigot_page/spigot_changelog.bbcode

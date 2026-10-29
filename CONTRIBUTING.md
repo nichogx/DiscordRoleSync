@@ -74,6 +74,6 @@ As far as I can tell, Spigot does not have an API for automatic uploads.
   - There's no beta channel in Spigot
 - Publishing and description updates are **manual**
   - Publish a new version with the .jar direct download link from the GitLab release
-  - The version's changelog needs to be **manually** translated from CHANGELOG.md to Spigot's format
-    - The translation script can also be run locally
-  - The description is automatically generated to bbcode in an artifact (with Pandoc and `spigot_page/spigot_bbcode.lua`), but must be **manually** updated.
+  - The version's changelog is converted from CHANGELOG.md to BBCode by CI and linked in the GitLab release, but must be **manually** pasted into Spigot
+    - It can also be generated locally with `ci/export_changelog.py` and Pandoc, like the `generate-spigot-description` CI job
+  - The description is automatically generated to BBCode (with Pandoc and `spigot_page/spigot_bbcode.lua`) and linked in the GitLab release, but must be **manually** updated.

@@ -31,6 +31,9 @@ if __name__ == "__main__":
         print("Not publishing version to Gitlab Releases, as it's not a full release.")
         sys.exit(0)
 
+    # Uploaded by the gitlab-registry job
+    package_url = f"{CI_API_V4_URL}/projects/{CI_PROJECT_ID}/packages/generic/discord_role_sync/{CI_COMMIT_TAG}"
+
     # Publish artifact
     print(f"Publishing new version '{CI_COMMIT_TAG}' to GitLab Releases...")
     r = requests.post(
@@ -46,8 +49,16 @@ if __name__ == "__main__":
             "assets": {
                 "links": [{
                     "name": f"discord_role_sync-{CI_COMMIT_TAG}.jar",
-                    "url": f"{CI_API_V4_URL}/projects/{CI_PROJECT_ID}/packages/generic/discord_role_sync/{CI_COMMIT_TAG}/discord_role_sync-{CI_COMMIT_TAG}.jar",
+                    "url": f"{package_url}/discord_role_sync-{CI_COMMIT_TAG}.jar",
                     "link_type": "package",
+                }, {
+                    "name": "Spigot page description (BBCode)",
+                    "url": f"{package_url}/spigot_page.bbcode",
+                    "link_type": "other",
+                }, {
+                    "name": "Spigot changelog (BBCode)",
+                    "url": f"{package_url}/spigot_changelog.bbcode",
+                    "link_type": "other",
                 }]
             }
         },
