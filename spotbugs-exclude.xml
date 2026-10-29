@@ -11,12 +11,4 @@
     <Match>
         <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
     </Match>
-
-    <!-- Existing issues, ignored so new ones fail CI. Remove each entry when it's fixed -->
-
-    <!-- Connections, statements and result sets are not closed if a query throws -->
-    <Match>
-        <Class name="dev.nicho.rolesync.db.DatabaseHandler"/>
-        <Bug pattern="OBL_UNSATISFIED_OBLIGATION,ODR_OPEN_DATABASE_RESOURCE"/>
-    </Match>
 </FindBugsFilter>

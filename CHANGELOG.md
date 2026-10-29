@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - `/drs reload` now validates config.yml and keeps the previous config if it is invalid, instead of loading it and breaking linking and the whitelist
 - The startup warning for a bot missing the Manage Roles permission now actually appears
+- MySQL connections are no longer leaked when a database query fails, which could eventually exhaust the connection pool and stop linking from working
 - Modrinth no longer lists Folia as a supported platform, as the plugin does not run on Folia
 - Accented characters in built-in translations (e.g. Portuguese) no longer show up garbled on servers whose system encoding isn't UTF-8, such as many Windows servers
 - Linked members who leave, are kicked or are banned from the Discord server are now removed from the whitelist even if the bot hadn't cached them yet

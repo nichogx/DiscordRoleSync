@@ -60,7 +60,7 @@ public abstract class DatabaseHandler {
     @SuppressFBWarnings(value = "SQL_INJECTION_JDBC", justification = "The table prefix is validated by ConfigLinter. All other values use parameters")
     protected void initialize() throws SQLException {
         Connection c = this.getConnection();
-        PreparedStatement ps = c.prepareStatement(
+        try (PreparedStatement ps = c.prepareStatement(
                 "CREATE TABLE IF NOT EXISTS `" + getTableName() + "` ("
                         + "`discord_id` varchar(24) NOT NULL,"
                         + "`minecraft_uuid` varchar(36) NOT NULL,"
@@ -69,11 +69,11 @@ public abstract class DatabaseHandler {
                         + "`verified` boolean NOT NULL DEFAULT false,"
                         + "`username_when_linked` TEXT NULL,"
                         + "PRIMARY KEY (`discord_id`));"
-        );
-
-        ps.execute();
-
-        this.closeConnection(c);
+        )) {
+            ps.execute();
+        } finally {
+            this.closeConnection(c);
+        }
     }
 
     /**
@@ -87,16 +87,16 @@ public abstract class DatabaseHandler {
         checkAsync();
 
         Connection c = this.getConnection();
-        PreparedStatement ps = c.prepareStatement("SELECT COUNT(*) FROM "
+        try (PreparedStatement ps = c.prepareStatement("SELECT COUNT(*) FROM "
                 + getTableName());
+             ResultSet res = ps.executeQuery()) {
+            int ret = 0;
+            if (res.next()) ret = res.getInt(1);
 
-        ResultSet res = ps.executeQuery();
-        int ret = 0;
-        if (res.next()) ret = res.getInt(1);
-
-        this.closeConnection(c);
-
-        return ret;
+            return ret;
+        } finally {
+            this.closeConnection(c);
+        }
     }
 
     /**
@@ -111,19 +111,19 @@ public abstract class DatabaseHandler {
         checkAsync();
 
         Connection c = this.getConnection();
-        PreparedStatement ps = c.prepareStatement(
+        try (PreparedStatement ps = c.prepareStatement(
                 "INSERT INTO " + getTableName() + " (discord_id, minecraft_uuid, verification_code) SELECT ?, ?, ? FROM (SELECT 1) " +
                         "as A WHERE NOT EXISTS(SELECT * FROM " + getTableName() + " WHERE minecraft_uuid = ?);"
-        );
+        )) {
+            ps.setString(1, discordID);
+            ps.setString(2, minecraftUUID);
+            ps.setInt(3, random.nextInt(900000) + 100000);
+            ps.setString(4, minecraftUUID);
 
-        ps.setString(1, discordID);
-        ps.setString(2, minecraftUUID);
-        ps.setInt(3, random.nextInt(900000) + 100000);
-        ps.setString(4, minecraftUUID);
-
-        ps.execute();
-
-        this.closeConnection(c);
+            ps.execute();
+        } finally {
+            this.closeConnection(c);
+        }
     }
 
     /**
@@ -138,18 +138,18 @@ public abstract class DatabaseHandler {
         checkAsync();
 
         Connection c = this.getConnection();
-        PreparedStatement ps = c.prepareStatement("UPDATE "
+        try (PreparedStatement ps = c.prepareStatement("UPDATE "
                 + getTableName() + " "
                 + "SET username_when_linked = ? WHERE discord_id = ? OR minecraft_uuid = ?"
-        );
+        )) {
+            ps.setString(1, minecraftUsername);
+            ps.setString(2, identifier);
+            ps.setString(3, identifier);
 
-        ps.setString(1, minecraftUsername);
-        ps.setString(2, identifier);
-        ps.setString(3, identifier);
-
-        ps.execute();
-
-        this.closeConnection(c);
+            ps.execute();
+        } finally {
+            this.closeConnection(c);
+        }
     }
 
     /**
@@ -163,15 +163,15 @@ public abstract class DatabaseHandler {
         checkAsync();
 
         Connection c = this.getConnection();
-        PreparedStatement ps = c.prepareStatement(
+        try (PreparedStatement ps = c.prepareStatement(
                 "UPDATE " + getTableName() + " " +
-                        "SET whitelisted = 1 WHERE minecraft_uuid = ?");
+                        "SET whitelisted = 1 WHERE minecraft_uuid = ?")) {
+            ps.setString(1, uuid);
 
-        ps.setString(1, uuid);
-
-        ps.execute();
-
-        this.closeConnection(c);
+            ps.execute();
+        } finally {
+            this.closeConnection(c);
+        }
     }
 
     /**
@@ -185,15 +185,15 @@ public abstract class DatabaseHandler {
         checkAsync();
 
         Connection c = this.getConnection();
-        PreparedStatement ps = c.prepareStatement(
+        try (PreparedStatement ps = c.prepareStatement(
                 "UPDATE " + getTableName() + " " +
-                        "SET whitelisted = 0 WHERE minecraft_uuid = ?");
+                        "SET whitelisted = 0 WHERE minecraft_uuid = ?")) {
+            ps.setString(1, uuid);
 
-        ps.setString(1, uuid);
-
-        ps.execute();
-
-        this.closeConnection(c);
+            ps.execute();
+        } finally {
+            this.closeConnection(c);
+        }
     }
 
     /**
@@ -207,14 +207,14 @@ public abstract class DatabaseHandler {
         checkAsync();
 
         Connection c = this.getConnection();
-        PreparedStatement ps = c.prepareStatement("DELETE FROM "
-                + getTableName() + " WHERE minecraft_uuid = ?");
+        try (PreparedStatement ps = c.prepareStatement("DELETE FROM "
+                + getTableName() + " WHERE minecraft_uuid = ?")) {
+            ps.setString(1, uuid);
 
-        ps.setString(1, uuid);
-
-        ps.execute();
-
-        this.closeConnection(c);
+            ps.execute();
+        } finally {
+            this.closeConnection(c);
+        }
 
         removeFromWhitelist(uuid);
     }
@@ -230,22 +230,22 @@ public abstract class DatabaseHandler {
         checkAsync();
 
         Connection c = this.getConnection();
-        PreparedStatement ps = c.prepareStatement("SELECT discord_id, minecraft_uuid, whitelisted, verification_code, verified, username_when_linked FROM "
+        try (PreparedStatement ps = c.prepareStatement("SELECT discord_id, minecraft_uuid, whitelisted, verification_code, verified, username_when_linked FROM "
                 + getTableName());
-
-        ResultSet rs = ps.executeQuery();
-        while (rs.next()) {
-            callback.accept(new LinkedUserInfo(
-                    rs.getString(1), // discord id
-                    rs.getString(2), // minecraft uuid
-                    rs.getBoolean(3), // whitelisted
-                    rs.getBoolean(5), // verified
-                    rs.getInt(4), // verification code
-                    rs.getString(6) // username when linked
-            ));
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                callback.accept(new LinkedUserInfo(
+                        rs.getString(1), // discord id
+                        rs.getString(2), // minecraft uuid
+                        rs.getBoolean(3), // whitelisted
+                        rs.getBoolean(5), // verified
+                        rs.getInt(4), // verification code
+                        rs.getString(6) // username when linked
+                ));
+            }
+        } finally {
+            this.closeConnection(c);
         }
-
-        this.closeConnection(c);
     }
 
     /**
@@ -260,59 +260,56 @@ public abstract class DatabaseHandler {
         checkAsync();
 
         Connection c = this.getConnection();
-        PreparedStatement ps = c.prepareStatement("SELECT discord_id, minecraft_uuid, whitelisted, verification_code, verified, username_when_linked FROM "
-                + getTableName() + " "
-                + "WHERE discord_id = ? OR minecraft_uuid = ?"
-        );
+        try {
+            LinkedUserInfo ret;
+            try (PreparedStatement ps = c.prepareStatement("SELECT discord_id, minecraft_uuid, whitelisted, verification_code, verified, username_when_linked FROM "
+                    + getTableName() + " "
+                    + "WHERE discord_id = ? OR minecraft_uuid = ?"
+            )) {
+                ps.setString(1, identifier);
+                ps.setString(2, identifier);
 
-        ps.setString(1, identifier);
-        ps.setString(2, identifier);
+                try (ResultSet res = ps.executeQuery()) {
+                    if (!res.next()) return null;
 
-        ResultSet res = ps.executeQuery();
+                    ret = new LinkedUserInfo(
+                            res.getString(1), // discord id
+                            res.getString(2), // minecraft uuid
+                            res.getBoolean(3), // whitelisted
+                            res.getBoolean(5), // verified
+                            res.getInt(4), // verification code
+                            res.getString(6) // username when linked
+                    );
+                }
+            }
 
-        LinkedUserInfo ret = null;
-        if (res.next()) {
-            int verificationCode = res.getInt(4);
+            if (ret.code != 0) return ret;
 
-            if (verificationCode != 0) {
-                ret = new LinkedUserInfo(
-                        res.getString(1), // discord id
-                        res.getString(2), // minecraft uuid
-                        res.getBoolean(3), // whitelisted
-                        res.getBoolean(5), // verified
-                        verificationCode,
-                        res.getString(6) // username when linked
-                );
-            } else {
-                // probably from old version (migrated database)
-                // verification info does not exist. Create and return new.
-                verificationCode = random.nextInt(900000) + 100000;
-                ret = new LinkedUserInfo(
-                        res.getString(1), // discord id
-                        res.getString(2), // minecraft uuid
-                        res.getBoolean(3), // whitelisted
-                        false, // verified
-                        verificationCode,
-                        res.getString(6) // username when linked
-                );
-
-                ps.close();
-                ps = c.prepareStatement("UPDATE "
-                        + getTableName() + " "
-                        + "SET verification_code = ? WHERE discord_id = ? OR minecraft_uuid = ?"
-                );
-
+            // probably from old version (migrated database)
+            // verification info does not exist. Create and return new.
+            int verificationCode = random.nextInt(900000) + 100000;
+            try (PreparedStatement ps = c.prepareStatement("UPDATE "
+                    + getTableName() + " "
+                    + "SET verification_code = ? WHERE discord_id = ? OR minecraft_uuid = ?"
+            )) {
                 ps.setInt(1, verificationCode);
                 ps.setString(2, identifier);
                 ps.setString(3, identifier);
 
                 ps.execute();
             }
+
+            return new LinkedUserInfo(
+                    ret.discordId,
+                    ret.uuid,
+                    ret.whitelisted,
+                    false, // verified
+                    verificationCode,
+                    ret.username
+            );
+        } finally {
+            this.closeConnection(c);
         }
-
-        this.closeConnection(c);
-
-        return ret;
     }
 
     /**
@@ -331,19 +328,18 @@ public abstract class DatabaseHandler {
         if (userInfo.code != verificationCode) return false;
 
         Connection c = this.getConnection();
-
-        PreparedStatement ps = c.prepareStatement("UPDATE "
+        try (PreparedStatement ps = c.prepareStatement("UPDATE "
                 + getTableName() + " "
                 + "SET verified = ? WHERE discord_id = ? OR minecraft_uuid = ?"
-        );
+        )) {
+            ps.setBoolean(1, true);
+            ps.setString(2, identifier);
+            ps.setString(3, identifier);
 
-        ps.setBoolean(1, true);
-        ps.setString(2, identifier);
-        ps.setString(3, identifier);
-
-        ps.execute();
-
-        closeConnection(c);
+            ps.execute();
+        } finally {
+            closeConnection(c);
+        }
 
         return true;
     }
