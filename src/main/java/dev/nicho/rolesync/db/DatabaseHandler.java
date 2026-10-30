@@ -53,6 +53,14 @@ public abstract class DatabaseHandler {
     protected abstract void closeConnection(Connection c) throws SQLException;
 
     /**
+     * Closes the database, releasing its connections and file locks.
+     * The handler can't be used after this.
+     *
+     * @throws SQLException if an SQL error occurs
+     */
+    public abstract void close() throws SQLException;
+
+    /**
      * Initializes the database, creating tables if needed.
      *
      * @throws SQLException if an SQL error occurs

@@ -225,6 +225,15 @@ public class RoleSync extends JavaPlugin {
             for (MetricCacher<?> cacher : metricCaches.values()) {
                 cacher.stop();
             }
+
+            // Close the database after the bot, since bot events use it
+            if (this.db != null) {
+                try {
+                    this.db.close();
+                } catch (SQLException e) {
+                    getLogger().warning("Unable to close the database.\n" + e.getMessage());
+                }
+            }
         }
     }
 

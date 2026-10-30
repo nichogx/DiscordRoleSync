@@ -12,6 +12,7 @@ public final class SQLiteHandler extends DatabaseHandler {
 
     private final File db;
     private Connection connection;
+    private boolean closed = false;
 
     public SQLiteHandler(RoleSync plugin, File db) throws IOException, SQLException {
         super(plugin);
@@ -35,7 +36,11 @@ public final class SQLiteHandler extends DatabaseHandler {
     }
 
     @Override
-    protected Connection getConnection() throws SQLException {
+    protected synchronized Connection getConnection() throws SQLException {
+        if (closed) {
+            throw new SQLException("The SQLite database has been closed.");
+        }
+
         if (connection != null && !connection.isClosed()) {
             return connection;
         }
@@ -47,5 +52,13 @@ public final class SQLiteHandler extends DatabaseHandler {
     @Override
     protected void closeConnection(Connection c) {
         // do nothing. SQLite's connection will be kept open forever
+    }
+
+    @Override
+    public synchronized void close() throws SQLException {
+        closed = true;
+        if (connection != null) {
+            connection.close();
+        }
     }
 }

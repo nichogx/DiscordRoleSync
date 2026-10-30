@@ -37,4 +37,9 @@ public final class MySQLHandler extends DatabaseHandler {
     protected void closeConnection(Connection c) throws SQLException {
         c.close();
     }
+
+    @Override
+    public void close() throws SQLException {
+        ds.close();
+    }
 }
