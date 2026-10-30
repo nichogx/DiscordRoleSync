@@ -46,6 +46,14 @@ Local builds use version `develop`. CI sets versions from tags/branches.
 - **Java:** Must stay Java 17 API compatible (enforced by `maven.compiler.release=17`).
 - **Minecraft:** Supports 1.8.8 to 1.21+, compiled against Spigot API 1.12.2. Be careful with APIs that don't exist on 1.8.8.
 
+## Writing Tests
+Only write tests that would fail if the code broke. No tautological tests (a mock returns X, then you assert X), no tests for trivial getters or delegation, and no tests that just repeat the implementation as `when`/`verify` calls.
+
+- Assert on the end result (database rows, a player's groups, the migrated config) rather than which methods were called.
+- Use real objects where it's cheap: SQLite in a `@TempDir`, `YamlConfiguration` loaded from a string. Only mock Bukkit `Server`, Discord, HTTP APIs and Vault permission providers.
+- Write expected values out literally. Don't compute them with the code under test.
+- Every bug fix gets a regression test that fails without the fix.
+
 ## Config Changes
 - Never manually edit `configVersion` in config.yml.
 - When changing config structure, add a migration to `ConfigMigrator` (`config/migrations/`) and test migrating from each supported version to latest.
