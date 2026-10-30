@@ -15,7 +15,7 @@ A list of managed Discord roles can be configured and linked o Minecraft groups.
 
 This can use both SQLite (automatically created, no setup needed) or MySQL. MySQL is recommended for stability on large servers.
 
-This plugin has been tested on Minecraft versions 1.8.8 to 1.21.
+This plugin has been tested on Minecraft versions 1.8.8 to 26.1.2.
 
 ## Features
 

@@ -8,7 +8,9 @@ from common import (
     ReleaseType,
     get_changelog,
     get_jar_path,
+    get_modrinth_user_agent,
 )
+from game_versions import get_hangar_game_versions, get_modrinth_game_versions
 
 # Validates a tagged release before anything is published, so a bad release
 # fails before any platform has received it.
@@ -43,6 +45,17 @@ if __name__ == "__main__":
         jar_version = match.group(1) if match else None
         if jar_version != CI_COMMIT_TAG:
             errors.append(f"plugin.yml version is '{jar_version}', expected '{CI_COMMIT_TAG}'")
+
+    # Publishing fails if a platform does not know the supported versions yet, e.g. right after a Minecraft release
+    try:
+        get_modrinth_game_versions(get_modrinth_user_agent(CI_COMMIT_TAG))
+    except Exception as e:
+        errors.append(str(e))
+
+    try:
+        get_hangar_game_versions()
+    except Exception as e:
+        errors.append(str(e))
 
     if errors:
         print(f"Release '{CI_COMMIT_TAG}' failed validation:")

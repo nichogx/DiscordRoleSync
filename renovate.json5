@@ -2,5 +2,45 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:recommended"
+  ],
+  "customDatasources": {
+    // Minecraft releases from Mojang, without snapshots
+    "minecraft": {
+      "defaultRegistryUrlTemplate": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
+      "transformTemplates": [
+        "{\"releases\": versions[type = \"release\"].{\"version\": id, \"releaseTimestamp\": releaseTime}}"
+      ]
+    }
+  },
+  "customManagers": [
+    {
+      // Newest supported Minecraft version, sent to Modrinth and Hangar when publishing
+      "customType": "regex",
+      "managerFilePatterns": ["/^ci/game_versions\\.py$/"],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)\\s+MAX_GAME_VERSION = \"(?<currentValue>[^\"]+)\""
+      ],
+      "versioningTemplate": "loose"
+    },
+    {
+      // Supported versions in the README. Matches the sentence instead of a marker comment,
+      // since the README is also the Modrinth, Hangar and Spigot description
+      "customType": "regex",
+      "managerFilePatterns": ["/^README\\.md$/"],
+      "matchStrings": [
+        "tested on Minecraft versions \\S+ to (?<currentValue>\\d+(?:\\.\\d+)*)"
+      ],
+      "datasourceTemplate": "custom.minecraft",
+      "depNameTemplate": "minecraft",
+      "versioningTemplate": "loose"
+    }
+  ],
+  "packageRules": [
+    {
+      // A new Minecraft version must be tested before claiming support
+      "matchDatasources": ["custom.minecraft"],
+      "automerge": false,
+      "commitMessageTopic": "supported Minecraft version"
+    }
   ]
 }

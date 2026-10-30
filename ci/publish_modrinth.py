@@ -9,28 +9,12 @@ from common import (
     ReleaseType,
     get_changelog,
     get_jar_path,
+    get_modrinth_user_agent,
     get_readme,
 )
+from game_versions import get_modrinth_game_versions
 
 PROJECT_ID = "g5nO2LNq"
-
-SUPPORTED_GAME_VERSIONS = [
-    "1.8", "1.8.1", "1.8.2", "1.8.3", "1.8.4", "1.8.5", "1.8.6", "1.8.7", "1.8.8", "1.8.9",
-    "1.9", "1.9.1", "1.9.2", "1.9.3", "1.9.4",
-    "1.10", "1.10.1", "1.10.2",
-    "1.11", "1.11.1", "1.11.2",
-    "1.12", "1.12.1", "1.12.2",
-    "1.13", "1.13.1", "1.13.2",
-    "1.14", "1.14.1", "1.14.2", "1.14.3", "1.14.4",
-    "1.15", "1.15.1", "1.15.2",
-    "1.16", "1.16.1", "1.16.2", "1.16.3", "1.16.4", "1.16.5",
-    "1.17", "1.17.1",
-    "1.18", "1.18.1", "1.18.2",
-    "1.19", "1.19.1", "1.19.2", "1.19.3", "1.19.4",
-    "1.20", "1.20.1", "1.20.2", "1.20.3", "1.20.4", "1.20.5", "1.20.6",
-    "1.21", "1.21.1", "1.21.2", "1.21.3", "1.21.4", "1.21.5", "1.21.6", "1.21.7", "1.21.8", "1.21.9", "1.21.10", "1.21.11",
-    "26.1", "26.1.1", "26.1.2",
-]
 
 if __name__ == "__main__":
     CI_COMMIT_TAG = os.getenv("CI_COMMIT_TAG")
@@ -41,8 +25,7 @@ if __name__ == "__main__":
     if not MODRINTH_API_KEY:
         raise Exception("MODRINTH_API_KEY not set. Will not upload version.")
 
-    # Modrinth wants a custom User-Agent: https://docs.modrinth.com/#section/User-Agents
-    user_agent = f"nichogx/DiscordRoleSync/{CI_COMMIT_TAG} (nicho@nicho.dev)"
+    user_agent = get_modrinth_user_agent(CI_COMMIT_TAG)
 
     # Publish to the correct channel
     release_type = ReleaseType.get_release_type(CI_COMMIT_TAG)
@@ -66,7 +49,8 @@ if __name__ == "__main__":
         raise Exception(f"Error checking for existing Modrinth version: HTTP {existing_r.status_code} {existing_r.text}")
     else:
         # Publish artifact
-        print(f"Publishing new version '{CI_COMMIT_TAG}' to Modrinth channel '{channel}'...")
+        game_versions = get_modrinth_game_versions(user_agent)
+        print(f"Publishing new version '{CI_COMMIT_TAG}' to Modrinth channel '{channel}' for Minecraft {', '.join(game_versions)}...")
         with open(get_jar_path(CI_COMMIT_TAG), "rb") as file:
             r = requests.post(
                 "https://api.modrinth.com/v2/version",
@@ -87,7 +71,7 @@ if __name__ == "__main__":
                         # Modrinth only allows dependencies to other Modrinth plugin, and Vault is not on Modrinth
                         "dependencies": [],
 
-                        "game_versions": SUPPORTED_GAME_VERSIONS,
+                        "game_versions": game_versions,
                         "version_type": channel,
                         "loaders": ["paper", "spigot", "bukkit", "purpur"],
                         "featured": release_type == ReleaseType.RELEASE,

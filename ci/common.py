@@ -9,6 +9,11 @@ REQUEST_TIMEOUT = (10, 120)
 MAX_JAR_SIZE = 10_000_000
 
 
+def get_modrinth_user_agent(version):
+    # Modrinth wants a custom User-Agent: https://docs.modrinth.com/#section/User-Agents
+    return f"nichogx/DiscordRoleSync/{version} (nicho@nicho.dev)"
+
+
 def get_jar_path(version):
     return f"../target/discord_role_sync-{version}.jar"
 

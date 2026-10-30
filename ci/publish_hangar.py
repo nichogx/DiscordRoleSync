@@ -12,12 +12,7 @@ from common import (
     get_jar_path,
     get_readme,
 )
-
-SUPPORTED_GAME_VERSIONS = [
-    "1.8", "1.8.8", # Hangar does not list all 1.8 versions
-    "1.9.x", "1.10.x", "1.11.x", "1.12.x", "1.13.x", "1.14.x", "1.15.x", "1.16.x", "1.17.x",
-    "1.18.x", "1.19.x", "1.20.x", "1.21.x", "26.1.x",
-]
+from game_versions import get_hangar_game_versions
 
 if __name__ == "__main__":
     CI_COMMIT_TAG = os.getenv("CI_COMMIT_TAG")
@@ -64,7 +59,8 @@ if __name__ == "__main__":
         raise Exception(f"Error checking for existing Hangar version: HTTP {existing_r.status_code} {existing_r.text}")
     else:
         # Publish artifact
-        print(f"Publishing new version '{CI_COMMIT_TAG}' to Hangar channel '{channel}'...")
+        game_versions = get_hangar_game_versions()
+        print(f"Publishing new version '{CI_COMMIT_TAG}' to Hangar channel '{channel}' for Minecraft {', '.join(game_versions)}...")
         with open(file_path, "rb") as file:
             r = requests.post(
                 "https://hangar.papermc.io/api/v1/projects/nichogx/DiscordRoleSync/upload",
@@ -86,7 +82,7 @@ if __name__ == "__main__":
                             }],
                         },
                         "platformDependencies": {
-                            "PAPER": SUPPORTED_GAME_VERSIONS,
+                            "PAPER": game_versions,
                         },
                         "description": get_changelog(CI_COMMIT_TAG),
                         "files": [{
