@@ -38,7 +38,7 @@ Local builds use version `develop`. CI sets versions from tags/branches.
 ## Code Conventions
 
 - **Permissions:** Go through `plugin.getVault()` for permission and group operations. Never instantiate `VaultAPI` directly.
-- **Async:** All database operations must run off the main thread via `plugin.getServer().getScheduler().runTaskAsynchronously()`. `checkAsync()` in `DatabaseHandler` throws if you don't.
+- **Async:** All database operations must run off the main thread via `plugin.getServer().getScheduler().runTaskAsynchronously()`. `checkAsync()` in `DatabaseHandler` warns in dev environments if you don't.
 - **Debug logging:** Use `plugin.debugLog()` for debug output. It is only shown in dev builds or when `enableDebugLogging: true`.
 - **Shaded JDA:** JDA is relocated to `DiscordRoleSync.net.dv8tion`, so IDE import paths won't match runtime paths.
 
