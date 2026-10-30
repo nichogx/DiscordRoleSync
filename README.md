@@ -62,6 +62,8 @@ The Discord ID of the user is a 17 to 20-digit number.
 The `/info` and `/unlink` commands are available for staff use. Both accept Discord IDs or Minecraft usernames. By default, these three admin commands are available for everyone that has the `MANAGE ROLES` Discord permission. This can be modified in your Discord server.
 The users need to remain in the Discord server to keep their roles. If they leave the server or are unlinked with the `/unlink` command, they are removed from the whitelist and every role is removed from them.
 
+If whitelist management is enabled (`manageWhitelist: true` on the config), turn off the vanilla whitelist with `/whitelist off` or `white-list=false` in `server.properties`. Otherwise the vanilla whitelist will still kick players the plugin lets in. Since Minecraft 26.3, new servers have the vanilla whitelist on by default.
+
 If verification is enabled (`requireVerification: true` on the config), users will either get the code when they are kicked by whitelist (if whitelist management is enabled) or by typing `/drs verify` in the Minecraft chat. This code then needs to be sent in Discord using `/verify <code>`.
 
 ## Languages and Translation

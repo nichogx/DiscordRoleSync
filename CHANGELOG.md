@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - The plugin now creates a `<tablePrefix>_schema_history` table to track database upgrades. Future versions will refuse to start on a database upgraded by a newer version
+- Warning on startup when whitelist management is enabled but the vanilla whitelist is also on, which kicks players the plugin lets in. New servers on Minecraft 26.3+ have the vanilla whitelist on by default
 
 ### Changed
 - **Breaking:** Java 17 or newer is now required. Servers running Java 8 or 11 must upgrade Java before updating the plugin

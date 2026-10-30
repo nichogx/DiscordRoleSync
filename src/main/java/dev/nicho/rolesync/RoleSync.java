@@ -197,6 +197,12 @@ public class RoleSync extends JavaPlugin {
         // event listeners
         if (getConfig().getBoolean("manageWhitelist")) {
             getServer().getPluginManager().registerEvents(new WhitelistLoginListener(this), this);
+
+            if (getServer().hasWhitelist()) {
+                getLogger().warning("manageWhitelist is enabled, but the vanilla whitelist is also on. "
+                        + "Players allowed by DiscordRoleSync will still be kicked unless they are on the vanilla whitelist. "
+                        + "Turn it off with /whitelist off or white-list=false in server.properties.");
+            }
         }
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(this), this);
 
