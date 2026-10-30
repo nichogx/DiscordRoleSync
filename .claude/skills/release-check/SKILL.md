@@ -121,6 +121,6 @@ Start the plan with a short common setup section:
 2. Set the bot token in `test_server/plugins/DiscordRoleSync/config.yml`.
 3. `cd test_server && ./run.sh`, logs in `test_server/logs/latest.log`.
 
-The bundled test server runs Paper 1.20.6. When a risk is specific to a Minecraft version (the newest supported version, or 1.8.8 for backward compatibility), say which server JAR to test with. When a change affects upgrades (database migrations, config migrations), include steps that start from a server running `<BASE>`: install the `<BASE>` JAR, link an account, then swap in the new JAR and check the data and config survived.
+`test_server/` is the maintainer's local, gitignored setup, so don't assume which server version it runs. Recommend testing on the latest supported Minecraft version by default, and leave the choice to the maintainer. When a risk is specific to an older version (e.g. 1.8.8 for backward compatibility), say so and suggest testing on that version too. When a change affects upgrades (database migrations, config migrations), include steps that start from a server running `<BASE>`: install the `<BASE>` JAR, link an account, then swap in the new JAR and check the data and config survived.
 
 End the report with the list of subagents run and anything that could not be checked (e.g. release notes that could not be found).
