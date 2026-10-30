@@ -1,14 +1,13 @@
 package dev.nicho.rolesync.minecraft;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.json.JSONObject;
+import net.dv8tion.jda.api.utils.data.DataObject;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 
 import static dev.nicho.rolesync.minecraft.UserSearch.encodePathSegment;
 import static dev.nicho.rolesync.minecraft.UserSearch.setTimeouts;
@@ -53,7 +52,7 @@ public class XboxAPI {
             ));
         }
 
-        JSONObject body = getJSONBody(c);
+        DataObject body = getJSONBody(c);
 
         // The Geyser UUID is the hex XUID, with all leading zeros
         String uuid = String.format("%032X", body.getLong("xuid"));
@@ -72,9 +71,9 @@ public class XboxAPI {
                 && getJSONBody(c).getString("message").contains("Unable to find user in our cache");
     }
 
-    private JSONObject getJSONBody(HttpURLConnection c) throws IOException {
+    private DataObject getJSONBody(HttpURLConnection c) throws IOException {
         try (InputStream response = getErrorOrInputStream(c)) {
-            return new JSONObject(new String(response.readAllBytes(), StandardCharsets.UTF_8));
+            return DataObject.fromJson(response);
         }
     }
 

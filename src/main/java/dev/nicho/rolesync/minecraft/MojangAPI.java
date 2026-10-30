@@ -1,13 +1,12 @@
 package dev.nicho.rolesync.minecraft;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import net.dv8tion.jda.api.utils.data.DataObject;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.*;
-import java.nio.charset.StandardCharsets;
 
 import static dev.nicho.rolesync.minecraft.UserSearch.encodePathSegment;
 import static dev.nicho.rolesync.minecraft.UserSearch.setTimeouts;
@@ -85,9 +84,9 @@ public class MojangAPI {
             ));
         }
 
-        JSONObject body;
+        DataObject body;
         try (InputStream response = c.getInputStream()) {
-            body = new JSONObject(new String(response.readAllBytes(), StandardCharsets.UTF_8));
+            body = DataObject.fromJson(response);
         }
 
         return new UserSearchResult(

@@ -1,15 +1,13 @@
 package dev.nicho.rolesync.util.plugin_meta;
 
 import dev.nicho.rolesync.RoleSync;
+import net.dv8tion.jda.api.utils.data.DataArray;
 import org.jetbrains.annotations.TestOnly;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -63,17 +61,16 @@ public class PluginVersion {
             throw new IOException("Error getting latest version from Modrinth.");
         }
 
-        JSONArray body;
+        DataArray body;
         try (InputStream response = c.getInputStream()) {
-            body = new JSONArray(new String(response.readAllBytes(), StandardCharsets.UTF_8));
+            body = DataArray.fromJson(response);
         }
 
         if (body.isEmpty()) {
             throw new IOException("No versions found on Modrinth.");
         }
 
-        JSONObject latestVersion = body.getJSONObject(0);
-        this.latestVersion = latestVersion.getString("version_number");
+        this.latestVersion = body.getObject(0).getString("version_number");
 
         if (plugin != null) {
             plugin.debugLog("refreshed latest version: %s", this.latestVersion);

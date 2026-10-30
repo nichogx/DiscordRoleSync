@@ -71,6 +71,7 @@ Only write tests that would fail if the code broke. No tautological tests (a moc
 `CHANGELOG.md` follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Pending changes go under the `unreleased` section at the top, grouped as `### Added`, `### Changed`, `### Fixed`, etc.
 
 - Write for the end user: a server admin downloading the plugin. Describe what changes for them (features, fixes, config, compatibility, supported Minecraft versions), not how it was implemented.
+- Keep implementation details out: no library names, class names or technical causes unless an admin needs them to act. Ask whether a server admin would understand and care about each word; if not, simplify (e.g. "Smaller plugin JAR (about 0.5 MB less), thanks to small optimizations").
 - Only call out dependency updates individually when they matter to admins (e.g. JDA, which affects Discord behavior). Otherwise "Updated dependencies" is enough.
 - Group changes that don't affect admins (CI, tests, build tooling, test-only or server-provided dependency bumps, Python scripts) under a broad entry such as "Housekeeping: CI and build improvements".
 - Keep entries to one line where possible.

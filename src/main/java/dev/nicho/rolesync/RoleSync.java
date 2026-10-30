@@ -18,7 +18,6 @@ import dev.nicho.rolesync.util.vault.VaultAPI;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import net.dv8tion.jda.api.exceptions.InvalidTokenException;
 import net.milkbowl.vault.permission.Permission;
-import org.apache.commons.io.FileUtils;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SimplePie;
 import org.bstats.charts.SingleLineChart;
@@ -37,10 +36,12 @@ import org.intellij.lang.annotations.PrintFormat;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.logging.Level;
+import java.util.stream.Stream;
 
 public class RoleSync extends JavaPlugin {
 
@@ -65,14 +66,14 @@ public class RoleSync extends JavaPlugin {
             File libFolder = new File(getDataFolder(), "lib");
             if (libFolder.exists() && libFolder.isDirectory()) {
                 getLogger().info("Deleting old lib folder");
-                FileUtils.deleteDirectory(libFolder);
+                deleteDirectory(libFolder.toPath());
             }
 
             // Delete old language folder that was replaced with translations
             File langFolder = new File(getDataFolder(), "language");
             if (langFolder.exists() && langFolder.isDirectory()) {
                 getLogger().info("Deleting old language folder");
-                FileUtils.deleteDirectory(langFolder);
+                deleteDirectory(langFolder.toPath());
             }
 
             // Create the new translations folder
@@ -500,9 +501,12 @@ public class RoleSync extends JavaPlugin {
         }
 
         // Go through all existing language files, checking if each needs to be updated
-        Iterator<File> dir = FileUtils.iterateFiles(languageFolder, new String[]{"yml"}, false);
-        while (dir.hasNext()) {
-            File file = dir.next();
+        File[] languageFiles = languageFolder.listFiles(f -> f.isFile() && f.getName().endsWith(".yml"));
+        if (languageFiles == null) {
+            throw new UncheckedIOException(new IOException("Failed to list the translations folder"));
+        }
+
+        for (File file : languageFiles) {
             String language = file.getName();
 
             YamlConfiguration loaded = YamlConfiguration.loadConfiguration(file);
@@ -539,6 +543,21 @@ public class RoleSync extends JavaPlugin {
         }
 
         return updated;
+    }
+
+    /**
+     * Deletes a directory and everything inside it.
+     *
+     * @param directory the directory to delete
+     * @throws IOException if any file could not be deleted
+     */
+    private static void deleteDirectory(Path directory) throws IOException {
+        try (Stream<Path> paths = Files.walk(directory)) {
+            // Delete children before their parent directories
+            for (Path path : paths.sorted(Comparator.reverseOrder()).toList()) {
+                Files.delete(path);
+            }
+        }
     }
 
     /**
