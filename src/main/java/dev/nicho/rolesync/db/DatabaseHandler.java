@@ -130,13 +130,11 @@ public abstract class DatabaseHandler {
 
         Connection c = this.getConnection();
         try (PreparedStatement ps = c.prepareStatement(
-                "INSERT INTO " + getTableName() + " (discord_id, minecraft_uuid, verification_code) SELECT ?, ?, ? FROM (SELECT 1) " +
-                        "as A WHERE NOT EXISTS(SELECT * FROM " + getTableName() + " WHERE minecraft_uuid = ?);"
+                "INSERT INTO " + getTableName() + " (discord_id, minecraft_uuid, verification_code) VALUES (?, ?, ?)"
         )) {
             ps.setString(1, discordID);
             ps.setString(2, minecraftUUID);
             ps.setInt(3, random.nextInt(900000) + 100000);
-            ps.setString(4, minecraftUUID);
 
             ps.execute();
         } finally {

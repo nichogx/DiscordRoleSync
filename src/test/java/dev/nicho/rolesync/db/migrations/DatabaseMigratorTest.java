@@ -13,6 +13,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -86,6 +87,37 @@ class DatabaseMigratorTest {
 
         assertEquals(migrator.getLatestVersion(), migrator.getCurrentVersion(c));
         assertEquals(1, count("SELECT COUNT(*) FROM drs_discordmcusers"));
+    }
+
+    @Test
+    void testRemovesDuplicateMinecraftAccounts() throws SQLException {
+        new DatabaseMigrator(LOGGER, Dialect.SQLITE, "drs", "db/migrations", List.of("001_baseline")).migrate(c);
+
+        // Before 002, concurrent links could store the same Minecraft account twice
+        try (PreparedStatement ps = c.prepareStatement("INSERT INTO drs_discordmcusers (discord_id, minecraft_uuid, verified) VALUES "
+                + "('1', 'unverified', false), ('2', 'unverified', false), "
+                + "('3', 'verified', false), ('4', 'verified', true), ('5', 'verified', false), "
+                + "('6', 'unique', false), "
+                // SQLite before 3.23 stored the "false" default as text
+                + "('7', 'text_false', 'false'), ('8', 'text_false', true)")) {
+            ps.execute();
+        }
+
+        new DatabaseMigrator(LOGGER, Dialect.SQLITE, "drs").migrate(c);
+
+        // The lowest Discord ID is kept, unless another link is verified
+        try (PreparedStatement ps = c.prepareStatement("SELECT discord_id FROM drs_discordmcusers ORDER BY discord_id");
+             ResultSet res = ps.executeQuery()) {
+            List<String> kept = new ArrayList<>();
+            while (res.next()) kept.add(res.getString(1));
+
+            assertEquals(List.of("1", "4", "6", "8"), kept);
+        }
+
+        try (PreparedStatement ps = c.prepareStatement(
+                "INSERT INTO drs_discordmcusers (discord_id, minecraft_uuid) VALUES ('9', 'unique')")) {
+            assertThrows(SQLException.class, ps::execute);
+        }
     }
 
     @Test

@@ -45,7 +45,8 @@ public final class DatabaseMigrator {
      * All migrations, in order. Never edit or remove a migration that has been released.
      */
     static final List<String> MIGRATIONS = List.of(
-            "001_baseline"
+            "001_baseline",
+            "002_unique_minecraft_uuid"
     );
 
     private static final String RESOURCE_DIR = "db/migrations";

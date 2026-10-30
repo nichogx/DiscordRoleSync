@@ -61,4 +61,19 @@ class SQLiteHandlerTest {
         assertEquals(1, reopened.getLinkedUserCount());
         reopened.close();
     }
+
+    @Test
+    void testLinkConflicts() throws IOException, SQLException {
+        SQLiteHandler db = new SQLiteHandler(plugin, new File(tempDir, "database.db"));
+        db.linkUser("123", "00000000-0000-0000-0000-000000000001");
+
+        // Discord account already linked
+        assertThrows(SQLException.class, () -> db.linkUser("123", "00000000-0000-0000-0000-000000000002"));
+        // Minecraft account already linked
+        assertThrows(SQLException.class, () -> db.linkUser("456", "00000000-0000-0000-0000-000000000001"));
+
+        assertEquals(1, db.getLinkedUserCount());
+        assertEquals("123", db.getLinkedUserInfo("00000000-0000-0000-0000-000000000001").discordId);
+        db.close();
+    }
 }
