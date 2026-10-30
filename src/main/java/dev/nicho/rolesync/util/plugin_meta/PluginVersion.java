@@ -144,7 +144,11 @@ public class PluginVersion {
         if (latest.minor > current.minor) return true;
         if (latest.minor < current.minor) return false;
 
-        return latest.patch > current.patch;
+        if (latest.patch > current.patch) return true;
+        if (latest.patch < current.patch) return false;
+
+        // A release candidate is older than the release with the same version number
+        return current.additional != null;
     }
 
     /**

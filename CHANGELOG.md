@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Linked members who leave, are kicked or are banned from the Discord server are now removed from the whitelist even if the bot hadn't cached them yet
 - Discord link and lookup commands no longer hang forever when the Mojang or GeyserMC API stops responding. They now give up after 10 seconds and show an error
 - The plugin can now be safely reloaded with `/reload` or PlugMan. Previously, reloading left MySQL connections open and the SQLite database file locked
+- Servers running a release candidate are now told when the final release is out
 
 ## [2.3.3](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/2.3.3) - 2025-07-09
 

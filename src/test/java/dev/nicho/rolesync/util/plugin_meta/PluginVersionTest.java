@@ -60,6 +60,11 @@ class PluginVersionTest {
         assertTrue(assertDoesNotThrow(() -> isOldReleaseWrapper("1.3.0", "2.0.0")));
         assertTrue(assertDoesNotThrow(() -> isOldReleaseWrapper("1.3.0", "1.4.0")));
         assertTrue(assertDoesNotThrow(() -> isOldReleaseWrapper("1.3.0", "1.3.1")));
+
+        // Current is a release candidate
+        assertTrue(assertDoesNotThrow(() -> isOldReleaseWrapper("1.3.0-rc.1", "1.3.0")));
+        assertTrue(assertDoesNotThrow(() -> isOldReleaseWrapper("1.3.0-rc.1", "1.3.1")));
+        assertFalse(assertDoesNotThrow(() -> isOldReleaseWrapper("1.3.0-rc.1", "1.2.9")));
     }
 
     private boolean isOldReleaseWrapper(String currentVersion, String latestVersion) throws IOException {
