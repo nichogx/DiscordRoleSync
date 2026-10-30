@@ -1,6 +1,7 @@
 package dev.nicho.rolesync.db;
 
 import dev.nicho.rolesync.RoleSync;
+import dev.nicho.rolesync.db.migrations.Dialect;
 import org.apache.commons.dbcp.BasicDataSource;
 
 import java.sql.Connection;
@@ -26,6 +27,11 @@ public final class MySQLHandler extends DatabaseHandler {
         ds.setTestOnBorrow(true);
 
         this.initialize();
+    }
+
+    @Override
+    protected Dialect getDialect() {
+        return Dialect.MYSQL;
     }
 
     @Override

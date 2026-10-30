@@ -1,6 +1,7 @@
 package dev.nicho.rolesync.db;
 
 import dev.nicho.rolesync.RoleSync;
+import dev.nicho.rolesync.db.migrations.Dialect;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,6 +34,11 @@ public final class SQLiteHandler extends DatabaseHandler {
         }
 
         this.initialize();
+    }
+
+    @Override
+    protected Dialect getDialect() {
+        return Dialect.SQLITE;
     }
 
     @Override

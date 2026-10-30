@@ -13,6 +13,7 @@ import org.mockito.Mockito;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -35,6 +36,7 @@ class SQLiteHandlerTest {
 
         plugin = Mockito.mock(RoleSync.class);
         Mockito.when(plugin.getConfig()).thenReturn(config);
+        Mockito.when(plugin.getLogger()).thenReturn(Logger.getLogger("SQLiteHandlerTest"));
     }
 
     @AfterEach

@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/unreleased) - unreleased
 
+### Added
+- The plugin now creates a `<tablePrefix>_schema_history` table to track database upgrades. Future versions will refuse to start on a database upgraded by a newer version
+
 ### Changed
 - **Breaking:** Java 17 or newer is now required. Servers running Java 8 or 11 must upgrade Java before updating the plugin
 - Updated JDA (the Discord library) to 6.7.0, which supports Discord's channel obfuscation, mandatory from November 16, 2026

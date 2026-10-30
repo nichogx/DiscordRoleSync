@@ -1,6 +1,8 @@
 package dev.nicho.rolesync.db;
 
 import dev.nicho.rolesync.RoleSync;
+import dev.nicho.rolesync.db.migrations.DatabaseMigrator;
+import dev.nicho.rolesync.db.migrations.Dialect;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.bukkit.Bukkit;
 
@@ -33,7 +35,16 @@ public abstract class DatabaseHandler {
      * @return the table name
      */
     private String getTableName() {
-        return plugin.getConfig().getString("database.tablePrefix") + "_discordmcusers";
+        return getTablePrefix() + "_discordmcusers";
+    }
+
+    /**
+     * Gets the table prefix, from database.tablePrefix in the config. It is validated by ConfigLinter.
+     *
+     * @return the table prefix
+     */
+    private String getTablePrefix() {
+        return plugin.getConfig().getString("database.tablePrefix");
     }
 
     /**
@@ -61,24 +72,23 @@ public abstract class DatabaseHandler {
     public abstract void close() throws SQLException;
 
     /**
-     * Initializes the database, creating tables if needed.
+     * Gets the SQL dialect of this database, used to pick dialect-specific migrations.
+     *
+     * @return the dialect
+     */
+    protected abstract Dialect getDialect();
+
+    /**
+     * Initializes the database, migrating its schema to the latest version.
      *
      * @throws SQLException if an SQL error occurs
      */
-    @SuppressFBWarnings(value = "SQL_INJECTION_JDBC", justification = "The table prefix is validated by ConfigLinter. All other values use parameters")
     protected void initialize() throws SQLException {
+        DatabaseMigrator migrator = new DatabaseMigrator(plugin.getLogger(), getDialect(), getTablePrefix());
+
         Connection c = this.getConnection();
-        try (PreparedStatement ps = c.prepareStatement(
-                "CREATE TABLE IF NOT EXISTS `" + getTableName() + "` ("
-                        + "`discord_id` varchar(24) NOT NULL,"
-                        + "`minecraft_uuid` varchar(36) NOT NULL,"
-                        + "`whitelisted` boolean NOT NULL DEFAULT false,"
-                        + "`verification_code` INT NOT NULL DEFAULT 0,"
-                        + "`verified` boolean NOT NULL DEFAULT false,"
-                        + "`username_when_linked` TEXT NULL,"
-                        + "PRIMARY KEY (`discord_id`));"
-        )) {
-            ps.execute();
+        try {
+            migrator.migrate(c);
         } finally {
             this.closeConnection(c);
         }
