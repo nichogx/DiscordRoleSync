@@ -7,7 +7,7 @@ from common import REQUEST_TIMEOUT
 MIN_GAME_VERSION = "1.8"
 # Updated by Renovate when Mojang releases a new version, together with README.md. Test the plugin on it before merging.
 # renovate: datasource=custom.minecraft depName=minecraft
-MAX_GAME_VERSION = "26.1.2"
+MAX_GAME_VERSION = "26.3"
 
 
 def parse_version(version):
