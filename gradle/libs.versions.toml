@@ -1,0 +1,35 @@
+[versions]
+bstats = "3.2.1"
+jacoco = "0.8.16"
+spotbugs = "4.10.5"
+
+[libraries]
+# Test only
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version = "6.1.3" }
+# Version comes from the JUnit BOM, which junit-jupiter brings in
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+mockito-core = { module = "org.mockito:mockito-core", version = "5.24.0" }
+
+# Packaged
+bstats-bukkit = { module = "org.bstats:bstats-bukkit", version.ref = "bstats" }
+bstats-base = { module = "org.bstats:bstats-base", version.ref = "bstats" }
+jda = { module = "net.dv8tion:JDA", version = "6.7.0" }
+commons-dbcp = { module = "commons-dbcp:commons-dbcp", version = "1.4" }
+
+# On server
+spigot-api = { module = "org.spigotmc:spigot-api", version = "1.12.2-R0.1-SNAPSHOT" }
+vault-api = { module = "com.github.MilkBowl:VaultAPI", version = "1.7.1" }
+sqlite-jdbc = { module = "org.xerial:sqlite-jdbc", version = "3.54.1.0" }
+guava = { module = "com.google.guava:guava", version = "33.7.2-jre" }
+placeholderapi = { module = "me.clip:placeholderapi", version = "2.12.3" }
+
+# Compile only
+jetbrains-annotations = { module = "org.jetbrains:annotations", version = "26.1.0" }
+spotbugs-annotations = { module = "com.github.spotbugs:spotbugs-annotations", version.ref = "spotbugs" }
+
+# SpotBugs plugin
+findsecbugs = { module = "com.h3xstream.findsecbugs:findsecbugs-plugin", version = "1.14.0" }
+
+[plugins]
+shadow = { id = "com.gradleup.shadow", version = "9.6.1" }
+spotbugs = { id = "com.github.spotbugs", version = "6.5.13" }

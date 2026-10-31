@@ -79,21 +79,59 @@ secret-scanner:
     # Ignore false positives by adding their fingerprint to .gitleaksignore
     - gitleaks git --redact --verbose
 
+# The wrapper JAR and the Gradle distribution it downloads run on every build, so make sure
+# both are Gradle's official ones. The wrapper only accepts a distribution matching
+# distributionSha256Sum, so checking that checksum also covers where it's downloaded from.
+# If this fails after a Gradle update, regenerate the wrapper with ./gradlew wrapper
+gradle-wrapper-checksum:
+  stage: lint
+
+  image: curlimages/curl:latest
+  script:
+    - |
+      PROPERTIES=gradle/wrapper/gradle-wrapper.properties
+      DISTRIBUTION=$(sed -nE 's#^distributionUrl=.*/(gradle-.+-(bin|all)\.zip)$#\1#p' "$PROPERTIES")
+      GRADLE_VERSION=$(echo "$DISTRIBUTION" | sed -E 's#^gradle-(.+)-(bin|all)\.zip$#\1#')
+      if [ -z "$GRADLE_VERSION" ]; then
+        echo "Could not read the Gradle version from distributionUrl in $PROPERTIES"
+        exit 1
+      fi
+
+      WRAPPER_EXPECTED=$(curl -fsSL "https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-wrapper.jar.sha256")
+      WRAPPER_ACTUAL=$(sha256sum gradle/wrapper/gradle-wrapper.jar | cut -d' ' -f1)
+      echo "gradle-wrapper.jar for Gradle ${GRADLE_VERSION}: expected ${WRAPPER_EXPECTED}, got ${WRAPPER_ACTUAL}"
+
+      DISTRIBUTION_EXPECTED=$(curl -fsSL "https://services.gradle.org/distributions/${DISTRIBUTION}.sha256")
+      DISTRIBUTION_ACTUAL=$(sed -n 's/^distributionSha256Sum=//p' "$PROPERTIES")
+      echo "distributionSha256Sum for ${DISTRIBUTION}: expected ${DISTRIBUTION_EXPECTED}, got ${DISTRIBUTION_ACTUAL}"
+
+      if [ "$WRAPPER_EXPECTED" != "$WRAPPER_ACTUAL" ]; then
+        echo "gradle-wrapper.jar is not the official wrapper for Gradle ${GRADLE_VERSION}"
+        exit 1
+      fi
+      if [ "$DISTRIBUTION_EXPECTED" != "$DISTRIBUTION_ACTUAL" ]; then
+        echo "distributionSha256Sum in $PROPERTIES is not the official checksum of ${DISTRIBUTION}"
+        exit 1
+      fi
+
 ## Test & Build
 ###
 
-.maven:
+.gradle:
   # Use the oldest supported Java version to guarantee compatibility
-  image: maven:3-eclipse-temurin-17
+  image: eclipse-temurin:17-jdk
   variables:
-    MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
-    MAVEN_CLI_OPTS: "--batch-mode --no-transfer-progress"
+    GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle-home"
+    GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+    GRADLE_CLI_OPTS: "--console=plain"
   cache:
     key:
       files:
-        - pom.xml
+        - gradle/wrapper/gradle-wrapper.properties
+        - gradle/libs.versions.toml
     paths:
-      - .m2/repository/
+      - .gradle-home/caches/
+      - .gradle-home/wrapper/
 
 python-ci-test:
   stage: test
@@ -111,38 +149,44 @@ python-ci-test:
     reports:
       junit: ci/report.xml
 
-maven-test:
+gradle-test:
   stage: test
-  extends: .maven
+  extends: .gradle
 
   script:
-    - mvn $MAVEN_CLI_OPTS test -Dpackage_version=ci-test
+    - ./gradlew $GRADLE_CLI_OPTS test -Ppackage_version=ci-test
     # Total line coverage, for the coverage regex below
     - |
-      awk -F, 'NR > 1 { missed += $8; covered += $9 } END { printf "Line coverage: %.2f%%\n", 100 * covered / (missed + covered) }' target/site/jacoco/jacoco.csv
+      awk -F, 'NR > 1 { missed += $8; covered += $9 } END { printf "Line coverage: %.2f%%\n", 100 * covered / (missed + covered) }' build/reports/jacoco/test/jacocoTestReport.csv
   coverage: '/Line coverage: \d+\.\d+%/'
 
   artifacts:
     expire_in: 30 days
     paths:
-      - target/surefire-reports/
-      - target/site/jacoco/
+      - build/test-results/test/
+      - build/reports/jacoco/test/
     reports:
-      junit: target/surefire-reports/*.xml
+      junit: build/test-results/test/*.xml
       coverage_report:
         coverage_format: jacoco
-        path: target/site/jacoco/jacoco.xml
+        path: build/reports/jacoco/test/jacocoTestReport.xml
 
 spotbugs:
   stage: test
-  extends: .maven
+  extends: .gradle
 
   script:
-    - mvn $MAVEN_CLI_OPTS compile spotbugs:check -Dpackage_version=ci-test
+    - ./gradlew $GRADLE_CLI_OPTS spotbugsMain -Ppackage_version=ci-test
+  artifacts:
+    # The findings are only listed in the HTML report
+    when: on_failure
+    expire_in: 30 days
+    paths:
+      - build/reports/spotbugs/
 
-maven-package:
+gradle-package:
   stage: build
-  extends: .maven
+  extends: .gradle
 
   script:
     - |
@@ -153,11 +197,11 @@ maven-package:
       else
         PACKAGE_VERSION=branch-${CI_COMMIT_SHORT_SHA}
       fi
-    # Tests already ran in maven-test
-    - mvn $MAVEN_CLI_OPTS package -DskipTests -Dpackage_version=${PACKAGE_VERSION}
+    # Tests already ran in gradle-test
+    - ./gradlew $GRADLE_CLI_OPTS shadowJar -Ppackage_version=${PACKAGE_VERSION}
     # Hangar does not accept .jars bigger than 10MB. Keep in sync with MAX_JAR_SIZE in ci/common.py
     - |
-      JAR_SIZE=$(stat -c %s target/discord_role_sync-${PACKAGE_VERSION}.jar)
+      JAR_SIZE=$(stat -c %s build/libs/discord_role_sync-${PACKAGE_VERSION}.jar)
       echo "JAR size: ${JAR_SIZE} bytes"
       if [[ "$JAR_SIZE" -gt 10000000 ]]; then
         echo "JAR is bigger than 10MB, which Hangar does not accept"
@@ -167,7 +211,7 @@ maven-package:
   artifacts:
     expire_in: 30 days
     paths:
-      - target/discord_role_sync-*.jar
+      - build/libs/discord_role_sync-*.jar
 
 ## Publish
 ###
@@ -206,7 +250,7 @@ gitlab-registry:
   script:
     # The Spigot files are linked in the GitLab release, for the manual Spigot upload
     - ./ci/upload_package.sh
-      target/discord_role_sync-${CI_COMMIT_TAG}.jar
+      build/libs/discord_role_sync-${CI_COMMIT_TAG}.jar
       spigot_page/spigot_page.bbcode
       spigot_page/spigot_changelog.bbcode
 

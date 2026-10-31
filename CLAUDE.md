@@ -9,9 +9,10 @@ DiscordRoleSync is a Minecraft plugin (Spigot/Paper) that does one-way sync of D
 ## Build & Test Commands
 
 ```bash
-mvn package   # Build; output in target/discord_role_sync-{version}.jar
-mvn test      # Java tests
-mvn compile spotbugs:check   # Static analysis; ignored findings are in spotbugs-exclude.xml
+./gradlew shadowJar     # Build; output in build/libs/discord_role_sync-{version}.jar
+./gradlew test          # Java tests; coverage report in build/reports/jacoco/
+./gradlew spotbugsMain  # Static analysis; ignored findings are in spotbugs-exclude.xml
+./gradlew build         # All of the above
 
 # Python tests
 cd ci && pip install -r requirements-dev.txt && pytest   # publishing scripts
@@ -25,10 +26,12 @@ pip install -r requirements.txt
 python validate.py en_US.yml ../../main/resources/language
 ```
 
-Local builds use version `develop`. CI sets versions from tags/branches.
+Local builds use version `develop`. CI sets versions from tags/branches with `-Ppackage_version=<version>`.
+
+Dependency and plugin versions are in `gradle/libs.versions.toml`. Gradle resolves version conflicts to the highest version, unlike Maven's nearest-wins.
 
 ### Test Server
-`test_server/` contains a Paper server with LuckPerms, Vault and PlaceholderAPI. Copy the built JAR to `test_server/plugins/`, set the bot token in `test_server/plugins/DiscordRoleSync/config.yml`, then run `cd test_server && ./run.sh`. Logs are in `test_server/logs/latest.log`.
+`test_server/` contains a Paper server with LuckPerms, Vault and PlaceholderAPI. Copy the built JAR (`build/libs/discord_role_sync-develop.jar`) to `test_server/plugins/`, set the bot token in `test_server/plugins/DiscordRoleSync/config.yml`, then run `cd test_server && ./run.sh`. Logs are in `test_server/logs/latest.log`.
 
 ## User Verification Flow
 1. User runs `/link <username>` in Discord.
@@ -43,7 +46,7 @@ Local builds use version `develop`. CI sets versions from tags/branches.
 - **Shaded JDA:** JDA is relocated to `DiscordRoleSync.net.dv8tion`, so IDE import paths won't match runtime paths.
 
 ### Version Support
-- **Java:** Must stay Java 17 API compatible (enforced by `maven.compiler.release=17`).
+- **Java:** Must stay Java 17 API compatible (enforced by `options.release = 17` in `build.gradle.kts`).
 - **Minecraft:** Supports 1.8.8 to 1.21+, compiled against Spigot API 1.12.2. Be careful with APIs that don't exist on 1.8.8.
 
 ## Writing Tests

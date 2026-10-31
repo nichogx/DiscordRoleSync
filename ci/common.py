@@ -5,7 +5,7 @@ from enum import Enum
 REQUEST_TIMEOUT = (10, 120)
 
 # Hangar does not accept .jars bigger than 10MB.
-# Also checked in the maven-package job in .gitlab-ci.yml.
+# Also checked in the gradle-package job in .gitlab-ci.yml.
 MAX_JAR_SIZE = 10_000_000
 
 
@@ -15,7 +15,7 @@ def get_modrinth_user_agent(version):
 
 
 def get_jar_path(version):
-    return f"../target/discord_role_sync-{version}.jar"
+    return f"../build/libs/discord_role_sync-{version}.jar"
 
 
 class ReleaseType(Enum):

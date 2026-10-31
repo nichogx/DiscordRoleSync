@@ -37,11 +37,11 @@ Prompt template:
 
 > You are checking library updates in the DiscordRoleSync Minecraft plugin (repo at `<REPO>`) for anything that could break it. Read `CLAUDE.md` first. Compare `<BASE>` to `HEAD`. Do not edit any files.
 >
-> 1. Run `git diff <BASE>..HEAD -- pom.xml` and list every dependency and plugin whose version changed, was added or was removed. Also check `.gitlab-ci.yml` for build image changes (JDK/Maven versions).
-> 2. Classify each by scope: **shaded** (compile scope, ends up in the plugin JAR, e.g. JDA, sqlite-jdbc, commons-dbcp, bStats, org.json), **server-provided** (`provided`, e.g. spigot-api, VaultAPI), **build plugin** (shade, compiler, replacer, etc.) or **test-only**. Skip deep research on test-only dependencies and ci/ Python requirements; just list them.
-> 3. For each shaded, server-provided and build-plugin change, read the upstream release notes or changelog for **every** version between the old and new one (use WebSearch/WebFetch: GitHub releases, project changelogs). Look for: removed or renamed APIs, behavior changes, new minimum Java version above 17, changed defaults, new transitive dependencies, Discord API/gateway changes (JDA), native library or file format changes (sqlite-jdbc), and anything that affects relocation by maven-shade-plugin.
+> 1. Run `git diff <BASE>..HEAD -- gradle/libs.versions.toml build.gradle.kts gradle/wrapper/gradle-wrapper.properties` and list every dependency and plugin whose version changed, was added or was removed. If `<BASE>` still has a `pom.xml` (built with Maven), compare its versions to `gradle/libs.versions.toml` instead. Also check `.gitlab-ci.yml` for build image changes (JDK versions). Gradle picks the highest version when dependencies disagree, so also compare `./gradlew dependencies --configuration runtimeClasspath` at `<BASE>` and `HEAD` (check out `<BASE>` in a separate worktree) for transitive versions that changed.
+> 2. Classify each by scope: **shaded** (`implementation`, ends up in the plugin JAR, e.g. JDA, commons-dbcp, bStats), **server-provided** (`compileOnly`, e.g. spigot-api, VaultAPI, sqlite-jdbc), **build plugin** (Shadow, SpotBugs, the Gradle wrapper, etc.) or **test-only**. Skip deep research on test-only dependencies and ci/ Python requirements; just list them.
+> 3. For each shaded, server-provided and build-plugin change, read the upstream release notes or changelog for **every** version between the old and new one (use WebSearch/WebFetch: GitHub releases, project changelogs). Look for: removed or renamed APIs, behavior changes, new minimum Java version above 17, changed defaults, new transitive dependencies, Discord API/gateway changes (JDA), native library or file format changes (sqlite-jdbc), and anything that affects relocation or `minimize()` in the Shadow plugin.
 > 4. For every potentially breaking item, grep the source (`src/main/java`) to see whether the plugin actually uses the affected API or behavior. Remember JDA is relocated to `DiscordRoleSync.net.dv8tion` at runtime.
-> 5. Check that `maven-shade-plugin` relocations in `pom.xml` still cover the shaded packages (a new transitive dependency that isn't relocated could clash with other plugins).
+> 5. Check that the `shadowJar` relocations in `build.gradle.kts` still cover the shaded packages (a new transitive dependency that isn't relocated could clash with other plugins).
 >
 > Return a table: dependency, old → new version, scope, risk (high/medium/low/none), reason with a link to the upstream note, and the affected files in this repo (or "not used"). Then list concrete things a human should test because of these updates. Keep it under 600 words. Only report risks you can tie to a specific upstream change; do not speculate.
 
@@ -64,7 +64,7 @@ Prompt template:
 
 > You are triaging all code changes in the DiscordRoleSync Minecraft plugin (repo at `<REPO>`) since `<BASE>` to find the riskiest ones before a release. Read `CLAUDE.md` first. Do not edit any files.
 >
-> 1. Run `git log --reverse --format='%h %s' <BASE>..HEAD` and `git diff --stat <BASE>..HEAD`. Read the diffs (`git show <sha>` or `git diff <BASE>..HEAD -- <path>`) of everything under `src/main/` and `pom.xml`. Ignore pure test, CI, docs and language-file changes except to note them.
+> 1. Run `git log --reverse --format='%h %s' <BASE>..HEAD` and `git diff --stat <BASE>..HEAD`. Read the diffs (`git show <sha>` or `git diff <BASE>..HEAD -- <path>`) of everything under `src/main/` and `build.gradle.kts`. Ignore pure test, CI, docs and language-file changes except to note them.
 > 2. Group commits into logical changes (one feature or fix may span several commits).
 > 3. Rate each change's risk as high, medium or low. Weigh: data loss or corruption (database schema/migrations, account links), config migrations and the config linter (a bad migration or lint rule stops the plugin enabling), whitelist and login handling (could lock players out or let them in), permission/group sync (could grant or strip permissions), threading (DB on main thread, Bukkit API off main thread), plugin enable/disable/reload lifecycle, Discord event handling, external HTTP calls, Java/Minecraft version compatibility, and how much existing behavior the change touches. Small, isolated or test-only changes are low.
 > 4. Compare the changes to the `unreleased` section of `CHANGELOG.md` and note any user-visible change that has no entry.
@@ -117,7 +117,7 @@ Cover only the risky changes and risky updates, highest risk first. Skip anythin
 
 Start the plan with a short common setup section:
 
-1. `mvn package`, then copy `target/discord_role_sync-develop.jar` to `test_server/plugins/`.
+1. `./gradlew shadowJar`, then copy `build/libs/discord_role_sync-develop.jar` to `test_server/plugins/`.
 2. Set the bot token in `test_server/plugins/DiscordRoleSync/config.yml`.
 3. `cd test_server && ./run.sh`, logs in `test_server/logs/latest.log`.
 

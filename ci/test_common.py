@@ -71,7 +71,7 @@ def test_release_type_unknown(version):
 
 
 def test_get_jar_path():
-    assert get_jar_path("2.3.3") == "../target/discord_role_sync-2.3.3.jar"
+    assert get_jar_path("2.3.3") == "../build/libs/discord_role_sync-2.3.3.jar"
 
 
 @pytest.mark.parametrize("line, expected", [

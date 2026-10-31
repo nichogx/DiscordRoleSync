@@ -1,6 +1,7 @@
 test_server/
 
 *.jar
+!gradle/wrapper/gradle-wrapper.jar
 *.class
 *.bbcode
 
@@ -10,9 +11,10 @@ venv/
 # Mac
 .DS_Store
 
-# Maven
+# Gradle
 log/
-target/
+.gradle/
+build/
 
 # Python
 __pycache__/
