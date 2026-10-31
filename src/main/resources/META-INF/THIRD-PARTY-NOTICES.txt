@@ -17,8 +17,7 @@ META-INF/NOTICE and META-INF/NOTICE.txt.
 - nv-websocket-client         https://github.com/TakahikoKawasaki/nv-websocket-client
 - Jackson                     https://github.com/FasterXML/jackson
 - Apache Commons Collections  https://commons.apache.org/proper/commons-collections/
-- Apache Commons DBCP         https://commons.apache.org/proper/commons-dbcp/
-- Apache Commons Pool         https://commons.apache.org/proper/commons-pool/
+- HikariCP                    https://github.com/brettwooldridge/HikariCP
 
 ================================================================================
 MIT License

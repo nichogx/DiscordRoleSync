@@ -36,7 +36,7 @@ dependencies {
         // Only used for voice encryption (DAVE), which the plugin doesn't use.
         exclude(group = "com.google.crypto.tink", module = "tink")
     }
-    implementation(libs.commons.dbcp)
+    implementation(libs.hikaricp)
 
     // On server
     compileOnly(libs.spigot.api) {
@@ -100,8 +100,6 @@ tasks.shadowJar {
     exclude("META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA")
     // Not needed at runtime. Keeps LICENSE/NOTICE files.
     exclude("META-INF/maven/**", "META-INF/versions/**", "module-info.class")
-    // Example config shipped inside the commons-dbcp jar
-    exclude("testpool.jocl")
     // Several dependencies ship license and notice files with the same name. Keep all of them,
     // instead of only the first one, so every shaded dependency's license is in the JAR.
     val sharedLicenseFiles = listOf("META-INF/LICENSE", "META-INF/LICENSE.txt", "META-INF/NOTICE", "META-INF/NOTICE.txt")
@@ -116,6 +114,8 @@ tasks.shadowJar {
     relocate("org.bstats", "DiscordRoleSync.org.bstats")
     // Other plugins such as Minecord use JDA at old versions
     relocate("net.dv8tion", "DiscordRoleSync.net.dv8tion")
+    // Other plugins may shade their own HikariCP version
+    relocate("com.zaxxer.hikari", "DiscordRoleSync.com.zaxxer.hikari")
 
     minimize()
 }

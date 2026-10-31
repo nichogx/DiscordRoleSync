@@ -14,7 +14,7 @@ mockito-core = { module = "org.mockito:mockito-core", version = "5.24.0" }
 bstats-bukkit = { module = "org.bstats:bstats-bukkit", version.ref = "bstats" }
 bstats-base = { module = "org.bstats:bstats-base", version.ref = "bstats" }
 jda = { module = "net.dv8tion:JDA", version = "6.7.0" }
-commons-dbcp = { module = "commons-dbcp:commons-dbcp", version = "1.4" }
+hikaricp = { module = "com.zaxxer:HikariCP", version = "7.1.0" }
 
 # On server
 spigot-api = { module = "org.spigotmc:spigot-api", version = "1.12.2-R0.1-SNAPSHOT" }
