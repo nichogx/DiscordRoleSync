@@ -8,6 +8,7 @@
 [![Discord](https://img.shields.io/discord/710557651758481480.svg?label=Discord&logo=discord)](https://discord.com/invite/JBNejsW)
 [![GitLab Issues](https://img.shields.io/gitlab/issues/open/nichogx%2FDiscordRoleSync?label=Issues&logo=gitlab)](https://gitlab.com/nichogx/DiscordRoleSync/-/issues)
 [![Pipeline Status](https://gitlab.com/nichogx/DiscordRoleSync/badges/master/pipeline.svg?key_text=Pipeline)](https://gitlab.com/nichogx/DiscordRoleSync/-/commits/master)
+[![bStats Servers](https://img.shields.io/bstats/servers/7533?label=Servers)](https://bstats.org/plugin/bukkit/DiscordRoleSync/7533)
 
 DiscordRoleSync is a Minecraft plugin for syncing Discord roles and Minecraft permissions. This syncs Discord to Minecraft only, it is not both ways.
 
