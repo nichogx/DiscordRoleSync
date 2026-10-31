@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Breaking:** Java 17 or newer is now required. Servers running Java 8 or 11 must upgrade Java before updating the plugin
 - Updated JDA (the Discord library) to 6.7.0, which supports Discord's channel obfuscation, mandatory from November 16, 2026
 - Updated dependencies
-- Smaller plugin JAR (about 0.5 MB less), thanks to small optimizations
+- Smaller plugin JAR (about 4 MB less, now under 5 MB)
 - Config validation now rejects a `database.tablePrefix` with characters other than letters, numbers and underscores, and a `language` with characters other than letters, numbers, underscores and dashes
 - Housekeeping: CI and build improvements
 

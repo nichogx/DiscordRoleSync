@@ -1,4 +1,11 @@
 import com.github.spotbugs.snom.Effort
+import proguard.gradle.ProGuardTask
+
+buildscript {
+    dependencies {
+        classpath(libs.proguard.gradle)
+    }
+}
 
 plugins {
     java
@@ -64,11 +71,6 @@ configurations.testImplementation {
     extendsFrom(configurations.compileOnly.get())
 }
 
-configurations.runtimeClasspath {
-    // Brought in by Kotlin (used by JDA's HTTP client). Annotations aren't needed at runtime.
-    exclude(group = "org.jetbrains", module = "annotations")
-}
-
 tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
     // Use 'release' instead of a toolchain so compiling on a newer JDK
@@ -92,6 +94,8 @@ tasks.jar {
 
 tasks.shadowJar {
     archiveClassifier = ""
+    // Intermediate JAR. shrinkJar writes the final one to build/libs/.
+    destinationDirectory = layout.buildDirectory.dir("shadow")
     // The plugin's own license. Third-party notices are in META-INF/THIRD-PARTY-NOTICES.txt.
     from("LICENSE")
     // META-INF/versions/** is excluded below, so the JAR isn't multi-release
@@ -128,12 +132,26 @@ tasks.shadowJar {
     relocate("org.apache.commons.collections4", "DiscordRoleSync.org.apache.commons.collections4")
     // Renames Jackson's META-INF/services files to match the relocated classes
     mergeServiceFiles()
+}
 
-    minimize()
+// Removes the classes, methods and fields of the bundled dependencies that the plugin never uses.
+// Keep rules for code that is only used through reflection are in proguard-rules.pro.
+val shrinkJar = tasks.register<ProGuardTask>("shrinkJar") {
+    injars(tasks.shadowJar.flatMap { it.archiveFile })
+    outjars(layout.buildDirectory.file("libs/${project.name}-${project.version}.jar"))
+
+    // The JDK and the jars provided by the server, which aren't bundled
+    libraryjars(
+        mapOf("jarfilter" to "!**.jar", "filter" to "!module-info.class"),
+        "${System.getProperty("java.home")}/jmods"
+    )
+    libraryjars(configurations.compileClasspath.get().minus(configurations.runtimeClasspath.get()))
+
+    configuration("proguard-rules.pro")
 }
 
 tasks.assemble {
-    dependsOn(tasks.shadowJar)
+    dependsOn(shrinkJar)
 }
 
 tasks.test {

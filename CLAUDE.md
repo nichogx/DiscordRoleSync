@@ -9,7 +9,7 @@ DiscordRoleSync is a Minecraft plugin (Spigot/Paper) that does one-way sync of D
 ## Build & Test Commands
 
 ```bash
-./gradlew shadowJar     # Build; output in build/libs/discord_role_sync-{version}.jar
+./gradlew assemble      # Build; output in build/libs/discord_role_sync-{version}.jar
 ./gradlew test          # Java tests; coverage report in build/reports/jacoco/
 ./gradlew spotbugsMain  # Static analysis; ignored findings are in spotbugs-exclude.xml
 ./gradlew build         # All of the above
@@ -27,6 +27,10 @@ python validate.py en_US.yml ../../main/resources/language
 ```
 
 Local builds use version `develop`. CI sets versions from tags/branches with `-Ppackage_version=<version>`.
+
+The JAR is built in two steps: `shadowJar` bundles and relocates the dependencies into `build/shadow/`, then `shrinkJar` runs ProGuard to remove the code they don't use. ProGuard can't see code that is only used through reflection, so a bundled dependency that uses reflection needs a keep rule in `proguard-rules.pro`, or it fails at runtime with `ClassNotFoundException` or `NoSuchMethodError` (tests run on the unshrunk classes and won't catch it). Test new or updated dependencies on the test server. ProGuard's notes about reflection only show with `./gradlew shrinkJar --info`.
+
+ProGuard reads the JDK classes from the `jmods` folder of the JDK running Gradle. Some JDK 24+ builds don't ship it (JEP 493), so build with a JDK that has `jmods`, such as Temurin 17 like CI.
 
 Dependency and plugin versions are in `gradle/libs.versions.toml`. Gradle resolves version conflicts to the highest version, unlike Maven's nearest-wins.
 

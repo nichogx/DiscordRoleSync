@@ -41,7 +41,7 @@ Prompt template:
 > 2. Classify each by scope: **shaded** (`implementation`, ends up in the plugin JAR, e.g. JDA, HikariCP, bStats), **server-provided** (`compileOnly`, e.g. spigot-api, VaultAPI, sqlite-jdbc), **build plugin** (Shadow, SpotBugs, the Gradle wrapper, etc.) or **test-only**. Skip deep research on test-only dependencies and ci/ Python requirements; just list them.
 > 3. For each shaded, server-provided and build-plugin change, read the upstream release notes or changelog for **every** version between the old and new one (use WebSearch/WebFetch: GitHub releases, project changelogs). Look for: removed or renamed APIs, behavior changes, new minimum Java version above 17, changed defaults, new transitive dependencies, Discord API/gateway changes (JDA), native library or file format changes (sqlite-jdbc), and anything that affects relocation or `minimize()` in the Shadow plugin.
 > 4. For every potentially breaking item, grep the source (`src/main/java`) to see whether the plugin actually uses the affected API or behavior. Remember JDA is relocated to `DiscordRoleSync.net.dv8tion` at runtime.
-> 5. Check that the `shadowJar` relocations in `build.gradle.kts` still cover the shaded packages (a new transitive dependency that isn't relocated could clash with other plugins).
+> 5. Check that the `shadowJar` relocations in `build.gradle.kts` still cover the shaded packages (a new transitive dependency that isn't relocated could clash with other plugins). Also flag new or updated bundled dependencies that use reflection, which may need a keep rule in `proguard-rules.pro`.
 >
 > Return a table: dependency, old → new version, scope, risk (high/medium/low/none), reason with a link to the upstream note, and the affected files in this repo (or "not used"). Then list concrete things a human should test because of these updates. Keep it under 600 words. Only report risks you can tie to a specific upstream change; do not speculate.
 
@@ -117,7 +117,7 @@ Cover only the risky changes and risky updates, highest risk first. Skip anythin
 
 Start the plan with a short common setup section:
 
-1. `./gradlew shadowJar`, then copy `build/libs/discord_role_sync-develop.jar` to `test_server/plugins/`.
+1. `./gradlew assemble`, then copy `build/libs/discord_role_sync-develop.jar` to `test_server/plugins/`.
 2. Set the bot token in `test_server/plugins/DiscordRoleSync/config.yml`.
 3. `cd test_server && ./run.sh`, logs in `test_server/logs/latest.log`.
 

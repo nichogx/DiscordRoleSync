@@ -27,6 +27,9 @@ placeholderapi = { module = "me.clip:placeholderapi", version = "2.12.3" }
 jetbrains-annotations = { module = "org.jetbrains:annotations", version = "26.1.0" }
 spotbugs-annotations = { module = "com.github.spotbugs:spotbugs-annotations", version.ref = "spotbugs" }
 
+# Build only
+proguard-gradle = { module = "com.guardsquare:proguard-gradle", version = "7.8.1" }
+
 # SpotBugs plugin
 findsecbugs = { module = "com.h3xstream.findsecbugs:findsecbugs-plugin", version = "1.14.0" }
 

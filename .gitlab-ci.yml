@@ -198,7 +198,7 @@ gradle-package:
         PACKAGE_VERSION=branch-${CI_COMMIT_SHORT_SHA}
       fi
     # Tests already ran in gradle-test
-    - ./gradlew $GRADLE_CLI_OPTS shadowJar -Ppackage_version=${PACKAGE_VERSION}
+    - ./gradlew $GRADLE_CLI_OPTS assemble -Ppackage_version=${PACKAGE_VERSION}
     # Hangar does not accept .jars bigger than 10MB. Keep in sync with MAX_JAR_SIZE in ci/common.py
     - |
       JAR_SIZE=$(stat -c %s build/libs/discord_role_sync-${PACKAGE_VERSION}.jar)
