@@ -116,6 +116,18 @@ tasks.shadowJar {
     relocate("net.dv8tion", "DiscordRoleSync.net.dv8tion")
     // Other plugins may shade their own HikariCP version
     relocate("com.zaxxer.hikari", "DiscordRoleSync.com.zaxxer.hikari")
+    // JDA's dependencies. Other plugins bundle their own versions of these, and on older servers
+    // a plugin may get another plugin's copy instead of its own. SLF4J is left as is, so logs go
+    // to the server's logger.
+    relocate("com.fasterxml.jackson", "DiscordRoleSync.com.fasterxml.jackson")
+    relocate("com.neovisionaries.ws", "DiscordRoleSync.com.neovisionaries.ws")
+    relocate("gnu.trove", "DiscordRoleSync.gnu.trove")
+    relocate("kotlin", "DiscordRoleSync.kotlin")
+    relocate("okhttp3", "DiscordRoleSync.okhttp3")
+    relocate("okio", "DiscordRoleSync.okio")
+    relocate("org.apache.commons.collections4", "DiscordRoleSync.org.apache.commons.collections4")
+    // Renames Jackson's META-INF/services files to match the relocated classes
+    mergeServiceFiles()
 
     minimize()
 }
