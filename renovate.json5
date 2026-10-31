@@ -41,6 +41,13 @@
       "matchDatasources": ["custom.minecraft"],
       "automerge": false,
       "commitMessageTopic": "supported Minecraft version"
+    },
+    {
+      // CI builds on the oldest supported Java version to guarantee compatibility
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["eclipse-temurin"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
     }
   ]
 }
