@@ -1,0 +1,86 @@
+DiscordRoleSync is licensed under the GNU General Public License v3.0. See the LICENSE file
+at the root of this JAR.
+
+This JAR also includes the following third-party software, under their own licenses.
+
+================================================================================
+Apache License 2.0
+================================================================================
+
+The license text is in META-INF/LICENSE. Notices from these libraries are in
+META-INF/NOTICE and META-INF/NOTICE.txt.
+
+- JDA                         https://github.com/discord-jda/JDA
+- OkHttp                      https://github.com/square/okhttp
+- Okio                        https://github.com/square/okio
+- Kotlin Standard Library     https://github.com/JetBrains/kotlin
+- nv-websocket-client         https://github.com/TakahikoKawasaki/nv-websocket-client
+- Jackson                     https://github.com/FasterXML/jackson
+- Apache Commons Collections  https://commons.apache.org/proper/commons-collections/
+- Apache Commons DBCP         https://commons.apache.org/proper/commons-dbcp/
+- Apache Commons Pool         https://commons.apache.org/proper/commons-pool/
+
+================================================================================
+MIT License
+================================================================================
+
+- SLF4J API                   https://www.slf4j.org/
+  The license text is in META-INF/LICENSE.txt.
+
+- bStats                      https://github.com/Bastian/bstats-metrics
+
+MIT License
+
+Copyright (c) 2021 Bastian Oppermann
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+================================================================================
+GNU Lesser General Public License 2.1
+================================================================================
+
+- Trove4j 3.1.0               https://bitbucket.org/trove4j/trove
+
+Copyright (c) 2001-2011, Eric D. Friedman, Rob Eden and Jeff Randall.
+
+Trove4j is included, unmodified apart from unused classes being removed, under the
+GNU Lesser General Public License 2.1. The license text is in META-INF/licenses/LGPL-2.1.txt.
+Its source code is available at https://repo1.maven.org/maven2/net/sf/trove4j/core/3.1.0/
+
+The classes gnu.trove.impl.HashFunctions and gnu.trove.impl.PrimeFinder in Trove4j carry
+the following notice:
+
+Copyright (c) 1999 CERN - European Organization for Nuclear Research.
+
+Permission to use, copy, modify, distribute and sell this software and
+its documentation for any purpose is hereby granted without fee,
+provided that the above copyright notice appear in all copies and that
+both that copyright notice and this permission notice appear in
+supporting documentation. CERN makes no representations about the
+suitability of this software for any purpose. It is provided "as is"
+without expressed or implied warranty.
+
+================================================================================
+Mozilla Public License 2.0
+================================================================================
+
+- Public Suffix List          https://publicsuffix.org/
+  Included by OkHttp as okhttp3/internal/publicsuffix/PublicSuffixDatabase.list.
+  The license text is at https://mozilla.org/MPL/2.0/ and the source form is
+  available at https://publicsuffix.org/list/public_suffix_list.dat

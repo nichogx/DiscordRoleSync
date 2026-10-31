@@ -92,6 +92,8 @@ tasks.jar {
 
 tasks.shadowJar {
     archiveClassifier = ""
+    // The plugin's own license. Third-party notices are in META-INF/THIRD-PARTY-NOTICES.txt.
+    from("LICENSE")
     // META-INF/versions/** is excluded below, so the JAR isn't multi-release
     addMultiReleaseAttribute = false
 

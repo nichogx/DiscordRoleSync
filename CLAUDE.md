@@ -30,6 +30,8 @@ Local builds use version `develop`. CI sets versions from tags/branches with `-P
 
 Dependency and plugin versions are in `gradle/libs.versions.toml`. Gradle resolves version conflicts to the highest version, unlike Maven's nearest-wins.
 
+Licenses of bundled dependencies are listed by hand in `src/main/resources/META-INF/THIRD-PARTY-NOTICES.txt`. Update it when a bundled dependency (including a transitive one) is added, removed or changes license. If its JAR doesn't ship its license text, add the text there or under `META-INF/licenses/`.
+
 ### Test Server
 `test_server/` contains a Paper server with LuckPerms, Vault and PlaceholderAPI. Copy the built JAR (`build/libs/discord_role_sync-develop.jar`) to `test_server/plugins/`, set the bot token in `test_server/plugins/DiscordRoleSync/config.yml`, then run `cd test_server && ./run.sh`. Logs are in `test_server/logs/latest.log`.
 
