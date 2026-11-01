@@ -110,7 +110,7 @@ tasks.shadowJar {
     sharedLicenseFiles.forEach { append(it) }
 
     // Let Shadow's transformers see every copy of these, instead of keeping only the first
-    filesMatching(sharedLicenseFiles + "META-INF/*.kotlin_module") {
+    filesMatching(sharedLicenseFiles + "META-INF/*.kotlin_module" + "META-INF/services/**") {
         duplicatesStrategy = DuplicatesStrategy.INCLUDE
     }
 
