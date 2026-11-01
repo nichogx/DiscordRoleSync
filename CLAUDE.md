@@ -85,5 +85,13 @@ Only write tests that would fail if the code broke. No tautological tests (a moc
 - Group changes that don't affect admins (CI, tests, build tooling, test-only or server-provided dependency bumps, Python scripts) under a broad entry such as "Housekeeping: CI and build improvements".
 - Keep entries to one line where possible.
 
+## Issues
+
+Issues are tracked on GitLab. Use the `glab` CLI (e.g. `glab issue create`).
+
+- Only create an issue when the user asks for one or confirms one should be created. Otherwise, suggest it and wait.
+- Every issue needs at least one label. Check the existing labels with `glab label list` and pick the ones that fit.
+- If no existing label fits, or a new one would fit better, don't create the label yourself. Suggest it to the user so they can create it.
+
 ## Publishing
 Tags publish automatically to the GitLab registry, Modrinth and Hangar. Spigot has no API and requires manual upload.
