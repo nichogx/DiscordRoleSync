@@ -140,10 +140,16 @@ val shrinkJar = tasks.register<ProGuardTask>("shrinkJar") {
     injars(tasks.shadowJar.flatMap { it.archiveFile })
     outjars(layout.buildDirectory.file("libs/${project.name}-${project.version}.jar"))
 
+    // The JDK 17 classes, taken from a Gradle toolchain rather than the JDK running Gradle.
+    // Some newer JDKs (24+, JEP 493) don't ship jmods, and 17 matches options.release.
+    val jdk17 = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(17)
+    }.get().metadata.installationPath
+
     // The JDK and the jars provided by the server, which aren't bundled
     libraryjars(
         mapOf("jarfilter" to "!**.jar", "filter" to "!module-info.class"),
-        "${System.getProperty("java.home")}/jmods"
+        jdk17.dir("jmods")
     )
     libraryjars(configurations.compileClasspath.get().minus(configurations.runtimeClasspath.get()))
 

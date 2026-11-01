@@ -30,7 +30,7 @@ Local builds use version `develop`. CI sets versions from tags/branches with `-P
 
 The JAR is built in two steps: `shadowJar` bundles and relocates the dependencies into `build/shadow/`, then `shrinkJar` runs ProGuard to remove the code they don't use. ProGuard can't see code that is only used through reflection, so a bundled dependency that uses reflection needs a keep rule in `proguard-rules.pro`, or it fails at runtime with `ClassNotFoundException` or `NoSuchMethodError` (tests run on the unshrunk classes and won't catch it). Test new or updated dependencies on the test server. ProGuard's notes about reflection only show with `./gradlew shrinkJar --info`.
 
-ProGuard reads the JDK classes from the `jmods` folder of the JDK running Gradle. Some JDK 24+ builds don't ship it (JEP 493), so build with a JDK that has `jmods`, such as Temurin 17 like CI.
+ProGuard reads the JDK classes from the `jmods` folder of a JDK 17 Gradle toolchain, not the JDK running Gradle (some JDK 24+ builds don't ship `jmods`, see JEP 493). If no JDK 17 is installed, Gradle downloads one to `~/.gradle/jdks` through the foojay resolver in `settings.gradle.kts`.
 
 Dependency and plugin versions are in `gradle/libs.versions.toml`. Gradle resolves version conflicts to the highest version, unlike Maven's nearest-wins.
 
