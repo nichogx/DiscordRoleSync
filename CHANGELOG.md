@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/unreleased) - unreleased
 
+### Added
+- Warning on startup, and when the bot joins a new Discord server, if the bot is in servers other than the configured one. Only one server is supported
+
+### Fixed
+- Leaving, joining or changing roles in another Discord server the bot is in no longer removes players from the whitelist or changes their groups
+
 ## [2.4.0](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/2.4.0) - 2026-11-02
 
 ### Added

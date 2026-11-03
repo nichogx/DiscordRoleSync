@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.events.session.ShutdownEvent;
 import net.dv8tion.jda.api.exceptions.InvalidTokenException;
@@ -24,6 +25,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.sql.SQLException;
 import java.time.Duration;
+import java.util.List;
 import java.util.Objects;
 
 public class SyncBot extends ListenerAdapter {
@@ -182,6 +184,42 @@ public class SyncBot extends ListenerAdapter {
                 }
             }
         }
+
+        warnAboutOtherServers(event.getJDA().getGuilds());
+    }
+
+    @Override
+    public void onGuildJoin(@NotNull GuildJoinEvent event) {
+        if (isConfiguredServer(event.getGuild())) return;
+
+        plugin.getLogger().warning("Bot was added to the Discord server " + describe(event.getGuild())
+                + ", which is not the configured server. Only one server is supported. "
+                + "Events from this server will be ignored.");
+    }
+
+    /**
+     * Logs a warning if the bot is in any server other than the configured one.
+     *
+     * @param guilds All the servers the bot is in
+     */
+    void warnAboutOtherServers(List<Guild> guilds) {
+        List<String> others = guilds.stream()
+                .filter(g -> !isConfiguredServer(g))
+                .map(SyncBot::describe)
+                .toList();
+        if (others.isEmpty()) return;
+
+        plugin.getLogger().warning("Bot is in more than one Discord server, but only the configured server ("
+                + plugin.getConfig().getString("bot.server") + ") is supported. "
+                + "Events from these servers will be ignored: " + String.join(", ", others));
+    }
+
+    private boolean isConfiguredServer(Guild guild) {
+        return guild.getId().equals(plugin.getConfig().getString("bot.server"));
+    }
+
+    private static String describe(Guild guild) {
+        return guild.getName() + " (" + guild.getId() + ")";
     }
 
     @Override

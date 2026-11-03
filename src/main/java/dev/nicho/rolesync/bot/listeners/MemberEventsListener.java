@@ -3,6 +3,7 @@ package dev.nicho.rolesync.bot.listeners;
 import dev.nicho.rolesync.RoleSync;
 import dev.nicho.rolesync.bot.discord.DiscordAgent;
 import dev.nicho.rolesync.db.DatabaseHandler;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent;
@@ -24,16 +25,19 @@ public class MemberEventsListener extends ListenerAdapter {
 
     @Override
     public void onGuildMemberRoleAdd(GuildMemberRoleAddEvent event) {
+        if (!isConfiguredServer(event.getGuild())) return;
         discordAgent.checkMemberRoles(event.getMember());
     }
 
     @Override
     public void onGuildMemberRoleRemove(GuildMemberRoleRemoveEvent event) {
+        if (!isConfiguredServer(event.getGuild())) return;
         discordAgent.checkMemberRoles(event.getMember());
     }
 
     @Override
     public void onGuildMemberJoin(GuildMemberJoinEvent event) {
+        if (!isConfiguredServer(event.getGuild())) return;
         try {
             DatabaseHandler.LinkedUserInfo userInfo = plugin.getDb().getLinkedUserInfo(event.getMember().getId());
             if (userInfo != null) {
@@ -49,6 +53,7 @@ public class MemberEventsListener extends ListenerAdapter {
 
     @Override
     public void onGuildMemberRemove(@NotNull GuildMemberRemoveEvent event) {
+        if (!isConfiguredServer(event.getGuild())) return;
         try {
             DatabaseHandler.LinkedUserInfo userInfo = plugin.getDb().getLinkedUserInfo(event.getUser().getId());
             if (userInfo != null) {
@@ -60,5 +65,13 @@ public class MemberEventsListener extends ListenerAdapter {
             plugin.getLogger().severe("An error occurred while removing kicked/banned/left member from whitelist.\n" +
                     e.getMessage());
         }
+    }
+
+    /**
+     * Only the server in bot.server is supported. Events from any other server the bot
+     * is in must be ignored, or they would change the groups and whitelist of linked users.
+     */
+    private boolean isConfiguredServer(Guild guild) {
+        return guild.getId().equals(plugin.getConfig().getString("bot.server"));
     }
 }
