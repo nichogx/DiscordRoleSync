@@ -1,13 +1,13 @@
 ---
 name: release-check
-description: Pre-release risk review for DiscordRoleSync. Checks dependency and Minecraft version updates since the last release for breaking changes, finds the riskiest code changes, runs focused bug reviews on them, and writes a step-by-step manual test plan. Use when preparing a new release.
+description: Pre-release risk review for DiscordRoleSync. Checks dependency and Minecraft version updates since the last release for breaking changes, finds the riskiest code changes, runs focused bug reviews on them, writes a step-by-step manual test plan, then suggests a version number and moves the unreleased CHANGELOG entries under it. Use when preparing a new release.
 argument-hint: "[base tag]"
 disable-model-invocation: true
 ---
 
 # Release check
 
-Produce a risk report and manual test plan for everything that changed since the last release. This skill is **read-only**: do not edit files, update the CHANGELOG, build, tag or push. The maintainer does the release themselves.
+Produce a risk report and manual test plan for everything that changed since the last release. The only file this skill may change is `CHANGELOG.md`, and only in Step 5 after the user confirms the version. Do not edit anything else, build, commit, tag or push. The maintainer does the release themselves.
 
 Subagents do the heavy reading so the main session stays small. Launch independent subagents **in a single message** so they run in parallel. Subagents start with no context, so every prompt must include the base tag, the repo path and what to return.
 
@@ -124,3 +124,33 @@ Start the plan with a short common setup section:
 `test_server/` is the maintainer's local, gitignored setup, so don't assume which server version it runs. Recommend testing on the latest supported Minecraft version by default, and leave the choice to the maintainer. When a risk is specific to an older version (e.g. 1.8.8 for backward compatibility), say so and suggest testing on that version too. When a change affects upgrades (database migrations, config migrations), include steps that start from a server running `<BASE>`: install the `<BASE>` JAR, link an account, then swap in the new JAR and check the data and config survived.
 
 End the report with the list of subagents run and anything that could not be checked (e.g. release notes that could not be found).
+
+## Step 5: Version number and CHANGELOG
+
+After the report, prepare the CHANGELOG for the release.
+
+### Check whether the CHANGELOG is already done
+
+List the version headings with `grep -n '^## \[' CHANGELOG.md` and the tags with `git tag`. If there is a version heading (other than `unreleased`) that matches no existing tag, the maintainer has already written the section for this release: say which version it is, point out anything in the CHANGELOG gaps section that is missing from it, and stop. Do not suggest a version or edit the file.
+
+If the `unreleased` section is empty, say so and stop: there is nothing to release.
+
+### Suggest a version
+
+The project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html). Start from the latest **final** release tag (no `-rc`), even when the baseline from Step 1 was an RC, and bump based on the `unreleased` entries:
+
+- **Major** if any entry is marked **Breaking** or removes or renames a config option, command or permission in a way that needs admin action.
+- **Minor** if there is anything under `### Added` (new features, config options, officially supported Minecraft versions).
+- **Patch** otherwise (fixes, dependency updates, housekeeping).
+
+Ask the user with `AskUserQuestion` which version to release. Offer the suggested version first, marked "(Recommended)", with a one-line reason naming the entry that decided it. Also offer the first release candidate of it (e.g. `3.0.0-rc.1`, or the next `-rc.N` if RC tags for that version exist) and the next smaller bump as alternatives. The user can type another version with "Other".
+
+### Update the CHANGELOG
+
+When the user confirms a version, edit `CHANGELOG.md`:
+
+1. Keep the `## [unreleased](...) - unreleased` heading where it is, now with nothing under it.
+2. Right below it, add `## [<VERSION>](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/<VERSION>) - <YYYY-MM-DD>` with today's date, followed by all the entries that were under `unreleased`, unchanged and in the same order. Keep one blank line between headings and their content, matching the existing sections.
+3. Do not add the CHANGELOG gaps from the report on your own. If there were any, ask the user whether to add them, and if so, write them following the Changelog rules in `CLAUDE.md`.
+
+Show the user the resulting diff (`git diff CHANGELOG.md`). Do not commit.
