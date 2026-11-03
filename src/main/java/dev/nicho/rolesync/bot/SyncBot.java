@@ -63,7 +63,8 @@ public class SyncBot extends ListenerAdapter {
                         CacheFlag.SCHEDULED_EVENTS,
                         CacheFlag.VOICE_STATE,
                         CacheFlag.ACTIVITY,
-                        CacheFlag.CLIENT_STATUS
+                        CacheFlag.CLIENT_STATUS,
+                        CacheFlag.SOUNDBOARD_SOUNDS
                 );
 
         synchronized (this) {

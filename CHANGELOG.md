@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Leaving, joining or changing roles in another Discord server the bot is in no longer removes players from the whitelist or changes their groups
 - Server startup no longer hangs when Modrinth is slow or unreachable. The update check now runs in the background and gives up after 10 seconds
+- Removed a harmless "Automatically disabled CacheFlags" warning from the Discord bot on startup
 
 ## [2.4.0](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/2.4.0) - 2026-11-02
 
