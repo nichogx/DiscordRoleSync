@@ -7,7 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/unreleased) - unreleased
 
+## [2.4.0](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/2.4.0) - 2026-11-02
+
 ### Added
+- Official support for Minecraft versions up to 26.3
 - The plugin now creates a `<tablePrefix>_schema_history` table to track database upgrades. Future versions will refuse to start on a database upgraded by a newer version
 - Warning on startup when whitelist management is enabled but the vanilla whitelist is also on, which kicks players the plugin lets in. New servers on Minecraft 26.3+ have the vanilla whitelist on by default
 
@@ -28,7 +31,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Linked members who leave, are kicked or are banned from the Discord server are now removed from the whitelist even if the bot hadn't cached them yet
 - Discord link and lookup commands no longer hang forever when the Mojang or GeyserMC API stops responding. They now give up after 10 seconds and show an error
 - The plugin can now be safely reloaded with `/reload` or PlugMan. Previously, reloading left MySQL connections open and the SQLite database file locked
-- Servers running a release candidate are now told when the final release is out
 
 ## [2.3.3](https://gitlab.com/nichogx/DiscordRoleSync/-/releases/2.3.3) - 2025-07-09
 
