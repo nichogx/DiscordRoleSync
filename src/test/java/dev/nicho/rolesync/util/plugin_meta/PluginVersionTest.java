@@ -3,6 +3,7 @@ package dev.nicho.rolesync.util.plugin_meta;
 import com.sun.net.httpserver.HttpServer;
 import org.junit.jupiter.api.Test;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetAddress;
@@ -75,6 +76,27 @@ class PluginVersionTest {
         assertTrue(assertDoesNotThrow(() -> isOldReleaseWrapper("1.3.0-rc.1", "1.3.0")));
         assertTrue(assertDoesNotThrow(() -> isOldReleaseWrapper("1.3.0-rc.1", "1.3.1")));
         assertFalse(assertDoesNotThrow(() -> isOldReleaseWrapper("1.3.0-rc.1", "1.2.9")));
+    }
+
+    @Test
+    void testParseLatestVersion() throws IOException {
+        assertEquals("2.4.0", parseLatestVersionWrapper(
+                "[{\"version_number\":\"2.4.0\"},{\"version_number\":\"2.3.1\"}]"));
+    }
+
+    @Test
+    void testParseLatestVersionInvalidResponse() {
+        // Regression: invalid responses used to throw an unchecked exception that aborted plugin enable.
+        assertThrows(IOException.class, () -> parseLatestVersionWrapper("<html><body>502 Bad Gateway</body></html>"));
+        assertThrows(IOException.class, () -> parseLatestVersionWrapper(""));
+        assertThrows(IOException.class, () -> parseLatestVersionWrapper("{\"error\":\"not_found\"}"));
+        assertThrows(IOException.class, () -> parseLatestVersionWrapper("[]"));
+        assertThrows(IOException.class, () -> parseLatestVersionWrapper("[\"2.4.0\"]"));
+        assertThrows(IOException.class, () -> parseLatestVersionWrapper("[{\"name\":\"2.4.0\"}]"));
+    }
+
+    private String parseLatestVersionWrapper(String body) throws IOException {
+        return PluginVersion.parseLatestVersion(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)));
     }
 
     private boolean isOldReleaseWrapper(String currentVersion, String latestVersion) throws IOException {

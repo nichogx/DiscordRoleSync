@@ -2,6 +2,7 @@ package dev.nicho.rolesync.util.plugin_meta;
 
 import dev.nicho.rolesync.RoleSync;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import net.dv8tion.jda.api.exceptions.ParsingException;
 import net.dv8tion.jda.api.utils.data.DataArray;
 import org.jetbrains.annotations.TestOnly;
 
@@ -76,7 +77,7 @@ public class PluginVersion {
     /**
      * Refreshes the latest version number from Modrinth
      *
-     * @throws IOException if an error occurs while connecting to the API
+     * @throws IOException if an error occurs while connecting to the API or reading its response
      */
     @SuppressFBWarnings(
             value = "URLCONNECTION_SSRF_FD",
@@ -97,19 +98,32 @@ public class PluginVersion {
             throw new IOException("Error getting latest version from Modrinth.");
         }
 
-        DataArray body;
         try (InputStream response = c.getInputStream()) {
-            body = DataArray.fromJson(response);
+            this.latestVersion = parseLatestVersion(response);
         }
-
-        if (body.isEmpty()) {
-            throw new IOException("No versions found on Modrinth.");
-        }
-
-        this.latestVersion = body.getObject(0).getString("version_number");
 
         if (plugin != null) {
             plugin.debugLog("refreshed latest version: %s", this.latestVersion);
+        }
+    }
+
+    /**
+     * Reads the latest version number from a Modrinth version list response.
+     *
+     * @param response the response body
+     * @return the version number of the most recent version
+     * @throws IOException if the response can't be read or isn't a valid version list
+     */
+    protected static String parseLatestVersion(InputStream response) throws IOException {
+        try {
+            DataArray body = DataArray.fromJson(response);
+            if (body.isEmpty()) {
+                throw new IOException("No versions found on Modrinth.");
+            }
+
+            return body.getObject(0).getString("version_number");
+        } catch (ParsingException e) {
+            throw new IOException("Invalid response from Modrinth: " + e.getMessage(), e);
         }
     }
 
