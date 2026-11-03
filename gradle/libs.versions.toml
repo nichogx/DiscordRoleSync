@@ -20,7 +20,7 @@ hikaricp = { module = "com.zaxxer:HikariCP", version = "7.1.0" }
 spigot-api = { module = "org.spigotmc:spigot-api", version = "1.12.2-R0.1-SNAPSHOT" }
 vault-api = { module = "com.github.MilkBowl:VaultAPI", version = "1.7.1" }
 sqlite-jdbc = { module = "org.xerial:sqlite-jdbc", version = "3.54.1.0" }
-guava = { module = "com.google.guava:guava", version = "33.7.2-jre" }
+guava = { module = "com.google.guava:guava", version = "33.8.0-jre" }
 placeholderapi = { module = "me.clip:placeholderapi", version = "2.12.3" }
 
 # Compile only
