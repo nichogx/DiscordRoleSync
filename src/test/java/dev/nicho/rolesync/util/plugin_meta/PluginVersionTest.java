@@ -1,8 +1,18 @@
 package dev.nicho.rolesync.util.plugin_meta;
 
+import com.sun.net.httpserver.HttpServer;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketTimeoutException;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -71,5 +81,56 @@ class PluginVersionTest {
         PluginVersion v = new PluginVersion();
         v.setLatestVersion(latestVersion);
         return v.isOldRelease(currentVersion);
+    }
+
+    @Test
+    void testRefreshLatestVersionTimesOutOnUnresponsiveServer() throws IOException {
+        // Accepts the connection but never sends a response, like a hung Modrinth
+        try (ServerSocket server = new ServerSocket(0, 1, InetAddress.getLoopbackAddress())) {
+            Thread acceptor = new Thread(() -> {
+                try (Socket ignored = server.accept()) {
+                    Thread.sleep(30_000);
+                } catch (IOException | InterruptedException ignored) {
+                    // test finished
+                }
+            });
+            acceptor.setDaemon(true);
+            acceptor.start();
+
+            PluginVersion v = new PluginVersion(null, "2.4.0",
+                    "http://127.0.0.1:" + server.getLocalPort() + "/version", 500);
+
+            assertTimeoutPreemptively(Duration.ofSeconds(5), () ->
+                    assertThrows(SocketTimeoutException.class, v::refreshLatestVersion));
+
+            acceptor.interrupt();
+        }
+    }
+
+    @Test
+    void testRefreshLatestVersionSendsPluginUserAgent() throws IOException {
+        AtomicReference<String> receivedUserAgent = new AtomicReference<>();
+        HttpServer server = HttpServer.create(new InetSocketAddress(InetAddress.getLoopbackAddress(), 0), 0);
+        server.createContext("/version", exchange -> {
+            receivedUserAgent.set(exchange.getRequestHeaders().getFirst("User-Agent"));
+            byte[] body = "[{\"version_number\":\"2.4.0\"}]".getBytes(StandardCharsets.UTF_8);
+            exchange.sendResponseHeaders(200, body.length);
+            try (OutputStream os = exchange.getResponseBody()) {
+                os.write(body);
+            }
+        });
+        server.start();
+
+        try {
+            PluginVersion v = new PluginVersion(null, "2.3.3",
+                    "http://127.0.0.1:" + server.getAddress().getPort() + "/version", 5_000);
+            v.refreshLatestVersion();
+
+            assertEquals("nichogx/DiscordRoleSync-plugin/2.3.3 (https://gitlab.com/nichogx/DiscordRoleSync)",
+                    receivedUserAgent.get());
+            assertEquals("2.4.0", v.getLatestVersion());
+        } finally {
+            server.stop(0);
+        }
     }
 }

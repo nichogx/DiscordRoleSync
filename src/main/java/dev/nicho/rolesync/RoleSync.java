@@ -210,11 +210,14 @@ public class RoleSync extends JavaPlugin {
         // bstats metrics
         registerMetrics();
 
-        try {
-            checkLatestVersion();
-        } catch (IOException e) {
-            getLogger().warning("Unable to run checks on the installed plugin version.\n" + e.getMessage());
-        }
+        // Contacts Modrinth, so it runs off the main thread to not hold up server startup
+        getServer().getScheduler().runTaskAsynchronously(this, () -> {
+            try {
+                checkLatestVersion();
+            } catch (IOException e) {
+                getLogger().warning("Unable to run checks on the installed plugin version.\n" + e.getMessage());
+            }
+        });
 
         // PlaceholderAPI
         if (this.getIntegrationEnabled("PlaceholderAPI")) {
@@ -327,7 +330,7 @@ public class RoleSync extends JavaPlugin {
      * Checks the installed version against the latest available, and logs
      * appropriate messages if the user is running either old or unsupported versions.
      *
-     * @throws IOException if we need to and can't contact Spigot.
+     * @throws IOException if we need to and can't contact Modrinth.
      */
     private void checkLatestVersion() throws IOException {
         String installedVersion = getDescription().getVersion();

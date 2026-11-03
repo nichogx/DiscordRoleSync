@@ -1,6 +1,7 @@
 package dev.nicho.rolesync.util.plugin_meta;
 
 import dev.nicho.rolesync.RoleSync;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import net.dv8tion.jda.api.utils.data.DataArray;
 import org.jetbrains.annotations.TestOnly;
 
@@ -13,15 +14,42 @@ import java.util.regex.Pattern;
 
 public class PluginVersion {
 
+    private static final String MODRINTH_VERSIONS_URL = "https://api.modrinth.com/v2/project/discordrolesync/version";
+    private static final int TIMEOUT_MILLIS = 10_000;
+    // Modrinth wants a User-Agent that identifies the client: https://docs.modrinth.com/#section/User-Agents
+    // Differs from the one in ci/common.py so plugin traffic can be told apart from CI traffic.
+    private static final String USER_AGENT_FORMAT =
+            "nichogx/DiscordRoleSync-plugin/%s (https://gitlab.com/nichogx/DiscordRoleSync)";
+
     private String latestVersion;
     private final RoleSync plugin;
+    private final String userAgent;
+    private final String versionsUrl;
+    private final int timeoutMillis;
 
     public PluginVersion() {
         this(null);
     }
 
     public PluginVersion(RoleSync plugin) {
+        this(plugin, plugin != null ? plugin.getDescription().getVersion() : "unknown",
+                MODRINTH_VERSIONS_URL, TIMEOUT_MILLIS);
+    }
+
+    /**
+     * Creates a PluginVersion that fetches versions from a custom URL. Used only for tests.
+     *
+     * @param plugin           the plugin, or null
+     * @param installedVersion the installed plugin version, sent in the User-Agent
+     * @param versionsUrl      the URL to fetch the list of versions from
+     * @param timeoutMillis    the connect and read timeout, in milliseconds
+     */
+    @TestOnly
+    PluginVersion(RoleSync plugin, String installedVersion, String versionsUrl, int timeoutMillis) {
         this.plugin = plugin;
+        this.userAgent = String.format(USER_AGENT_FORMAT, installedVersion);
+        this.versionsUrl = versionsUrl;
+        this.timeoutMillis = timeoutMillis;
     }
 
     public String getLatestVersion() throws IOException {
@@ -46,15 +74,23 @@ public class PluginVersion {
     }
 
     /**
-     * Refreshes the latest version number from Spigot
+     * Refreshes the latest version number from Modrinth
      *
      * @throws IOException if an error occurs while connecting to the API
      */
+    @SuppressFBWarnings(
+            value = "URLCONNECTION_SSRF_FD",
+            justification = "The URL is the hardcoded Modrinth URL, and only tests can change it"
+    )
     public void refreshLatestVersion() throws IOException {
-        URL reqUrl = new URL("https://api.modrinth.com/v2/project/discordrolesync/version");
+        URL reqUrl = new URL(versionsUrl);
 
         HttpURLConnection c = (HttpURLConnection) reqUrl.openConnection();
         c.setRequestMethod("GET");
+        c.setRequestProperty("User-Agent", userAgent);
+        // Without timeouts, a slow or unreachable Modrinth would hang the check until the OS gives up
+        c.setConnectTimeout(timeoutMillis);
+        c.setReadTimeout(timeoutMillis);
         c.connect();
 
         if (c.getResponseCode() != 200) {
