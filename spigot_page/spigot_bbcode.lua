@@ -1,5 +1,5 @@
 -- Pandoc filter for SpigotMC's BBCode, used with `-t bbcode_xenforo`.
--- Spigot doesn't support [heading=N] or [img alt=...], so replace them with tags it does support.
+-- Spigot doesn't support [heading=N], [img alt=...] or [ICODE], so replace them with tags it does support.
 
 -- Same as include_badges in ci/common.py, so all platforms show the same badges
 local include_badges = { "Discord", "GitLab Issues" }
@@ -68,8 +68,12 @@ local function image(el)
   return raw("[IMG]" .. el.src .. "[/IMG]")
 end
 
+local function code(el)
+  return raw("[FONT=Courier New]" .. el.text .. "[/FONT]")
+end
+
 -- Badges must be removed before images are converted to raw BBCode
 return {
   { Para = remove_badges },
-  { Header = header, Image = image },
+  { Header = header, Image = image, Code = code },
 }
