@@ -1,13 +1,13 @@
 package dev.nicho.rolesync.bot;
 
 import dev.nicho.rolesync.RoleSync;
+import dev.nicho.rolesync.bot.discord.BotPermissionChecker;
 import dev.nicho.rolesync.bot.discord.DiscordAgent;
 import dev.nicho.rolesync.bot.listeners.MemberEventsListener;
 import dev.nicho.rolesync.bot.listeners.SlashCommandListener;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
@@ -47,8 +47,7 @@ public class SyncBot extends ListenerAdapter {
      * Starts the bot
      *
      * @throws InvalidTokenException if the token is invalid
-     * @throws IllegalStateException if the bot is not in the configured server, or doesn't have
-     *                               the required permissions
+     * @throws IllegalStateException if the bot is not in the configured server
      */
     public void start() throws InvalidTokenException, IllegalStateException {
         plugin.getLogger().info("Initializing bot");
@@ -175,14 +174,8 @@ public class SyncBot extends ListenerAdapter {
         if (guild == null) {
             plugin.getLogger().severe("Bot is not a member of the configured server. This plugin will not work correctly.");
         } else {
-            Permission[] requiredPermissions = {
-                    Permission.MANAGE_ROLES,
-            };
-
-            for (Permission p : requiredPermissions) {
-                if (!guild.getSelfMember().hasPermission(p)) {
-                    plugin.getLogger().severe("Bot does not have required permission " + p.getName() + ". This plugin will not work correctly.");
-                }
+            for (String warning : BotPermissionChecker.check(plugin.getConfig(), guild)) {
+                plugin.getLogger().warning(warning);
             }
         }
 

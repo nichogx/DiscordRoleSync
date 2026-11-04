@@ -42,10 +42,20 @@ Just copy the .jar to the plugins folder and run the server once to generate the
 6. Turn on "Server Members Intent" - it won't work without this as the bot needs to work with the member list
 7. Click copy token and paste it in the config file. Anyone with your token can log in as your bot, so you should keep it secret as if it were a password.
 8. Go back to the Discord developer website and on the left sidebar, click "OAuth2"
-9. Select "bot" as a scope then copy the link
+9. Select "bot" as a scope. If you use the linked role or nickname features, also select the permissions they need (see Bot Permissions below). Then copy the link
 10. Go to the link you just copied to add the bot to your server
 
 Don't forget to put all roles in the configs. You should put the role IDs, not the role names. To get the ID you should enable developer mode in Discord, then right-click the role and copy ID (it's a number of approximately 18 digits). The same thing applies for the server ID and channel IDs.
+
+### Bot Permissions
+The bot always needs the **Server Members Intent** (step 6 above). Without it, the bot can't see members and their roles, and nothing works.
+
+Syncing roles to Minecraft groups, the whitelist and all the Discord commands don't need any server permissions. The optional features below each need one:
+
+- **Give linked users a Discord role** (`giveLinkedRole`): needs **Manage Roles**. The bot's highest role must also be above the linked role in the server's role list.
+- **Rename linked users on Discord** (`discordRename.template`): needs **Manage Nicknames**. Discord never lets bots rename the server owner or members with a role higher than the bot's.
+
+The plugin shows a warning on startup if an enabled feature is missing its permission.
 
 ## How it Works
 It's pretty simple: all your users should use the `/link` command in Discord to link their Minecraft account:

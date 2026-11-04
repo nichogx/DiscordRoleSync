@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Warning on startup, and when the bot joins a new Discord server, if the bot is in servers other than the configured one. Only one server is supported
 
+### Changed
+- The bot no longer warns about a missing Manage Roles permission unless the linked role is enabled. It now also warns if Manage Nicknames is missing when nickname renaming is enabled, or if the linked role is above the bot's role
+
 ### Fixed
 - Leaving, joining or changing roles in another Discord server the bot is in no longer removes players from the whitelist or changes their groups
 - Server startup no longer hangs when Modrinth is slow or unreachable. The update check now runs in the background and gives up after 10 seconds
