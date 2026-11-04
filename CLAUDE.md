@@ -92,7 +92,11 @@ Issues are tracked on GitLab. Use the `glab` CLI (e.g. `glab issue create`).
 - Only create an issue when the user asks for one or confirms one should be created. Otherwise, suggest it and wait.
 - Every issue needs at least one label. Check the existing labels with `glab label list` and pick the ones that fit.
 - If no existing label fits, or a new one would fit better, don't create the label yourself. Suggest it to the user so they can create it.
-- These label rules are only for issues. Don't add labels to merge requests you open unless the user asks for them.
+
+## Merge Requests
+
+- Don't push new branches unless the user explicitly asks to create an MR.
+- The label rules above are only for issues. Don't add labels to merge requests you open unless the user asks for them.
 
 ## Publishing
 Tags publish automatically to the GitLab registry, Modrinth and Hangar. Spigot has no API and requires manual upload.
