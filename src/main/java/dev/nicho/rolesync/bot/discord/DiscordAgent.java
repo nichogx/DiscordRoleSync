@@ -126,8 +126,8 @@ public class DiscordAgent {
         }
 
         try {
-            // reset nickname
-            if (!plugin.getConfig().getString("discordRename.template").isEmpty()) {
+            // reset nickname. Discord doesn't let bots change the server owner's nickname
+            if (!plugin.getConfig().getString("discordRename.template").isEmpty() && !member.isOwner()) {
                 member.modifyNickname(null).queue(null,
                         error -> plugin.getLogger().warning("Error while changing user's nickname: " + error.getMessage())
                 );
@@ -149,7 +149,10 @@ public class DiscordAgent {
         try {
             List<String> excludedRoles = plugin.getConfig().getStringList("discordRename.excludedRoles");
             String renameTemplate = plugin.getConfig().getString("discordRename.template");
-            if (mcUser != null && !renameTemplate.isEmpty() && !hasRoleFromList(member, excludedRoles)) {
+            if (mcUser != null && !renameTemplate.isEmpty() && member.isOwner()) {
+                plugin.getLogger().info("Not changing the nickname of " + member.getEffectiveName()
+                        + ", Discord doesn't let bots change the server owner's nickname.");
+            } else if (mcUser != null && !renameTemplate.isEmpty() && !hasRoleFromList(member, excludedRoles)) {
                 String nick = renameTemplate
                         .replace("$discord_name$", member.getUser().getEffectiveName())
                         .replace("$minecraft_name$", mcUser);
