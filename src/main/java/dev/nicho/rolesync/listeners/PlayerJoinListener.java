@@ -73,18 +73,15 @@ public class PlayerJoinListener implements Listener {
 
             plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
                 // Server is running a release version. Check for updates and send if available.
-                PluginVersion v = new PluginVersion(this.plugin);
-                boolean isOldVersion;
                 String latestVersion;
                 try {
-                    isOldVersion = v.isOldRelease(installedVersion);
-                    latestVersion = v.getLatestVersion();
+                    latestVersion = plugin.getPluginVersion().getLatestVersion();
                 } catch (IOException e) {
                     plugin.getLogger().warning("Error while checking for latest version." + e.getMessage());
                     return;
                 }
 
-                if (isOldVersion) {
+                if (PluginVersion.isOldRelease(installedVersion, latestVersion)) {
                     String message = ChatColor.BLUE + this.chatPrefix + ChatColor.AQUA
                             + plugin.getLanguage().getString("notLatestVersion") + "\n" +
                             ChatColor.BLUE + this.chatPrefix + ChatColor.AQUA + plugin.getLanguage().getString("current") + " "

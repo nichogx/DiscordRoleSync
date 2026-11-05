@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.concurrent.TimeUnit;
+import java.util.function.LongSupplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,24 +19,28 @@ public class PluginVersion {
 
     private static final String MODRINTH_VERSIONS_URL = "https://api.modrinth.com/v2/project/discordrolesync/version";
     private static final int TIMEOUT_MILLIS = 10_000;
+    // How long a fetched latest version is reused before asking Modrinth again
+    private static final long CACHE_MILLIS = TimeUnit.HOURS.toMillis(6);
+    // How long to wait after a failed check before asking Modrinth again
+    private static final long RETRY_AFTER_FAILURE_MILLIS = TimeUnit.MINUTES.toMillis(10);
     // Modrinth wants a User-Agent that identifies the client: https://docs.modrinth.com/#section/User-Agents
     // Differs from the one in ci/common.py so plugin traffic can be told apart from CI traffic.
     private static final String USER_AGENT_FORMAT =
             "nichogx/DiscordRoleSync-plugin/%s (https://gitlab.com/nichogx/DiscordRoleSync)";
 
     private String latestVersion;
+    private long latestVersionFetchedAt;
+    // When the last check failed, or null if the last check succeeded
+    private Long lastFailureAt;
     private final RoleSync plugin;
     private final String userAgent;
     private final String versionsUrl;
     private final int timeoutMillis;
-
-    public PluginVersion() {
-        this(null);
-    }
+    private final LongSupplier clock;
 
     public PluginVersion(RoleSync plugin) {
-        this(plugin, plugin != null ? plugin.getDescription().getVersion() : "unknown",
-                MODRINTH_VERSIONS_URL, TIMEOUT_MILLIS);
+        this(plugin, plugin.getDescription().getVersion(),
+                MODRINTH_VERSIONS_URL, TIMEOUT_MILLIS, System::currentTimeMillis);
     }
 
     /**
@@ -44,34 +50,57 @@ public class PluginVersion {
      * @param installedVersion the installed plugin version, sent in the User-Agent
      * @param versionsUrl      the URL to fetch the list of versions from
      * @param timeoutMillis    the connect and read timeout, in milliseconds
+     * @param clock            the current time, in milliseconds
      */
     @TestOnly
-    PluginVersion(RoleSync plugin, String installedVersion, String versionsUrl, int timeoutMillis) {
+    PluginVersion(RoleSync plugin, String installedVersion, String versionsUrl, int timeoutMillis,
+                  LongSupplier clock) {
         this.plugin = plugin;
         this.userAgent = String.format(USER_AGENT_FORMAT, installedVersion);
         this.versionsUrl = versionsUrl;
         this.timeoutMillis = timeoutMillis;
+        this.clock = clock;
     }
 
-    public String getLatestVersion() throws IOException {
-        if (latestVersion == null) {
-            this.refreshLatestVersion();
+    /**
+     * Gets the latest version, fetching it from Modrinth if it was never fetched
+     * or was fetched more than 6 hours ago.
+     * <p>
+     * After a failed check, Modrinth isn't asked again for 10 minutes. Until then, and
+     * when a check fails, the last fetched version is returned if there is one.
+     *
+     * @return the latest version
+     * @throws IOException if no version was fetched yet and Modrinth can't be reached
+     */
+    public synchronized String getLatestVersion() throws IOException {
+        long now = clock.getAsLong();
+        boolean expired = latestVersion == null || now - latestVersionFetchedAt >= CACHE_MILLIS;
+        boolean waitingAfterFailure = lastFailureAt != null && now - lastFailureAt < RETRY_AFTER_FAILURE_MILLIS;
+
+        if (expired && waitingAfterFailure && latestVersion == null) {
+            throw new IOException("The last check failed, trying again in a few minutes.");
+        }
+
+        if (expired && !waitingAfterFailure) {
+            try {
+                this.refreshLatestVersion();
+                lastFailureAt = null;
+            } catch (IOException e) {
+                lastFailureAt = clock.getAsLong();
+                if (latestVersion == null) {
+                    throw e;
+                }
+
+                if (plugin != null) {
+                    plugin.debugLog("couldn't refresh latest version, using %s: %s", latestVersion, e.getMessage());
+                }
+            }
         }
 
         if (plugin != null) {
             plugin.debugLog("getLatestVersion: %s", latestVersion);
         }
         return latestVersion;
-    }
-
-    /**
-     * Sets the latest version. Used only for tests.
-     *
-     * @param version The version to set as latest.
-     */
-    @TestOnly
-    protected void setLatestVersion(String version) {
-        this.latestVersion = version;
     }
 
     /**
@@ -83,7 +112,7 @@ public class PluginVersion {
             value = "URLCONNECTION_SSRF_FD",
             justification = "The URL is the hardcoded Modrinth URL, and only tests can change it"
     )
-    public void refreshLatestVersion() throws IOException {
+    public synchronized void refreshLatestVersion() throws IOException {
         URL reqUrl = new URL(versionsUrl);
 
         HttpURLConnection c = (HttpURLConnection) reqUrl.openConnection();
@@ -92,15 +121,21 @@ public class PluginVersion {
         // Without timeouts, a slow or unreachable Modrinth would hang the check until the OS gives up
         c.setConnectTimeout(timeoutMillis);
         c.setReadTimeout(timeoutMillis);
-        c.connect();
+        try {
+            c.connect();
 
-        if (c.getResponseCode() != 200) {
-            throw new IOException("Error getting latest version from Modrinth.");
-        }
+            if (c.getResponseCode() != 200) {
+                throw new IOException("Error getting latest version from Modrinth.");
+            }
 
-        try (InputStream response = c.getInputStream()) {
-            this.latestVersion = parseLatestVersion(response);
+            try (InputStream response = c.getInputStream()) {
+                this.latestVersion = parseLatestVersion(response);
+            }
+        } finally {
+            // Checks are hours apart, so close the connection instead of keeping it open for reuse
+            c.disconnect();
         }
+        this.latestVersionFetchedAt = clock.getAsLong();
 
         if (plugin != null) {
             plugin.debugLog("refreshed latest version: %s", this.latestVersion);
@@ -155,11 +190,11 @@ public class PluginVersion {
     /**
      * Compares the passed version to the latest release.
      *
-     * @param version the version to compare
+     * @param version       the version to compare
+     * @param latestVersion the latest version, from {@link #getLatestVersion()}
      * @return true if the latest release is a clean release, later than the installed one. False otherwise.
-     * @throws IOException in case we can't get the latest version
      */
-    public boolean isOldRelease(String version) throws IOException {
+    public static boolean isOldRelease(String version, String latestVersion) {
         SemanticVersion current;
         try {
             current = parseSemanticVersion(version);
@@ -171,14 +206,13 @@ public class PluginVersion {
 
         SemanticVersion latest;
         try {
-            String latestRaw = getLatestVersion();
-            if (getVersionType(latestRaw) != VersionType.RELEASE) {
+            if (getVersionType(latestVersion) != VersionType.RELEASE) {
                 // If the latest one is not a clean release, don't prompt the user
                 // to update.
                 return false;
             }
 
-            latest = parseSemanticVersion(latestRaw);
+            latest = parseSemanticVersion(latestVersion);
         } catch (IllegalArgumentException e) {
             // Shouldn't happen, but if anything is wrong with the latest release, don't
             // prompt the user to update.

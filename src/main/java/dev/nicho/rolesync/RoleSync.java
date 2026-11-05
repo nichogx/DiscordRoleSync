@@ -55,6 +55,7 @@ public class RoleSync extends JavaPlugin {
     private DatabaseHandler db = null;
     private SyncBot bot = null;
     private VaultAPI vault = null;
+    private PluginVersion pluginVersion = null;
 
     private String chatPrefix = null;
 
@@ -205,6 +206,8 @@ public class RoleSync extends JavaPlugin {
                         + "Turn it off with /whitelist off or white-list=false in server.properties.");
             }
         }
+        // Shared so the startup and join checks reuse the latest version instead of each asking Modrinth
+        pluginVersion = new PluginVersion(this);
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(this), this);
 
         // bstats metrics
@@ -334,8 +337,7 @@ public class RoleSync extends JavaPlugin {
      */
     private void checkLatestVersion() throws IOException {
         String installedVersion = getDescription().getVersion();
-        PluginVersion v = new PluginVersion(this);
-        String latestVersion = v.getLatestVersion();
+        String latestVersion = pluginVersion.getLatestVersion();
 
         PluginVersion.VersionType versionType = PluginVersion.getVersionType(installedVersion);
         if (versionType != PluginVersion.VersionType.RELEASE) {
@@ -345,7 +347,7 @@ public class RoleSync extends JavaPlugin {
         }
 
         // Server is running a release version. Check for updates and send if available.
-        if (v.isOldRelease(installedVersion)) {
+        if (PluginVersion.isOldRelease(installedVersion, latestVersion)) {
             getLogger().warning(String.format(
                     "%s %s %s, %s %s",
                     language.getString("notLatestVersion"),
@@ -627,6 +629,10 @@ public class RoleSync extends JavaPlugin {
 
     public VaultAPI getVault() {
         return vault;
+    }
+
+    public PluginVersion getPluginVersion() {
+        return pluginVersion;
     }
 
     public SyncBot getBot() {

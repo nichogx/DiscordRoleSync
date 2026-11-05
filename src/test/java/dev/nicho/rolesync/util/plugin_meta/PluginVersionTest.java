@@ -13,6 +13,8 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -99,10 +101,8 @@ class PluginVersionTest {
         return PluginVersion.parseLatestVersion(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)));
     }
 
-    private boolean isOldReleaseWrapper(String currentVersion, String latestVersion) throws IOException {
-        PluginVersion v = new PluginVersion();
-        v.setLatestVersion(latestVersion);
-        return v.isOldRelease(currentVersion);
+    private boolean isOldReleaseWrapper(String currentVersion, String latestVersion) {
+        return PluginVersion.isOldRelease(currentVersion, latestVersion);
     }
 
     @Test
@@ -120,7 +120,7 @@ class PluginVersionTest {
             acceptor.start();
 
             PluginVersion v = new PluginVersion(null, "2.4.0",
-                    "http://127.0.0.1:" + server.getLocalPort() + "/version", 500);
+                    "http://127.0.0.1:" + server.getLocalPort() + "/version", 500, System::currentTimeMillis);
 
             assertTimeoutPreemptively(Duration.ofSeconds(5), () ->
                     assertThrows(SocketTimeoutException.class, v::refreshLatestVersion));
@@ -145,12 +145,105 @@ class PluginVersionTest {
 
         try {
             PluginVersion v = new PluginVersion(null, "2.3.3",
-                    "http://127.0.0.1:" + server.getAddress().getPort() + "/version", 5_000);
+                    "http://127.0.0.1:" + server.getAddress().getPort() + "/version", 5_000, System::currentTimeMillis);
             v.refreshLatestVersion();
 
             assertEquals("nichogx/DiscordRoleSync-plugin/2.3.3 (https://gitlab.com/nichogx/DiscordRoleSync)",
                     receivedUserAgent.get());
             assertEquals("2.4.0", v.getLatestVersion());
+        } finally {
+            server.stop(0);
+        }
+    }
+
+    @Test
+    void testGetLatestVersionReusesFetchedVersionForSixHours() throws IOException {
+        AtomicInteger requests = new AtomicInteger();
+        AtomicReference<String> served = new AtomicReference<>("2.4.0");
+        HttpServer server = HttpServer.create(new InetSocketAddress(InetAddress.getLoopbackAddress(), 0), 0);
+        server.createContext("/version", exchange -> {
+            requests.incrementAndGet();
+            byte[] body = ("[{\"version_number\":\"" + served.get() + "\"}]").getBytes(StandardCharsets.UTF_8);
+            exchange.sendResponseHeaders(200, body.length);
+            try (OutputStream os = exchange.getResponseBody()) {
+                os.write(body);
+            }
+        });
+        server.start();
+
+        try {
+            AtomicLong now = new AtomicLong(1_000_000L);
+            PluginVersion v = new PluginVersion(null, "2.3.3",
+                    "http://127.0.0.1:" + server.getAddress().getPort() + "/version", 5_000, now::get);
+
+            assertEquals("2.4.0", v.getLatestVersion());
+            served.set("2.5.0");
+
+            // Like several admins joining within 6 hours: no new requests
+            now.addAndGet(Duration.ofHours(6).toMillis() - 1);
+            assertEquals("2.4.0", v.getLatestVersion());
+            assertEquals("2.4.0", v.getLatestVersion());
+            assertEquals(1, requests.get());
+
+            // After 6 hours the next check asks Modrinth again and sees the new release
+            now.incrementAndGet();
+            assertEquals("2.5.0", v.getLatestVersion());
+            assertEquals(2, requests.get());
+        } finally {
+            server.stop(0);
+        }
+    }
+
+    @Test
+    void testGetLatestVersionWaitsTenMinutesAfterFailedCheck() throws IOException {
+        AtomicInteger requests = new AtomicInteger();
+        AtomicInteger status = new AtomicInteger(500);
+        AtomicReference<String> served = new AtomicReference<>("2.4.0");
+        HttpServer server = HttpServer.create(new InetSocketAddress(InetAddress.getLoopbackAddress(), 0), 0);
+        server.createContext("/version", exchange -> {
+            requests.incrementAndGet();
+            byte[] body = ("[{\"version_number\":\"" + served.get() + "\"}]").getBytes(StandardCharsets.UTF_8);
+            exchange.sendResponseHeaders(status.get(), body.length);
+            try (OutputStream os = exchange.getResponseBody()) {
+                os.write(body);
+            }
+        });
+        server.start();
+
+        try {
+            AtomicLong now = new AtomicLong(1_000_000L);
+            PluginVersion v = new PluginVersion(null, "2.3.3",
+                    "http://127.0.0.1:" + server.getAddress().getPort() + "/version", 5_000, now::get);
+
+            // Modrinth is down and nothing was fetched yet: the check fails
+            assertThrows(IOException.class, v::getLatestVersion);
+            assertEquals(1, requests.get());
+
+            // Like several admins joining during the outage: no new requests for 10 minutes
+            now.addAndGet(Duration.ofMinutes(10).toMillis() - 1);
+            assertThrows(IOException.class, v::getLatestVersion);
+            assertThrows(IOException.class, v::getLatestVersion);
+            assertEquals(1, requests.get());
+
+            // After 10 minutes Modrinth is back and the next check fetches the version
+            status.set(200);
+            now.incrementAndGet();
+            assertEquals("2.4.0", v.getLatestVersion());
+            assertEquals(2, requests.get());
+
+            // After 6 hours Modrinth is down again: the last fetched version is still used
+            served.set("2.5.0");
+            status.set(500);
+            now.addAndGet(Duration.ofHours(6).toMillis());
+            assertEquals("2.4.0", v.getLatestVersion());
+            assertEquals("2.4.0", v.getLatestVersion());
+            assertEquals(3, requests.get());
+
+            // 10 minutes after that failure, Modrinth is back and the new release is fetched
+            status.set(200);
+            now.addAndGet(Duration.ofMinutes(10).toMillis());
+            assertEquals("2.5.0", v.getLatestVersion());
+            assertEquals(4, requests.get());
         } finally {
             server.stop(0);
         }
