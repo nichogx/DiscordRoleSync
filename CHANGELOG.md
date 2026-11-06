@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Warning on startup, and when the bot joins a new Discord server, if the bot is in servers other than the configured one. Only one server is supported
+- The bot token and MySQL password can be set with the `DRS_BOT_TOKEN` and `DRS_DB_PASSWORD` environment variables instead of `config.yml`
 
 ### Changed
 - The bot no longer warns about a missing Manage Roles permission unless the linked role is enabled. It now also warns if Manage Nicknames is missing when nickname renaming is enabled, or if the linked role is above the bot's role

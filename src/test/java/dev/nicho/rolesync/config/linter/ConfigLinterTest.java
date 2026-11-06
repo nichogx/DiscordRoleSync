@@ -39,6 +39,31 @@ class ConfigLinterTest {
     }
 
     @Test
+    void testEmptyTokenPassesWhenEnvironmentVariableIsSet() {
+        ConfigLinter linter = new ConfigLinter(null,
+                name -> name.equals("DRS_BOT_TOKEN") ? "token from env" : null);
+        Configuration testConfig = newBasicValidConfig();
+
+        testConfig.set("bot.token", "");
+        assertEmpty(linter.run(testConfig));
+
+        testConfig.set("bot.token", null);
+        assertEmpty(linter.run(testConfig));
+    }
+
+    @Test
+    void testEmptyTokenFailsWhenEnvironmentVariableIsEmpty() {
+        ConfigLinter linter = new ConfigLinter(null,
+                name -> name.equals("DRS_BOT_TOKEN") ? "" : null);
+        Configuration testConfig = newBasicValidConfig();
+
+        testConfig.set("bot.token", "");
+        LintResult result = linter.run(testConfig);
+        assertEquals(1, result.asMap().size());
+        assertContainsError(result, "Validate bot essential config", "Invalid or empty token set in 'bot.token' (or the DRS_BOT_TOKEN environment variable)");
+    }
+
+    @Test
     void testValidateBotEssentialConfig() {
         ConfigLinter linter = new ConfigLinter();
         Configuration testConfig = newBasicValidConfig();
@@ -46,12 +71,12 @@ class ConfigLinterTest {
         testConfig.set("bot.token", null);
         LintResult result = linter.run(testConfig);
         assertEquals(1, result.asMap().size());
-        assertContainsError(result, "Validate bot essential config", "Invalid or empty token set in 'bot.token'");
+        assertContainsError(result, "Validate bot essential config", "Invalid or empty token set in 'bot.token' (or the DRS_BOT_TOKEN environment variable)");
 
         testConfig.set("bot.token", "");
         result = linter.run(testConfig);
         assertEquals(1, result.asMap().size());
-        assertContainsError(result, "Validate bot essential config", "Invalid or empty token set in 'bot.token'");
+        assertContainsError(result, "Validate bot essential config", "Invalid or empty token set in 'bot.token' (or the DRS_BOT_TOKEN environment variable)");
 
 
         testConfig = newBasicValidConfig();

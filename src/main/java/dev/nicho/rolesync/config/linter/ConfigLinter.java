@@ -1,6 +1,7 @@
 package dev.nicho.rolesync.config.linter;
 
 import dev.nicho.rolesync.RoleSync;
+import dev.nicho.rolesync.config.ConfigSecrets;
 import dev.nicho.rolesync.minecraft.UUIDMode;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
@@ -8,6 +9,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.UnaryOperator;
 
 public class ConfigLinter {
 
@@ -20,6 +22,7 @@ public class ConfigLinter {
     /** Valid language names. Must be safe to use as a file name. */
     private static final String languageRegex = "^[A-Za-z0-9_-]+$";
     private final RoleSync plugin;
+    private UnaryOperator<String> env;
 
     /**
      * Creates a config linter linked to the plugin.
@@ -27,15 +30,27 @@ public class ConfigLinter {
      * @param plugin a reference to the plugin
      */
     public ConfigLinter(RoleSync plugin) {
-        this.plugin = plugin;
+        this(plugin, System::getenv);
     }
 
     /**
-     * Creates a config linter without linking to the plugin.
-     * Intended for CI, some features such as warn logging are not available.
+     * Creates a config linter without linking to the plugin, for tests.
+     * Some features such as warn logging are not available. Environment
+     * variables are ignored, so tests don't depend on the developer's shell.
      */
-    public ConfigLinter() {
-        this(null);
+    ConfigLinter() {
+        this(null, name -> null);
+    }
+
+    /**
+     * Creates a config linter with a custom environment variable lookup, for tests.
+     *
+     * @param plugin a reference to the plugin, or null
+     * @param env    returns the value of an environment variable, or null if it isn't set
+     */
+    ConfigLinter(RoleSync plugin, UnaryOperator<String> env) {
+        this.plugin = plugin;
+        this.env = env;
     }
 
     /**
@@ -67,9 +82,9 @@ public class ConfigLinter {
                     c -> {
                         List<String> result = new ArrayList<>();
 
-                        String token = c.getString("bot.token");
+                        String token = new ConfigSecrets(c, env).getBotToken();
                         if (token == null || token.isEmpty()) {
-                            result.add("Invalid or empty token set in 'bot.token'");
+                            result.add("Invalid or empty token set in 'bot.token' (or the DRS_BOT_TOKEN environment variable)");
                         }
 
                         String serverId = c.getString("bot.server");

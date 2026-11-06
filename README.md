@@ -40,7 +40,7 @@ Just copy the .jar to the plugins folder and run the server once to generate the
 4. Click "add bot" and confirm
 5. In this page, you can change your bot's picture and username.
 6. Turn on "Server Members Intent" - it won't work without this as the bot needs to work with the member list
-7. Click copy token and paste it in the config file. Anyone with your token can log in as your bot, so you should keep it secret as if it were a password.
+7. Click copy token and paste it in the config file. Anyone with your token can log in as your bot, so you should keep it secret as if it were a password. You can also leave it out of the config and set the `DRS_BOT_TOKEN` environment variable instead (and `DRS_DB_PASSWORD` for the MySQL password).
 8. Go back to the Discord developer website and on the left sidebar, click "OAuth2"
 9. Select "bot" as a scope. If you use the linked role or nickname features, also select the permissions they need (see Bot Permissions below). Then copy the link
 10. Go to the link you just copied to add the bot to your server

@@ -1,6 +1,7 @@
 package dev.nicho.rolesync;
 
 import dev.nicho.rolesync.bot.SyncBot;
+import dev.nicho.rolesync.config.ConfigSecrets;
 import dev.nicho.rolesync.config.linter.ConfigLinter;
 import dev.nicho.rolesync.config.linter.LintResult;
 import dev.nicho.rolesync.config.migrations.ConfigMigration;
@@ -169,7 +170,7 @@ public class RoleSync extends JavaPlugin {
                         getConfig().getInt("database.mysql.dbport"),
                         getConfig().getString("database.mysql.dbname"),
                         getConfig().getString("database.mysql.dbuser"),
-                        getConfig().getString("database.mysql.dbpass"));
+                        new ConfigSecrets(getConfig()).getDbPassword());
             } else {
                 this.db = new SQLiteHandler(this, new File(getDataFolder(), "database.db"));
             }
@@ -611,7 +612,7 @@ public class RoleSync extends JavaPlugin {
             try {
                 this.bot.start();
             } catch (InvalidTokenException | IllegalArgumentException e) {
-                getLogger().log(Level.SEVERE, "Error logging in. Did you set your token in config.yml?", e);
+                getLogger().log(Level.SEVERE, "Error logging in. Did you set your token in config.yml or the DRS_BOT_TOKEN environment variable?", e);
 
                 // Switch back to main thread to disable ourselves
                 this.getServer().getScheduler().runTask(this, () -> this.setEnabled(false));

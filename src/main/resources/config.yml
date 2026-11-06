@@ -23,6 +23,8 @@ commandNames:
 
 bot:
   # Token -- you should keep this a secret. Get one from the Discord developer portal.
+  # You can also set it with the DRS_BOT_TOKEN environment variable, which
+  # overrides this value. Then this can be left empty.
   token: ""
 
   # Server where the bot will look for roles
@@ -44,6 +46,8 @@ database:
     dbport: 3306
     dbname: ""
     dbuser: ""
+    # You can also set the password with the DRS_DB_PASSWORD environment
+    # variable, which overrides this value. Then this can be left empty.
     dbpass: ""
 
     # WARNING: connecting to databases with SSL disabled is extremely unsafe!

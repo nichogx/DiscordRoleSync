@@ -5,6 +5,7 @@ import dev.nicho.rolesync.bot.discord.BotPermissionChecker;
 import dev.nicho.rolesync.bot.discord.DiscordAgent;
 import dev.nicho.rolesync.bot.listeners.MemberEventsListener;
 import dev.nicho.rolesync.bot.listeners.SlashCommandListener;
+import dev.nicho.rolesync.config.ConfigSecrets;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -52,7 +53,7 @@ public class SyncBot extends ListenerAdapter {
     public void start() throws InvalidTokenException, IllegalStateException {
         plugin.getLogger().info("Initializing bot");
         JDABuilder builder = JDABuilder
-                .create(plugin.getConfig().getString("bot.token"),
+                .create(new ConfigSecrets(plugin.getConfig()).getBotToken(),
                         GatewayIntent.GUILD_MEMBERS,
                         GatewayIntent.GUILD_MODERATION)
                 .disableCache(
