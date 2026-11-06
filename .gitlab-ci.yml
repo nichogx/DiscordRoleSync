@@ -54,7 +54,7 @@ changelog-linter:
 python-linter:
   stage: lint
 
-  image: ghcr.io/astral-sh/ruff:0.17.3-alpine
+  image: ghcr.io/astral-sh/ruff:0.17.4-alpine
   script:
     # Report for the MR widget, then fail the job with readable output if there are errors
     - ruff check --exit-zero --output-format=gitlab --output-file=gl-code-quality-report.json
